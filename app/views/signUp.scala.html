@@ -1,0 +1,29 @@
+@(signInForm: Form[forms.SignUpForm.Data])(implicit request: RequestHeader)
+
+@import bootstrap._
+
+@main("Silhouette - Sign Up") {
+    @request.flash.get("error").map { msg =>
+        <div class="col-md-6 col-md-offset-3 alert alert-danger alert-error">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Error!</strong> @msg
+        </div>
+    }
+    <fieldset>
+        <legend class="col-md-6 col-md-offset-3">Sign up for a new account</legend>
+        @helper.form(action = routes.SignUpController.signUp()) {
+            @text(signInForm("firstName"), "First name")
+            @text(signInForm("lastName"), "Last name")
+            @text(signInForm("email"), "Email")
+            @password(signInForm("password"), "Password")
+            <div class="form-group">
+                <div class="col-md-6 col-md-offset-3">
+                    <button id="submit" type="submit" value="submit" class="btn btn-primary btn-block">Submit</button>
+                </div>
+            </div>
+            <div class="sign-in-now col-md-6 col-md-offset-3">
+                <p>Already a member? <a href="@routes.ApplicationController.signIn">Sign in now</a></p>
+            </div>
+        }
+    </fieldset>
+}

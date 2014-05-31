@@ -1,0 +1,19 @@
+body {
+    padding-top: 50px;
+}
+h1 {
+    text-align: center;
+    font-size: 30px;
+}
+.starter-template {
+    padding: 40px 15px;
+}
+
+fieldset {
+    margin-top: 100px;
+    text-align: center;
+}
+.social-providers,
+.sign-in-now {
+    margin-top: 20px;
+}

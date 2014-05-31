@@ -1,0 +1,37 @@
+@(signInForm: Form[com.mohiva.play.silhouette.core.providers.Credentials])(implicit env: com.mohiva.play.silhouette.core.Environment[User, _], request: RequestHeader)
+
+@import com.mohiva.play.silhouette.core.providers._
+@import bootstrap._
+
+@main("Silhouette - Sign In") {
+    @request.flash.get("error").map { msg =>
+        <div class="col-md-6 col-md-offset-3 alert alert-danger alert-error">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Error!</strong> @msg
+        </div>
+    }
+    <fieldset>
+        <legend class="col-md-6 col-md-offset-3">Sign in with your credentials</legend>
+        @helper.form(action = routes.CredentialsAuthController.authenticate()) {
+            @text(signInForm("identifier"), "Email")
+            @password(signInForm("password"), "Password")
+            <div class="form-group">
+                <div class="col-md-6 col-md-offset-3">
+                    <button id="submit" type="submit" value="submit" class="btn btn-primary btn-block">Submit</button>
+                </div>
+            </div>
+        }
+        @defining(env.providers.values.filter(_.isInstanceOf[SocialProvider[_]])) { providers =>
+            @if(!providers.isEmpty) {
+                <div class="social-providers col-md-6 col-md-offset-3">
+                    <p>Or use your existing account on one of the following services to sign in:</p>
+                    <div>
+                    @for(p <- providers) {
+                        <a href="@routes.SocialAuthController.authenticate(p.id)"><img src="@routes.Assets.at(s"images/providers/${p.id}.png")" style="width:60px;height:60px;"></a>
+                    }
+                    </div>
+                </div>
+            }
+        }
+    </fieldset>
+}
