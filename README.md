@@ -3,6 +3,10 @@ Silhouette Seed Template
 
 The Silhouette Seed Template is an Activator template which shows how [Silhouette](https://github.com/mohiva/play-silhouette) can be implemented in a Play Framework application. It's an starting point which can be extended to fit your needs.
 
+## Example
+
+You can find a running example of this template under the following URL: http://play-silhouette-seed.mohiva.cloudbees.net/
+
 ## Features
 
 * Sign Up
@@ -17,7 +21,7 @@ Consulate the [Silhouette wiki](https://github.com/mohiva/play-silhouette/wiki) 
 
 ## Activator
 
-* See https://typesafe.com/activator/template/play-silhouette-seed
+See https://typesafe.com/activator/template/play-silhouette-seed
 
 # License
 
