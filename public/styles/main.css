@@ -17,3 +17,10 @@ fieldset {
 .sign-in-now {
     margin-top: 20px;
 }
+
+.user {
+    margin-top: 50px;
+}
+.user .data {
+    margin-top: 10px;
+}
