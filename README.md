@@ -18,7 +18,7 @@ You can find a running example of this template under the following URL: http://
 
 ## Documentation
 
-Consulate the [Silhouette wiki](https://github.com/mohiva/play-silhouette/wiki) for more information.
+Consulate the [Silhouette wiki](https://github.com/mohiva/play-silhouette/wiki) for more information. If you need help with the integration of Silhouette into your project, don't hesitate and ask questions in our [mailing list](https://groups.google.com/forum/#!forum/play-silhouette) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/playframework).
 
 ## Activator
 
