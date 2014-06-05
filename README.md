@@ -1,7 +1,7 @@
 Silhouette Seed Template
 =====================================
 
-The Silhouette Seed Template is an Activator template which shows how [Silhouette](https://github.com/mohiva/play-silhouette) can be implemented in a Play Framework application. It's a starting point which can be extended to fit your needs.
+The Silhouette Seed project is an Activator template which shows how [Silhouette](https://github.com/mohiva/play-silhouette) can be implemented in a Play Framework application. It's a starting point which can be extended to fit your needs.
 
 ## Example
 
@@ -11,9 +11,10 @@ You can find a running example of this template under the following URL: http://
 
 * Sign Up
 * Sign In (Credentials)
-* Social Auth
+* Social Auth (Facebook, Google+, Twitter)
 * Dependency Injection with Guice
 * Publishing Events
+* Avatar service
 
 ## Documentation
 
