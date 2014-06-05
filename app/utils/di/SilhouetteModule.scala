@@ -111,6 +111,15 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   }
 
   /**
+   * Provides the avatar service.
+   *
+   * @param httpLayer The HTTP layer implementation.
+   * @return The avatar service implementation.
+   */
+  @Provides
+  def provideAvatarService(httpLayer: HTTPLayer): AvatarService = new GravatarService(httpLayer)
+
+  /**
    * Provides the credentials provider.
    *
    * @param authInfoService The auth info service implemenetation.
