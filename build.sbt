@@ -2,12 +2,12 @@ import play.Project._
 
 name := "play-silhouette-seed"
 
-version := "1.0-SNAPSHOT"
+version := "0.9"
 
 resolvers += "Sonatype Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
 
 libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % "1.0-SNAPSHOT",
+  "com.mohiva" %% "play-silhouette" % "0.9",
   "org.webjars" %% "webjars-play" % "2.2.1-2",
   "org.webjars" % "bootstrap" % "3.1.1",
   "org.webjars" % "jquery" % "1.11.0",
