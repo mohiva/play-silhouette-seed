@@ -3,7 +3,7 @@ package app
 import play.api.i18n.{Messages, Lang}
 import play.api.mvc.Results._
 import play.api.GlobalSettings
-import play.api.mvc.{SimpleResult, RequestHeader}
+import play.api.mvc.{Result, RequestHeader}
 import com.mohiva.play.silhouette.core.{Logger, SecuredSettings}
 import utils.di.SilhouetteModule
 import scala.concurrent.Future
@@ -39,7 +39,7 @@ object Global extends GlobalSettings with SecuredSettings with Logger {
    * @param lang The currently selected language.
    * @return The result to send to the client.
    */
-  override def onNotAuthenticated(request: RequestHeader, lang: Lang): Option[Future[SimpleResult]] = {
+  override def onNotAuthenticated(request: RequestHeader, lang: Lang): Option[Future[Result]] = {
     Some(Future.successful(Redirect(routes.ApplicationController.signIn)))
   }
 
@@ -52,7 +52,7 @@ object Global extends GlobalSettings with SecuredSettings with Logger {
    * @param lang The currently selected language.
    * @return The result to send to the client.
    */
-  override def onNotAuthorized(request: RequestHeader, lang: Lang): Option[Future[SimpleResult]] = {
+  override def onNotAuthorized(request: RequestHeader, lang: Lang): Option[Future[Result]] = {
     Some(Future.successful(Redirect(routes.ApplicationController.signIn).flashing("error" -> Messages("access.denied"))))
   }
 }
