@@ -5,6 +5,7 @@ import com.mohiva.play.silhouette.core.LoginInfo
 import scala.slick.driver.MySQLDriver.simple._
 import scala.concurrent.Future
 import java.util.UUID
+import play.Logger
 
 /**
  * Give access to the user object using Slick
@@ -49,6 +50,14 @@ class UserDAOSlick extends UserDAO {
   val slickLoginInfos = TableQuery[LoginInfos]
 
   val db = Database.forConfig("db.default")
+  
+  try {
+    db withSession (implicit session =>
+      (slickUsers.ddl ++ slickLoginInfos.ddl).create
+    )
+  } catch {
+    case _ => Logger.debug("Could not create schema. Maybe it already exists?")
+  }
   
   /**
    * Finds a user by its login info.
