@@ -2,6 +2,7 @@ package utils.di
 
 import play.api.Play
 import play.api.Play.current
+import play.Logger
 import com.google.inject.{ Provides, AbstractModule }
 import net.codingwell.scalaguice.ScalaModule
 import com.mohiva.play.silhouette.core.{EventBus, Environment}
@@ -27,7 +28,14 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    */
   def configure() {
     bind[UserService].to[UserServiceImpl]
-    bind[UserDAO].to[UserDAOImpl]
+    val useSlick = Play.configuration.getBoolean("silhouette.seed.db.useSlick").getOrElse(false)
+    if (useSlick) {
+      Logger.debug("Binding to Slick DAO implementation.")
+      bind[UserDAO].to[UserDAOSlick]
+    } else {
+      Logger.debug("Binding to In-Memory DAO implementation.")
+      bind[UserDAO].to[UserDAOImpl]
+    }
     bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAO]
     bind[DelegableAuthInfoDAO[OAuth1Info]].to[OAuth1InfoDAO]
     bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDAO]

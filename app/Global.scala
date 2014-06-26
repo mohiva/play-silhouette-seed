@@ -4,10 +4,11 @@ import play.api.i18n.{Messages, Lang}
 import play.api.mvc.Results._
 import play.api.GlobalSettings
 import play.api.mvc.{Result, RequestHeader}
+import play.api.Play
 import com.mohiva.play.silhouette.core.{Logger, SecuredSettings}
 import utils.di.SilhouetteModule
 import scala.concurrent.Future
-import com.google.inject.Guice
+import com.google.inject.{Guice, Injector}
 import controllers.routes
 
 /**
@@ -18,7 +19,13 @@ object Global extends GlobalSettings with SecuredSettings with Logger {
   /**
    * The Guice dependencies injector.
    */
-  val injector = Guice.createInjector(new SilhouetteModule)
+  var injector: Injector = _
+  
+  override def onStart(app: play.api.Application) = {
+    super.onStart(app);
+    // Now the configuration is read and we can create our Injector.
+    injector = Guice.createInjector(new SilhouetteModule())
+  }
 
   /**
    * Loads the controller classes with the Guice injector,
