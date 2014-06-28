@@ -2,6 +2,7 @@ package models.daos.slick
 
 import scala.slick.driver.MySQLDriver.simple._
 import play.Logger
+import scala.slick.jdbc.meta.MTable
 
 object DBTableDefinitions {
 
@@ -70,15 +71,14 @@ object DBTableDefinitions {
   
   val db = Database.forConfig("db.default")
   
-  /*
-  def createTable[E <: scala.slick.lifted.AbstractTable[_]](table: TableQuery[E]) {
+  def createTable(table: TableQuery[_ <: Table[_]]) {
     db withSession { implicit session => 
       try {
         Logger.debug("Attempting to create table $table ...")
-        (table.ddl).create
+        table.ddl.create
         Logger.debug("... done.")
       } catch {
-        case _ => Logger.debug("Could not create schema for $table. Maybe it already exists?")
+        case _ => Logger.debug("Could not create schema for table `" + table.baseTableRow.tableName + "`. Maybe it already exists?")
       }
     }
   }
@@ -87,41 +87,4 @@ object DBTableDefinitions {
   createTable(slickLoginInfos)
   createTable(slickUserLoginInfos)
   createTable(slickPasswordInfos)
-  */
-  try {
-    db withSession { implicit session =>
-      Logger.debug("Attempting to create database table users...")
-      (slickUsers.ddl).create
-      Logger.debug("... done.")
-    }
-  } catch {
-    case _: Throwable => Logger.debug("Could not create schema. Maybe it already exists?")
-  }
-  try {
-	  db withSession { implicit session =>
-	  Logger.debug("Attempting to create database table slickLoginInfos...")
-	  (slickLoginInfos.ddl).create
-	  Logger.debug("... done.")
-	  }
-  } catch {
-    case _: Throwable => Logger.debug("Could not create schema. Maybe it already exists?")
-  }
-  try {
-	  db withSession { implicit session =>
-	  Logger.debug("Attempting to create database table slickUserLoginInfos...")
-	  (slickUserLoginInfos.ddl).create
-	  Logger.debug("... done.")
-	  }
-  } catch {
-    case _: Throwable => Logger.debug("Could not create schema. Maybe it already exists?")
-  }
-  try {
-	  db withSession { implicit session =>
-	  Logger.debug("Attempting to create database table slickPasswordInfos...")
-	  (slickPasswordInfos.ddl).create
-	  Logger.debug("... done.")
-	  }
-  } catch {
-  case _: Throwable => Logger.debug("Could not create schema. Maybe it already exists?")
-  }
 }
