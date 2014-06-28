@@ -30,13 +30,14 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[UserService].to[UserServiceImpl]
     val useSlick = Play.configuration.getBoolean("silhouette.seed.db.useSlick").getOrElse(false)
     if (useSlick) {
-      Logger.debug("Binding to Slick DAO implementation.")
+      Logger.debug("Binding to Slick DAO implementations.")
       bind[UserDAO].to[UserDAOSlick]
+      bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAOSlick]
     } else {
-      Logger.debug("Binding to In-Memory DAO implementation.")
+      Logger.debug("Binding to In-Memory DAO implementations.")
       bind[UserDAO].to[UserDAOImpl]
+      bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAO]
     }
-    bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAO]
     bind[DelegableAuthInfoDAO[OAuth1Info]].to[OAuth1InfoDAO]
     bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDAO]
     bind[CacheLayer].to[PlayCacheLayer]
