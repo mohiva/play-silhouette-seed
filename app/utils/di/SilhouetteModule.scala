@@ -34,12 +34,13 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       Logger.debug("Binding to Slick DAO implementations.")
       bind[UserDAO].to[UserDAOSlick]
       bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAOSlick]
+      bind[DelegableAuthInfoDAO[OAuth1Info]].to[OAuth1InfoDAOSlick]
     } else {
       Logger.debug("Binding to In-Memory DAO implementations.")
       bind[UserDAO].to[UserDAOImpl]
       bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAO]
+      bind[DelegableAuthInfoDAO[OAuth1Info]].to[OAuth1InfoDAO]
     }
-    bind[DelegableAuthInfoDAO[OAuth1Info]].to[OAuth1InfoDAO]
     bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDAO]
     bind[CacheLayer].to[PlayCacheLayer]
     bind[HTTPLayer].to[PlayHTTPLayer]

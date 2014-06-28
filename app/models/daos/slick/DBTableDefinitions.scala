@@ -64,10 +64,26 @@ object DBTableDefinitions {
     def * = (hasher, password, salt, loginInfoId) <> (DBPasswordInfo.tupled, DBPasswordInfo.unapply _)
   }
   
+  case class DBOAuth1Info (
+    id: Option[Long],
+    token: String,
+    secret: String,
+    loginInfoId: Long
+  )
+  
+  class OAuth1Infos(tag: Tag) extends Table[DBOAuth1Info](tag, "oauth1info") {
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def token = column[String]("token")
+    def secret = column[String]("secret")
+    def loginInfoId = column[Long]("loginInfoId")
+    def * = (id.?, token, secret, loginInfoId) <> (DBOAuth1Info.tupled, DBOAuth1Info.unapply _)
+  }
+  
   val slickUsers = TableQuery[Users]
   val slickLoginInfos = TableQuery[LoginInfos]
   val slickUserLoginInfos = TableQuery[UserLoginInfos]
   val slickPasswordInfos = TableQuery[PasswordInfos]
+  val slickOAuth1Infos = TableQuery[OAuth1Infos]
   
   val db = Database.forConfig("db.default")
   
@@ -87,4 +103,5 @@ object DBTableDefinitions {
   createTable(slickLoginInfos)
   createTable(slickUserLoginInfos)
   createTable(slickPasswordInfos)
+  createTable(slickOAuth1Infos)
 }

@@ -36,8 +36,6 @@ class PasswordInfoDAOSlick extends DelegableAuthInfoDAO[PasswordInfo] {
         authInfo
       }
     }
-    
-    //Future.successful(authInfo)
   }
 
   /**
@@ -47,7 +45,6 @@ class PasswordInfoDAOSlick extends DelegableAuthInfoDAO[PasswordInfo] {
    * @return The retrieved password info or None if no password info could be retrieved for the given login info.
    */
   def find(loginInfo: LoginInfo): Future[Option[PasswordInfo]] = {
-    //Future.successful(data.get(loginInfo))
     Future.successful {
       db withSession { implicit session =>
         slickLoginInfos.filter(info => info.providerID === loginInfo.providerID && info.providerKey === loginInfo.providerKey).firstOption match {
@@ -55,7 +52,7 @@ class PasswordInfoDAOSlick extends DelegableAuthInfoDAO[PasswordInfo] {
             val passwordInfo = slickPasswordInfos.filter(_.loginInfoId === info.id).first
             Some(PasswordInfo(passwordInfo.hasher, passwordInfo.password, passwordInfo.salt))
           }
-          case None => None
+          // case None => None
         }
       }
     }
