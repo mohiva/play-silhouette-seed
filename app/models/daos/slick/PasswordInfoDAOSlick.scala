@@ -7,7 +7,6 @@ import scala.concurrent.Future
 import models.daos.slick.DBTableDefinitions
 import models.daos.slick.DBTableDefinitions._
 import scala.slick.driver.MySQLDriver.simple._
-import PasswordInfoDAOSlick._
 
 /**
  * The DAO to store the password information.
@@ -61,10 +60,4 @@ class PasswordInfoDAOSlick extends DelegableAuthInfoDAO[PasswordInfo] {
       }
     }
   }
-}
-
-/**
- * The companion object.
- */
-object PasswordInfoDAOSlick {
 }
