@@ -1,9 +1,9 @@
-package models.slick
+package models.daos.slick
 
 import scala.slick.driver.MySQLDriver.simple._
 import play.Logger
 
-object DBTables {
+object DBTableDefinitions {
 
   case class DBUser (
     userID: String,

@@ -1,12 +1,11 @@
-package models.daos
+package models.daos.slick
 
 import com.mohiva.play.silhouette.core.LoginInfo
 import com.mohiva.play.silhouette.core.providers.PasswordInfo
 import com.mohiva.play.silhouette.contrib.daos.DelegableAuthInfoDAO
-import scala.collection.mutable
 import scala.concurrent.Future
-import models.slick.DBTables
-import models.slick.DBTables._
+import models.daos.slick.DBTableDefinitions
+import models.daos.slick.DBTableDefinitions._
 import scala.slick.driver.MySQLDriver.simple._
 import PasswordInfoDAOSlick._
 
@@ -15,7 +14,7 @@ import PasswordInfoDAOSlick._
  */
 class PasswordInfoDAOSlick extends DelegableAuthInfoDAO[PasswordInfo] {
 
-  val db = DBTables.db
+  val db = DBTableDefinitions.db
   
   /**
    * Saves the password info.

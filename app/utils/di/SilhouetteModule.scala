@@ -16,6 +16,7 @@ import com.mohiva.play.silhouette.contrib.services._
 import com.mohiva.play.silhouette.contrib.daos.DelegableAuthInfoDAO
 import models.services.{UserService, UserServiceImpl}
 import models.daos._
+import models.daos.slick._
 import models.User
 
 /**

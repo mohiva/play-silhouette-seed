@@ -1,20 +1,21 @@
-package models.daos
+package models.daos.slick
 
 import models.User
 import scala.slick.driver.MySQLDriver.simple._
-import models.slick.DBTables
-import models.slick.DBTables._
+import models.daos.slick.DBTableDefinitions
+import models.daos.slick.DBTableDefinitions._
 import com.mohiva.play.silhouette.core.LoginInfo
 import scala.concurrent.Future
 import java.util.UUID
 import play.Logger
+import models.daos.UserDAO
 
 /**
  * Give access to the user object using Slick
  */
 class UserDAOSlick extends UserDAO {
   
-  val db = DBTables.db
+  val db = DBTableDefinitions.db
   
   /**
    * Finds a user by its login info.
@@ -110,9 +111,3 @@ class UserDAOSlick extends UserDAO {
     }
   }
 }
-
-/**
- * The companion object.
-object UserDAOSlick {
-}
- */
