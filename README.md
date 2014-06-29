@@ -1,11 +1,13 @@
-Silhouette Seed Template
-=====================================
+Silhouette Slick Seed Template
+==============================
 
-The Silhouette Seed project is an Activator template which shows how [Silhouette](https://github.com/mohiva/play-silhouette) can be implemented in a Play Framework application. It's a starting point which can be extended to fit your needs.
+This is a fork of the official Silhouette Seed project. If you want to have a first look at Silhouette, I suggest you have a look at the [official project](https://github.com/mohiva/play-silhouette-seed)
+
+The Silhouette Slick Seed project is an Activator template which shows how [Silhouette](https://github.com/mohiva/play-silhouette) can be implemented in a Play Framework application. It uses the [play-slick](https://github.com/playframework/play-slick) library for database access.
 
 ## Example
 
-You can find a running example of this template under the following URL: http://play-silhouette-seed.mohiva.cloudbees.net/
+Currently, there is no running example of this template.
 
 ## Features
 
@@ -15,14 +17,15 @@ You can find a running example of this template under the following URL: http://
 * Dependency Injection with Guice
 * Publishing Events
 * Avatar service
+* play-slick database access
 
 ## Documentation
 
-Consulate the [Silhouette wiki](https://github.com/mohiva/play-silhouette/wiki) for more information. If you need help with the integration of Silhouette into your project, don't hesitate and ask questions in our [mailing list](https://groups.google.com/forum/#!forum/play-silhouette) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/playframework).
+Consulate the official [Silhouette wiki](https://github.com/mohiva/play-silhouette/wiki) for more information. If you need help with the integration of Silhouette into your project, don't hesitate and ask questions in our [mailing list](https://groups.google.com/forum/#!forum/play-silhouette) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/playframework).
 
 ## Activator
 
-See https://typesafe.com/activator/template/play-silhouette-seed
+Currently, there is no activator hosted at typesafe.
 
 # License
 
