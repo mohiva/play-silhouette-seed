@@ -3,17 +3,19 @@ package models.daos.slick
 import com.mohiva.play.silhouette.core.LoginInfo
 import com.mohiva.play.silhouette.core.providers.PasswordInfo
 import com.mohiva.play.silhouette.contrib.daos.DelegableAuthInfoDAO
+import play.api.db.slick._
 import scala.concurrent.Future
 import models.daos.slick.DBTableDefinitions._
-import scala.slick.driver.MySQLDriver.simple._
+import play.api.db.slick.Config.driver.simple._
+
 
 /**
  * The DAO to store the password information.
  */
 class PasswordInfoDAOSlick extends DelegableAuthInfoDAO[PasswordInfo] {
 
-  val db = DBTableDefinitions.db
-  
+  import play.api.Play.current
+
   /**
    * Saves the password info.
    *
@@ -27,7 +29,7 @@ class PasswordInfoDAOSlick extends DelegableAuthInfoDAO[PasswordInfo] {
     Future.successful(authInfo)
     */
     Future.successful {
-      db withSession {implicit session =>
+      DB withSession {implicit session =>
         val infoId = slickLoginInfos.filter(
           x => x.providerID === loginInfo.providerID && x.providerKey === loginInfo.providerKey
         ).first.id.get
@@ -45,7 +47,7 @@ class PasswordInfoDAOSlick extends DelegableAuthInfoDAO[PasswordInfo] {
    */
   def find(loginInfo: LoginInfo): Future[Option[PasswordInfo]] = {
     Future.successful {
-      db withSession { implicit session =>
+      DB withSession { implicit session =>
         slickLoginInfos.filter(info => info.providerID === loginInfo.providerID && info.providerKey === loginInfo.providerKey).firstOption match {
           case Some(info) =>
             val passwordInfo = slickPasswordInfos.filter(_.loginInfoId === info.id).first

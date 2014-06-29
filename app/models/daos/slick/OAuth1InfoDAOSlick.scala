@@ -5,15 +5,16 @@ import com.mohiva.play.silhouette.core.providers.OAuth1Info
 import com.mohiva.play.silhouette.contrib.daos.DelegableAuthInfoDAO
 import scala.concurrent.Future
 import models.daos.slick.DBTableDefinitions._
-import scala.slick.driver.MySQLDriver.simple._
+import play.api.db.slick.Config.driver.simple._
+import play.api.db.slick._
 
 /**
  * The DAO to store the OAuth1 information.
  */
 class OAuth1InfoDAOSlick extends DelegableAuthInfoDAO[OAuth1Info] {
 
-  val db = DBTableDefinitions.db
-  
+  import play.api.Play.current
+
   /**
    * Saves the OAuth1 info.
    *
@@ -23,7 +24,7 @@ class OAuth1InfoDAOSlick extends DelegableAuthInfoDAO[OAuth1Info] {
    */
   def save(loginInfo: LoginInfo, authInfo: OAuth1Info): Future[OAuth1Info] = {
     Future.successful(
-      db withSession { implicit session =>
+      DB withSession { implicit session =>
         val infoId = slickLoginInfos.filter(
           x => x.providerID === loginInfo.providerID && x.providerKey === loginInfo.providerKey
         ).first.id.get
@@ -46,7 +47,7 @@ class OAuth1InfoDAOSlick extends DelegableAuthInfoDAO[OAuth1Info] {
    */
   def find(loginInfo: LoginInfo): Future[Option[OAuth1Info]] = {
     Future.successful(
-      db withSession { implicit session =>
+      DB withSession { implicit session =>
         slickLoginInfos.filter(info => info.providerID === loginInfo.providerID && info.providerKey === loginInfo.providerKey).firstOption match {
           case Some(info) =>
             val oAuth1Info = slickOAuth1Infos.filter(_.loginInfoId === info.id).first
