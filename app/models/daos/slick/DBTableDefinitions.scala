@@ -79,11 +79,31 @@ object DBTableDefinitions {
     def * = (id.?, token, secret, loginInfoId) <> (DBOAuth1Info.tupled, DBOAuth1Info.unapply _)
   }
   
+  case class DBOAuth2Info (
+    id: Option[Long],
+    accessToken: String,
+    tokenType: Option[String],
+    expiresIn: Option[Int],
+    refreshToken: Option[String],
+    loginInfoId: Long
+  )
+  
+  class OAuth2Infos(tag: Tag) extends Table[DBOAuth2Info](tag, "oauth2info") {
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def accessToken = column[String]("accesstoken")
+    def tokenType = column[Option[String]]("tokentype")
+    def expiresIn = column[Option[Int]]("expiresin")
+    def refreshToken = column[Option[String]]("refreshtoken")
+    def loginInfoId = column[Long]("logininfoid")
+    def * = (id.?, accessToken, tokenType, expiresIn, refreshToken, loginInfoId) <> (DBOAuth2Info.tupled, DBOAuth2Info.unapply _)
+  }
+  
   val slickUsers = TableQuery[Users]
   val slickLoginInfos = TableQuery[LoginInfos]
   val slickUserLoginInfos = TableQuery[UserLoginInfos]
   val slickPasswordInfos = TableQuery[PasswordInfos]
   val slickOAuth1Infos = TableQuery[OAuth1Infos]
+  val slickOAuth2Infos = TableQuery[OAuth2Infos]
   
   val db = Database.forConfig("db.default")
   
@@ -104,4 +124,5 @@ object DBTableDefinitions {
   createTable(slickUserLoginInfos)
   createTable(slickPasswordInfos)
   createTable(slickOAuth1Infos)
+  createTable(slickOAuth2Infos)
 }
