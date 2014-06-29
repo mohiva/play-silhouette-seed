@@ -2,7 +2,6 @@ package models.daos.slick
 
 import models.User
 import scala.slick.driver.MySQLDriver.simple._
-import models.daos.slick.DBTableDefinitions
 import models.daos.slick.DBTableDefinitions._
 import com.mohiva.play.silhouette.core.LoginInfo
 import scala.concurrent.Future
@@ -29,19 +28,16 @@ class UserDAOSlick extends UserDAO {
         slickLoginInfos.filter(
           x => x.providerID === loginInfo.providerID && x.providerKey === loginInfo.providerKey
         ).firstOption match {
-          case Some(info) => {
+          case Some(info) =>
             slickUserLoginInfos.filter(_.loginInfoId === info.id).firstOption match {
-              case Some(userLoginInfo) => {
+              case Some(userLoginInfo) =>
                 slickUsers.filter(_.id === userLoginInfo.userID).firstOption match {
-                  case Some(user) => {
+                  case Some(user) =>
                     Some(User(UUID.fromString(user.userID), loginInfo, user.firstName, user.lastName, user.fullName, user.email, user.avatarURL))
-                  }
                   case None => None
                 }
-              }
               case None => None
             }
-          }
           case None => None
         }
       }
@@ -58,21 +54,18 @@ class UserDAOSlick extends UserDAO {
     db withSession { implicit session =>
       Future.successful {
         slickUsers.filter(
-          _.id === userID.toString()
+          _.id === userID.toString
         ).firstOption match {
-          case Some(user) => {
+          case Some(user) =>
             slickUserLoginInfos.filter(_.userID === user.userID).firstOption match {
-              case Some(info) => {
+              case Some(info) =>
                 slickLoginInfos.filter(_.id === info.loginInfoId).firstOption match {
-                  case Some(loginInfo) => {
+                  case Some(loginInfo) =>
                     Some(User(UUID.fromString(user.userID), LoginInfo(loginInfo.providerID, loginInfo.providerKey), user.firstName, user.lastName, user.fullName, user.email, user.avatarURL))
-                  }
                   case None => None
                 }
-              }
               case None => None
             }
-          }
           case None => None
         }
       }
@@ -88,7 +81,7 @@ class UserDAOSlick extends UserDAO {
   def save(user: User) = {
     db withSession { implicit session =>
       Future.successful {
-        val dbUser = DBUser(user.userID.toString(), user.firstName, user.lastName, user.fullName, user.email, user.avatarURL)
+        val dbUser = DBUser(user.userID.toString, user.firstName, user.lastName, user.fullName, user.email, user.avatarURL)
         slickUsers.insertOrUpdate(dbUser) // Ok, that was easy. Now add the user.loginInfo...
         var dbLoginInfo = DBLoginInfo(None, user.loginInfo.providerID, user.loginInfo.providerKey)
         // Insert if it does not exist yet
@@ -99,12 +92,10 @@ class UserDAOSlick extends UserDAO {
         dbLoginInfo = slickLoginInfos.filter(info => info.providerID === dbLoginInfo.providerID && info.providerKey === dbLoginInfo.providerKey).first
         // Now make sure they are connected
         slickUserLoginInfos.filter(info => info.userID === dbUser.userID && info.loginInfoId === dbLoginInfo.id).firstOption match {
-          case Some(info) => {
+          case Some(info) =>
             // They are connected already, we could as well omit this case ;)
-          }
-          case None => {
+          case None =>
             slickUserLoginInfos += DBUserLoginInfo(dbUser.userID, dbLoginInfo.id.get)
-          }
         }
         user // We do not change the user => return it
       }

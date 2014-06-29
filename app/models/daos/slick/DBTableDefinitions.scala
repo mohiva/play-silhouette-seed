@@ -2,7 +2,6 @@ package models.daos.slick
 
 import scala.slick.driver.MySQLDriver.simple._
 import play.Logger
-import scala.slick.jdbc.meta.MTable
 
 object DBTableDefinitions {
 
@@ -22,7 +21,7 @@ object DBTableDefinitions {
     def fullName = column[Option[String]]("fullName")
     def email = column[Option[String]]("email")
     def avatarURL = column[Option[String]]("avatarURL")
-    def * = (id, firstName, lastName, fullName, email, avatarURL) <> (DBUser.tupled, DBUser.unapply _)
+    def * = (id, firstName, lastName, fullName, email, avatarURL) <> (DBUser.tupled, DBUser.unapply)
   }
   
   case class DBLoginInfo (
@@ -35,7 +34,7 @@ object DBTableDefinitions {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def providerID = column[String]("providerID")
     def providerKey = column[String]("providerKey")
-    def * = (id.?, providerID, providerKey) <> (DBLoginInfo.tupled, DBLoginInfo.unapply _)
+    def * = (id.?, providerID, providerKey) <> (DBLoginInfo.tupled, DBLoginInfo.unapply)
   }
   
   case class DBUserLoginInfo (
@@ -46,7 +45,7 @@ object DBTableDefinitions {
   class UserLoginInfos(tag: Tag) extends Table[DBUserLoginInfo](tag, "userlogininfo") {
     def userID = column[String]("userID", O.NotNull)
     def loginInfoId = column[Long]("loginInfoId", O.NotNull)
-    def * = (userID, loginInfoId) <> (DBUserLoginInfo.tupled, DBUserLoginInfo.unapply _)
+    def * = (userID, loginInfoId) <> (DBUserLoginInfo.tupled, DBUserLoginInfo.unapply)
   }
   
   case class DBPasswordInfo (
@@ -61,7 +60,7 @@ object DBTableDefinitions {
     def password = column[String]("password")
     def salt = column[Option[String]]("salt")
     def loginInfoId = column[Long]("loginInfoId")
-    def * = (hasher, password, salt, loginInfoId) <> (DBPasswordInfo.tupled, DBPasswordInfo.unapply _)
+    def * = (hasher, password, salt, loginInfoId) <> (DBPasswordInfo.tupled, DBPasswordInfo.unapply)
   }
   
   case class DBOAuth1Info (
@@ -76,7 +75,7 @@ object DBTableDefinitions {
     def token = column[String]("token")
     def secret = column[String]("secret")
     def loginInfoId = column[Long]("loginInfoId")
-    def * = (id.?, token, secret, loginInfoId) <> (DBOAuth1Info.tupled, DBOAuth1Info.unapply _)
+    def * = (id.?, token, secret, loginInfoId) <> (DBOAuth1Info.tupled, DBOAuth1Info.unapply)
   }
   
   case class DBOAuth2Info (
@@ -95,7 +94,7 @@ object DBTableDefinitions {
     def expiresIn = column[Option[Int]]("expiresin")
     def refreshToken = column[Option[String]]("refreshtoken")
     def loginInfoId = column[Long]("logininfoid")
-    def * = (id.?, accessToken, tokenType, expiresIn, refreshToken, loginInfoId) <> (DBOAuth2Info.tupled, DBOAuth2Info.unapply _)
+    def * = (id.?, accessToken, tokenType, expiresIn, refreshToken, loginInfoId) <> (DBOAuth2Info.tupled, DBOAuth2Info.unapply)
   }
   
   val slickUsers = TableQuery[Users]
@@ -114,10 +113,9 @@ object DBTableDefinitions {
         table.ddl.create
         Logger.debug("... done.")
       } catch {
-        case e: Throwable => {
+        case e: Throwable =>
           Logger.debug("Could not create schema for table `" + table.baseTableRow.tableName + "`. Maybe it already exists?")
-          Logger.debug(e.getMessage())
-        }
+          Logger.debug(e.getMessage)
       }
     }
   }

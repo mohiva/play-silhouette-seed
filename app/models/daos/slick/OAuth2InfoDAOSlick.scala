@@ -1,11 +1,9 @@
-package models.daos
+package models.daos.slick
 
 import com.mohiva.play.silhouette.core.LoginInfo
 import com.mohiva.play.silhouette.core.providers.OAuth2Info
 import com.mohiva.play.silhouette.contrib.daos.DelegableAuthInfoDAO
-import scala.collection.mutable
 import scala.concurrent.Future
-import models.daos.slick.DBTableDefinitions
 import models.daos.slick.DBTableDefinitions._
 import scala.slick.driver.MySQLDriver.simple._
 
@@ -30,9 +28,8 @@ class OAuth2InfoDAOSlick extends DelegableAuthInfoDAO[OAuth2Info] {
           x => x.providerID === loginInfo.providerID && x.providerKey === loginInfo.providerKey
         ).first.id.get
         slickOAuth2Infos.filter(_.loginInfoId === infoId).firstOption match {
-          case Some(info) => {
+          case Some(info) =>
             slickOAuth2Infos update DBOAuth2Info(info.id, authInfo.accessToken, authInfo.tokenType, authInfo.expiresIn, authInfo.refreshToken, infoId)
-          }
           case None => slickOAuth2Infos insert DBOAuth2Info(None, authInfo.accessToken, authInfo.tokenType, authInfo.expiresIn, authInfo.refreshToken, infoId) 
         }
         authInfo
@@ -50,10 +47,9 @@ class OAuth2InfoDAOSlick extends DelegableAuthInfoDAO[OAuth2Info] {
     Future.successful(
       db withSession { implicit session =>
         slickLoginInfos.filter(info => info.providerID === loginInfo.providerID && info.providerKey === loginInfo.providerKey).firstOption match {
-          case Some(info) => {
+          case Some(info) =>
             val oAuth2Info = slickOAuth2Infos.filter(_.loginInfoId === info.id).first
             Some(OAuth2Info(oAuth2Info.accessToken, oAuth2Info.tokenType, oAuth2Info.expiresIn, oAuth2Info.refreshToken))
-          }
           case None => None
         }
       }
