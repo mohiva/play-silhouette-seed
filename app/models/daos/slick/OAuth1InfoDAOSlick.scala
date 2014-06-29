@@ -29,7 +29,14 @@ class OAuth1InfoDAOSlick extends DelegableAuthInfoDAO[OAuth1Info] {
         val infoId = slickLoginInfos.filter(
           x => x.providerID === loginInfo.providerID && x.providerKey === loginInfo.providerKey
         ).first.id.get
-        slickOAuth1Infos insert DBOAuth1Info(None, authInfo.token, authInfo.secret, infoId)
+        slickOAuth1Infos.filter(_.loginInfoId === infoId).firstOption match {
+          case Some(info) => {
+            slickOAuth1Infos update DBOAuth1Info(info.id, authInfo.token, authInfo.secret, infoId)
+          }
+          case None => {
+            slickOAuth1Infos insert DBOAuth1Info(None, authInfo.token, authInfo.secret, infoId)
+          }
+        }
         authInfo
       }
     )

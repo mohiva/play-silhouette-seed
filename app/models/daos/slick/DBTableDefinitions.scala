@@ -114,7 +114,10 @@ object DBTableDefinitions {
         table.ddl.create
         Logger.debug("... done.")
       } catch {
-        case _ => Logger.debug("Could not create schema for table `" + table.baseTableRow.tableName + "`. Maybe it already exists?")
+        case e: Throwable => {
+          Logger.debug("Could not create schema for table `" + table.baseTableRow.tableName + "`. Maybe it already exists?")
+          Logger.debug(e.getMessage())
+        }
       }
     }
   }

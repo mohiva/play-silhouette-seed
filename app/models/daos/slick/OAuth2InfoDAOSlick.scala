@@ -29,7 +29,12 @@ class OAuth2InfoDAOSlick extends DelegableAuthInfoDAO[OAuth2Info] {
         val infoId = slickLoginInfos.filter(
           x => x.providerID === loginInfo.providerID && x.providerKey === loginInfo.providerKey
         ).first.id.get
-        slickOAuth2Infos insert DBOAuth2Info(None, authInfo.accessToken, authInfo.tokenType, authInfo.expiresIn, authInfo.refreshToken, infoId)
+        slickOAuth2Infos.filter(_.loginInfoId === infoId).firstOption match {
+          case Some(info) => {
+            slickOAuth2Infos update DBOAuth2Info(info.id, authInfo.accessToken, authInfo.tokenType, authInfo.expiresIn, authInfo.refreshToken, infoId)
+          }
+          case None => slickOAuth2Infos insert DBOAuth2Info(None, authInfo.accessToken, authInfo.tokenType, authInfo.expiresIn, authInfo.refreshToken, infoId) 
+        }
         authInfo
       }
     )
@@ -49,7 +54,7 @@ class OAuth2InfoDAOSlick extends DelegableAuthInfoDAO[OAuth2Info] {
             val oAuth2Info = slickOAuth2Infos.filter(_.loginInfoId === info.id).first
             Some(OAuth2Info(oAuth2Info.accessToken, oAuth2Info.tokenType, oAuth2Info.expiresIn, oAuth2Info.refreshToken))
           }
-          // case None => None
+          case None => None
         }
       }
     )
