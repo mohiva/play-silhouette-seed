@@ -84,7 +84,7 @@ class UserDAOSlick extends UserDAO {
       Future.successful {
         val dbUser = DBUser(user.userID.toString, user.firstName, user.lastName, user.fullName, user.email, user.avatarURL)
         slickUsers.where(_.id === dbUser.userID).firstOption match {
-          case Some(userFound) => slickUsers.update(dbUser)
+          case Some(userFound) => slickUsers.filter(_.id === dbUser.userID).update(dbUser)
           case None => slickUsers.insert(dbUser)
         }
         var dbLoginInfo = DBLoginInfo(None, user.loginInfo.providerID, user.loginInfo.providerKey)
