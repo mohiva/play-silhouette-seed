@@ -21,6 +21,23 @@ Currently, there is no running example of this template.
 
 ## Documentation
 
+### Slick
+
+This template defaults to an in memory data storage via hash maps. To enable database acces (via [Slick]()), you need to edit the play configuration.
+
+To enable use of Slick DAOs, use this:
+
+    silhouette.seed.db.useSlick=true
+
+Additionally, you need to configure the database layer. Example for MySQL:
+
+    db.default.driver=com.mysql.jdbc.Driver
+    db.default.url="jdbc:mysql://localhost/play_silhouette_slick_seed"
+    db.default.user=your_db_user
+    db.default.password="your_db_password"
+
+### Common
+
 Consulate the official [Silhouette wiki](https://github.com/mohiva/play-silhouette/wiki) for more information. If you need help with the integration of Silhouette into your project, don't hesitate and ask questions in our [mailing list](https://groups.google.com/forum/#!forum/play-silhouette) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/playframework).
 
 ## Activator
