@@ -14,3 +14,12 @@ dist
 /RUNNING_PID
 /.settings
 conf/evolutions
+/nbproject/private/
+/build/
+# netbeans project
+project.properties
+project.xml
+manifest.mf
+genfiles.properties
+build.xml
+build-impl.xml

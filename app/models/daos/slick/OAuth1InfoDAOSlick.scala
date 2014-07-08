@@ -52,7 +52,7 @@ class OAuth1InfoDAOSlick extends DelegableAuthInfoDAO[OAuth1Info] {
           case Some(info) =>
             val oAuth1Info = slickOAuth1Infos.filter(_.loginInfoId === info.id).first
             Some(OAuth1Info(oAuth1Info.token, oAuth1Info.secret))
-          // case None => None
+          case None => None
         }
       }
     )
