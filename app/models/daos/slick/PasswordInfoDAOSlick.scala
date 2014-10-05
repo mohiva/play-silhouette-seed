@@ -52,7 +52,7 @@ class PasswordInfoDAOSlick extends DelegableAuthInfoDAO[PasswordInfo] {
           case Some(info) =>
             val passwordInfo = slickPasswordInfos.filter(_.loginInfoId === info.id).first
             Some(PasswordInfo(passwordInfo.hasher, passwordInfo.password, passwordInfo.salt))
-          // case None => None
+          case None => None
         }
       }
     }
