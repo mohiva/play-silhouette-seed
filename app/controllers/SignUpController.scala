@@ -5,12 +5,12 @@ import javax.inject.Inject
 import scala.concurrent.Future
 import play.api.mvc.Action
 import play.api.libs.concurrent.Execution.Implicits._
-import com.mohiva.play.silhouette.core._
-import com.mohiva.play.silhouette.core.providers._
-import com.mohiva.play.silhouette.core.utils.PasswordHasher
-import com.mohiva.play.silhouette.core.services.{AvatarService, AuthInfoService}
-import com.mohiva.play.silhouette.core.exceptions.AuthenticationException
-import com.mohiva.play.silhouette.contrib.services.CachedCookieAuthenticator
+import com.mohiva.play.silhouette.api._
+import com.mohiva.play.silhouette.impl.providers._
+import com.mohiva.play.silhouette.impl.providers.credentials.hasher.BCryptPasswordHasher
+import com.mohiva.play.silhouette.api.services.{AvatarService, AuthInfoService}
+import com.mohiva.play.silhouette.api.exceptions.AuthenticationException
+import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticatorService
 import models.services.UserService
 import models.User
 import forms.SignUpForm
@@ -25,12 +25,12 @@ import forms.SignUpForm
  * @param passwordHasher The password hasher implementation.
  */
 class SignUpController @Inject() (
-  implicit val env: Environment[User, CachedCookieAuthenticator],
+  implicit val env: Environment[User, CookieAuthenticatorService],
   val userService: UserService,
   val authInfoService: AuthInfoService,
   val avatarService: AvatarService,
   val passwordHasher: PasswordHasher)
-  extends Silhouette[User, CachedCookieAuthenticator] {
+  extends Silhouette[User, CookieAuthenticatorService] {
 
   /**
    * Registers a new user.

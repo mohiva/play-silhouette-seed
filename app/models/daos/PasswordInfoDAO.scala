@@ -1,8 +1,8 @@
 package models.daos
 
-import com.mohiva.play.silhouette.core.LoginInfo
-import com.mohiva.play.silhouette.core.providers.PasswordInfo
-import com.mohiva.play.silhouette.contrib.daos.DelegableAuthInfoDAO
+import com.mohiva.play.silhouette.api.LoginInfo
+import com.mohiva.play.silhouette.impl.providers.PasswordInfo
+import com.mohiva.play.silhouette.impl.daos.DelegableAuthInfoDAO
 import scala.collection.mutable
 import scala.concurrent.Future
 import PasswordInfoDAO._

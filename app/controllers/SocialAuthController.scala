@@ -4,11 +4,11 @@ import javax.inject.Inject
 import scala.concurrent.Future
 import play.api.mvc.Action
 import play.api.libs.concurrent.Execution.Implicits._
-import com.mohiva.play.silhouette.core._
-import com.mohiva.play.silhouette.core.providers._
-import com.mohiva.play.silhouette.core.exceptions.AuthenticationException
-import com.mohiva.play.silhouette.core.services.AuthInfoService
-import com.mohiva.play.silhouette.contrib.services.CachedCookieAuthenticator
+import com.mohiva.play.silhouette.api._
+import com.mohiva.play.silhouette.impl.providers._
+import com.mohiva.play.silhouette.api.exceptions.AuthenticationException
+import com.mohiva.play.silhouette.api.services.AuthInfoService
+import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticatorService
 import models.services.UserService
 import models.User
 
@@ -18,10 +18,10 @@ import models.User
  * @param env The Silhouette environment.
  */
 class SocialAuthController @Inject() (
-  val env: Environment[User, CachedCookieAuthenticator],
+  val env: Environment[User, CookieAuthenticatorService],
   val userService: UserService,
   val authInfoService: AuthInfoService)
-  extends Silhouette[User, CachedCookieAuthenticator] {
+  extends Silhouette[User, CookieAuthenticatorService] {
 
   /**
    * Authenticates a user against a social provider.
@@ -35,7 +35,7 @@ class SocialAuthController @Inject() (
       case _ => Future.failed(new AuthenticationException(s"Cannot authenticate with unexpected social provider $provider"))
     }).flatMap {
       case Left(result) => Future.successful(result)
-      case Right(profile: CommonSocialProfile[_]) =>
+      case Right(profile: CommonSocialProfile) =>
         for {
           user <- userService.save(profile)
           authInfo <- authInfoService.save(profile.loginInfo, profile.authInfo)

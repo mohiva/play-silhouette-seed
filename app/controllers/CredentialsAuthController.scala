@@ -4,11 +4,11 @@ import javax.inject.Inject
 import scala.concurrent.Future
 import play.api.mvc.Action
 import play.api.libs.concurrent.Execution.Implicits._
-import com.mohiva.play.silhouette.core._
-import com.mohiva.play.silhouette.core.providers._
-import com.mohiva.play.silhouette.core.services.AuthInfoService
-import com.mohiva.play.silhouette.core.exceptions.AuthenticationException
-import com.mohiva.play.silhouette.contrib.services.CachedCookieAuthenticator
+import com.mohiva.play.silhouette.api._
+import com.mohiva.play.silhouette.impl.providers._
+import com.mohiva.play.silhouette.api.services.AuthInfoService
+import com.mohiva.play.silhouette.api.exceptions.AuthenticationException
+import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticatorService
 import models.services.UserService
 import models.User
 import forms.SignInForm
@@ -19,10 +19,10 @@ import forms.SignInForm
  * @param env The Silhouette environment.
  */
 class CredentialsAuthController @Inject() (
-  implicit val env: Environment[User, CachedCookieAuthenticator],
+  implicit val env: Environment[User, CookieAuthenticatorService],
   val userService: UserService,
   val authInfoService: AuthInfoService)
-  extends Silhouette[User, CachedCookieAuthenticator] {
+  extends Silhouette[User, CookieAuthenticatorService] {
 
   /**
    * Authenticates a user against the credentials provider.

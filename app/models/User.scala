@@ -1,6 +1,6 @@
 package models
 
-import com.mohiva.play.silhouette.core.{LoginInfo, Identity}
+import com.mohiva.play.silhouette.api.{LoginInfo, Identity}
 import java.util.UUID
 
 /**

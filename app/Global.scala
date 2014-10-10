@@ -4,7 +4,7 @@ import play.api.i18n.{Messages, Lang}
 import play.api.mvc.Results._
 import play.api.GlobalSettings
 import play.api.mvc.{Result, RequestHeader}
-import com.mohiva.play.silhouette.core.{Logger, SecuredSettings}
+import com.mohiva.play.silhouette.api.{Logger, SecuredSettings}
 import utils.di.SilhouetteModule
 import scala.concurrent.Future
 import com.google.inject.Guice

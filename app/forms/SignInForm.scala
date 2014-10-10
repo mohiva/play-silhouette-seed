@@ -2,7 +2,7 @@ package forms
 
 import play.api.data.Form
 import play.api.data.Forms._
-import com.mohiva.play.silhouette.core.providers.Credentials
+import com.mohiva.play.silhouette.impl.providers.Credentials
 
 /**
  * The form which handles the submission of the credentials.

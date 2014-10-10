@@ -4,15 +4,16 @@ import play.api.Play
 import play.api.Play.current
 import com.google.inject.{ Provides, AbstractModule }
 import net.codingwell.scalaguice.ScalaModule
-import com.mohiva.play.silhouette.core.{EventBus, Environment}
-import com.mohiva.play.silhouette.core.utils._
-import com.mohiva.play.silhouette.core.services._
-import com.mohiva.play.silhouette.core.providers._
-import com.mohiva.play.silhouette.core.providers.oauth2._
-import com.mohiva.play.silhouette.core.providers.oauth1._
-import com.mohiva.play.silhouette.contrib.utils._
-import com.mohiva.play.silhouette.contrib.services._
-import com.mohiva.play.silhouette.contrib.daos.DelegableAuthInfoDAO
+import com.mohiva.play.silhouette.api.{EventBus, Environment}
+import com.mohiva.play.silhouette.api.util._
+import com.mohiva.play.silhouette.api.services._
+import com.mohiva.play.silhouette.impl.providers._
+import com.mohiva.play.silhouette.impl.providers.oauth2._
+import com.mohiva.play.silhouette.impl.providers.oauth1._
+import com.mohiva.play.silhouette.impl.util._
+import com.mohiva.play.silhouette.impl.services._
+import com.mohiva.play.silhouette.impl.daos.DelegableAuthInfoDAO
+import com.mohiva.play.silhouette.impl.authenticators.{CookieAuthenticatorService, CookieAuthenticator}
 import models.services.{UserService, UserServiceImpl}
 import models.daos._
 import models.User
@@ -49,14 +50,14 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   @Provides
   def provideEnvironment(
     userService: UserService,
-    authenticatorService: AuthenticatorService[CachedCookieAuthenticator],
+    authenticatorService: CookieAuthenticatorService,
     eventBus: EventBus,
     credentialsProvider: CredentialsProvider,
     facebookProvider: FacebookProvider,
     googleProvider: GoogleProvider,
-    twitterProvider: TwitterProvider): Environment[User, CachedCookieAuthenticator] = {
+    twitterProvider: TwitterProvider): Environment[User, CookieAuthenticatorService] = {
 
-    Environment[User, CachedCookieAuthenticator](
+    Environment[User, CookieAuthenticator](
       userService,
       authenticatorService,
       Map(
@@ -79,9 +80,9 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   @Provides
   def provideAuthenticatorService(
     cacheLayer: CacheLayer,
-    idGenerator: IDGenerator): AuthenticatorService[CachedCookieAuthenticator] = {
+    idGenerator: IDGenerator): AuthenticatorService[CookieAuthenticatorService] = {
 
-    new CachedCookieAuthenticatorService(CachedCookieAuthenticatorSettings(
+    new CookieAuthenticatorService(CachedCookieAuthenticatorSettings(
       cookieName = Play.configuration.getString("silhouette.authenticator.cookieName").get,
       cookiePath = Play.configuration.getString("silhouette.authenticator.cookiePath").get,
       cookieDomain = Play.configuration.getString("silhouette.authenticator.cookieDomain"),
