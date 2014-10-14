@@ -1,7 +1,7 @@
-@(signInForm: Form[com.mohiva.play.silhouette.core.providers.Credentials])(implicit env: com.mohiva.play.silhouette.core.Environment[User, _], request: RequestHeader)
+@(signInForm: Form[com.mohiva.play.silhouette.impl.providers.Credentials])(implicit env: com.mohiva.play.silhouette.api.Environment[User, _], request: RequestHeader)
 
-@import com.mohiva.play.silhouette.core.providers._
-@import bootstrap._
+@import com.mohiva.play.silhouette.impl.providers._
+@import views.html.bootstrap._
 
 @main("Silhouette - Sign In") {
     @request.flash.get("error").map { msg =>
@@ -21,7 +21,7 @@
                 </div>
             </div>
         }
-        @defining(env.providers.values.filter(_.isInstanceOf[SocialProvider[_]])) { providers =>
+        @defining(env.providers.values.filter(_.isInstanceOf[SocialProvider])) { providers =>
             @if(!providers.isEmpty) {
                 <div class="social-providers col-md-6 col-md-offset-3">
                     <p>Or use your existing account on one of the following services to sign in:</p>

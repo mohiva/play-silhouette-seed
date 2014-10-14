@@ -1,11 +1,13 @@
 package models.daos
 
-import models.User
-import com.mohiva.play.silhouette.core.LoginInfo
-import scala.concurrent.Future
-import scala.collection.mutable
 import java.util.UUID
-import UserDAOImpl._
+
+import com.mohiva.play.silhouette.api.LoginInfo
+import models.User
+import models.daos.UserDAOImpl._
+
+import scala.collection.mutable
+import scala.concurrent.Future
 
 /**
  * Give access to the user object.
