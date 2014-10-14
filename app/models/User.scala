@@ -1,7 +1,8 @@
 package models
 
-import com.mohiva.play.silhouette.api.{LoginInfo, Identity}
 import java.util.UUID
+
+import com.mohiva.play.silhouette.api.{Identity, LoginInfo}
 
 /**
  * The user object.

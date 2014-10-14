@@ -2,13 +2,15 @@ package models.services
 
 import java.util.UUID
 import javax.inject.Inject
-import play.api.libs.concurrent.Execution.Implicits._
+
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.api.services.AuthInfo
 import com.mohiva.play.silhouette.impl.providers.CommonSocialProfile
-import scala.concurrent.Future
-import models.daos.UserDAO
 import models.User
+import models.daos.UserDAO
+import play.api.libs.concurrent.Execution.Implicits._
+
+import scala.concurrent.Future
 
 /**
  * Handles actions to users.

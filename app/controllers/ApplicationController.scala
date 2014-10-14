@@ -1,19 +1,21 @@
 package controllers
 
-import models.User
-import com.mohiva.play.silhouette.api.{LogoutEvent, Environment, Silhouette}
-import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticatorService
-import scala.concurrent.Future
 import javax.inject.Inject
+
+import com.mohiva.play.silhouette.api.{Environment, LogoutEvent, Silhouette}
+import com.mohiva.play.silhouette.impl.authenticators.SessionAuthenticator
 import forms._
+import models.User
+
+import scala.concurrent.Future
 
 /**
  * The basic application controller.
  *
  * @param env The Silhouette environment.
  */
-class ApplicationController @Inject() (implicit val env: Environment[User, CookieAuthenticatorService])
-  extends Silhouette[User, CookieAuthenticatorService] {
+class ApplicationController @Inject() (implicit val env: Environment[User, SessionAuthenticator])
+  extends Silhouette[User, SessionAuthenticator] {
 
   /**
    * Handles the index action.
@@ -54,7 +56,8 @@ class ApplicationController @Inject() (implicit val env: Environment[User, Cooki
    * @return The result to display.
    */
   def signOut = SecuredAction.async { implicit request =>
+    val result = Future.successful(Redirect(routes.ApplicationController.index))
     env.eventBus.publish(LogoutEvent(request.identity, request, request2lang))
-    Future.successful(env.authenticatorService.discard(Redirect(routes.ApplicationController.index)))
+    env.authenticatorService.discard(request.authenticator, result)
   }
 }

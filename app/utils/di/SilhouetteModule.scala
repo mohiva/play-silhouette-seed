@@ -1,22 +1,25 @@
 package utils.di
 
+import com.google.inject.{AbstractModule, Provides}
+import com.mohiva.play.silhouette.api.services._
+import com.mohiva.play.silhouette.api.util._
+import com.mohiva.play.silhouette.api.{Environment, EventBus}
+import com.mohiva.play.silhouette.impl.authenticators._
+import com.mohiva.play.silhouette.impl.daos.DelegableAuthInfoDAO
+import com.mohiva.play.silhouette.impl.providers._
+import com.mohiva.play.silhouette.impl.providers.credentials.hasher.BCryptPasswordHasher
+import com.mohiva.play.silhouette.impl.providers.oauth1._
+import com.mohiva.play.silhouette.impl.providers.oauth1.services.PlayOAuth1Service
+import com.mohiva.play.silhouette.impl.providers.oauth2._
+import com.mohiva.play.silhouette.impl.providers.oauth2.state.{CookieStateProvider, CookieStateSettings}
+import com.mohiva.play.silhouette.impl.services._
+import com.mohiva.play.silhouette.impl.util._
+import models.User
+import models.daos._
+import models.services.{UserService, UserServiceImpl}
+import net.codingwell.scalaguice.ScalaModule
 import play.api.Play
 import play.api.Play.current
-import com.google.inject.{ Provides, AbstractModule }
-import net.codingwell.scalaguice.ScalaModule
-import com.mohiva.play.silhouette.api.{EventBus, Environment}
-import com.mohiva.play.silhouette.api.util._
-import com.mohiva.play.silhouette.api.services._
-import com.mohiva.play.silhouette.impl.providers._
-import com.mohiva.play.silhouette.impl.providers.oauth2._
-import com.mohiva.play.silhouette.impl.providers.oauth1._
-import com.mohiva.play.silhouette.impl.util._
-import com.mohiva.play.silhouette.impl.services._
-import com.mohiva.play.silhouette.impl.daos.DelegableAuthInfoDAO
-import com.mohiva.play.silhouette.impl.authenticators.{CookieAuthenticatorService, CookieAuthenticator}
-import models.services.{UserService, UserServiceImpl}
-import models.daos._
-import models.User
 
 /**
  * The Guice module which wires all Silhouette dependencies.
@@ -36,6 +39,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[HTTPLayer].to[PlayHTTPLayer]
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
     bind[PasswordHasher].toInstance(new BCryptPasswordHasher)
+    bind[FingerprintGenerator].toInstance(new DefaultFingerprintGenerator(false))
     bind[EventBus].toInstance(EventBus())
   }
 
@@ -50,14 +54,14 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   @Provides
   def provideEnvironment(
     userService: UserService,
-    authenticatorService: CookieAuthenticatorService,
+    authenticatorService: SessionAuthenticatorService,
     eventBus: EventBus,
     credentialsProvider: CredentialsProvider,
     facebookProvider: FacebookProvider,
     googleProvider: GoogleProvider,
-    twitterProvider: TwitterProvider): Environment[User, CookieAuthenticatorService] = {
+    twitterProvider: TwitterProvider): Environment[User, SessionAuthenticator] = {
 
-    Environment[User, CookieAuthenticator](
+    Environment[User, SessionAuthenticator](
       userService,
       authenticatorService,
       Map(
@@ -73,25 +77,19 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   /**
    * Provides the authenticator service.
    *
-   * @param cacheLayer The cache layer implementation.
-   * @param idGenerator The ID generator used to create the authenticator ID.
+   * @param fingerprintGenerator The cache layer implementation.
    * @return The authenticator service.
    */
   @Provides
   def provideAuthenticatorService(
-    cacheLayer: CacheLayer,
-    idGenerator: IDGenerator): AuthenticatorService[CookieAuthenticatorService] = {
-
-    new CookieAuthenticatorService(CachedCookieAuthenticatorSettings(
-      cookieName = Play.configuration.getString("silhouette.authenticator.cookieName").get,
-      cookiePath = Play.configuration.getString("silhouette.authenticator.cookiePath").get,
-      cookieDomain = Play.configuration.getString("silhouette.authenticator.cookieDomain"),
-      secureCookie = Play.configuration.getBoolean("silhouette.authenticator.secureCookie").get,
-      httpOnlyCookie = Play.configuration.getBoolean("silhouette.authenticator.httpOnlyCookie").get,
-      cookieIdleTimeout = Play.configuration.getInt("silhouette.authenticator.cookieIdleTimeout").get,
-      cookieAbsoluteTimeout = Play.configuration.getInt("silhouette.authenticator.cookieAbsoluteTimeout"),
+    fingerprintGenerator: FingerprintGenerator): SessionAuthenticatorService = {
+    new SessionAuthenticatorService(SessionAuthenticatorSettings(
+      sessionKey = Play.configuration.getString("silhouette.authenticator.sessionKey").get,
+      encryptAuthenticator = Play.configuration.getBoolean("silhouette.authenticator.encryptAuthenticator").get,
+      useFingerprinting = Play.configuration.getBoolean("silhouette.authenticator.useFingerprinting").get,
+      authenticatorIdleTimeout = Play.configuration.getInt("silhouette.authenticator.authenticatorIdleTimeout"),
       authenticatorExpiry = Play.configuration.getInt("silhouette.authenticator.authenticatorExpiry").get
-    ), cacheLayer, idGenerator, Clock())
+    ), fingerprintGenerator, Clock())
   }
 
   /**
@@ -121,6 +119,24 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   def provideAvatarService(httpLayer: HTTPLayer): AvatarService = new GravatarService(httpLayer)
 
   /**
+   * Provides the OAuth2 state provider.
+   *
+   * @param idGenerator The ID generator implementation.
+   * @return The OAuth2 state provider implementation.
+   */
+  @Provides
+  def provideOAuth2StateProvider(idGenerator: IDGenerator): OAuth2StateProvider = {
+    new CookieStateProvider(CookieStateSettings(
+      cookieName = Play.configuration.getString("silhouette.oauth2StateProvider.cookieName").get,
+      cookiePath = Play.configuration.getString("silhouette.oauth2StateProvider.cookiePath").get,
+      cookieDomain = Play.configuration.getString("silhouette.oauth2StateProvider.cookieDomain"),
+      secureCookie = Play.configuration.getBoolean("silhouette.oauth2StateProvider.secureCookie").get,
+      httpOnlyCookie = Play.configuration.getBoolean("silhouette.oauth2StateProvider.httpOnlyCookie").get,
+      expirationTime = Play.configuration.getInt("silhouette.oauth2StateProvider.expirationTime").get
+    ), idGenerator, Clock())
+  }
+
+  /**
    * Provides the credentials provider.
    *
    * @param authInfoService The auth info service implemenetation.
@@ -138,13 +154,13 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   /**
    * Provides the Facebook provider.
    *
-   * @param cacheLayer The cache layer implementation.
    * @param httpLayer The HTTP layer implementation.
+   * @param stateProvider The OAuth2 state provider implementation.
    * @return The Facebook provider.
    */
   @Provides
-  def provideFacebookProvider(cacheLayer: CacheLayer, httpLayer: HTTPLayer): FacebookProvider = {
-    FacebookProvider(cacheLayer, httpLayer, OAuth2Settings(
+  def provideFacebookProvider(httpLayer: HTTPLayer, stateProvider: OAuth2StateProvider): FacebookProvider = {
+    FacebookProvider(httpLayer, stateProvider, OAuth2Settings(
       authorizationURL = Play.configuration.getString("silhouette.facebook.authorizationURL").get,
       accessTokenURL = Play.configuration.getString("silhouette.facebook.accessTokenURL").get,
       redirectURL = Play.configuration.getString("silhouette.facebook.redirectURL").get,
@@ -156,13 +172,13 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   /**
    * Provides the Google provider.
    *
-   * @param cacheLayer The cache layer implementation.
    * @param httpLayer The HTTP layer implementation.
+   * @param stateProvider The OAuth2 state provider implementation.
    * @return The Google provider.
    */
   @Provides
-  def provideGoogleProvider(cacheLayer: CacheLayer, httpLayer: HTTPLayer): GoogleProvider = {
-    GoogleProvider(cacheLayer, httpLayer, OAuth2Settings(
+  def provideGoogleProvider(httpLayer: HTTPLayer, stateProvider: OAuth2StateProvider): GoogleProvider = {
+    GoogleProvider(httpLayer, stateProvider, OAuth2Settings(
       authorizationURL = Play.configuration.getString("silhouette.google.authorizationURL").get,
       accessTokenURL = Play.configuration.getString("silhouette.google.accessTokenURL").get,
       redirectURL = Play.configuration.getString("silhouette.google.redirectURL").get,

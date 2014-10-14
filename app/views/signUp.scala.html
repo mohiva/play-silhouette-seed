@@ -1,6 +1,6 @@
 @(signInForm: Form[forms.SignUpForm.Data])(implicit request: RequestHeader)
 
-@import bootstrap._
+@import views.html.bootstrap._
 
 @main("Silhouette - Sign Up") {
     @request.flash.get("error").map { msg =>
