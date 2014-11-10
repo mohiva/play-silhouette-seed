@@ -12,9 +12,14 @@ import utils.di.SilhouetteModule
 import scala.concurrent.Future
 
 /**
+ * The global object.
+ */
+object Global extends Global
+
+/**
  * The global configuration.
  */
-object Global extends GlobalSettings with SecuredSettings with Logger {
+trait Global extends GlobalSettings with SecuredSettings with Logger {
 
   /**
    * The Guice dependencies injector.
