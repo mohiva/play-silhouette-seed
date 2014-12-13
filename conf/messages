@@ -1,3 +1,4 @@
 error.email = Valid email required
 error.required = This field is required
 access.denied = Access denied!
+user.exists = There already exists a user with this email!
