@@ -48,12 +48,16 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * @param userService The user service implementation.
    * @param authenticatorService The authentication service implementation.
    * @param eventBus The event bus instance.
+   * @param credentialsProvider The credentials provider implementation.
+   * @param facebookProvider The Facebook provider implementation.
+   * @param googleProvider The Google provider implementation.
+   * @param twitterProvider The Twitter provider implementation.
    * @return The Silhouette environment.
    */
   @Provides
   def provideEnvironment(
     userService: UserService,
-    authenticatorService: SessionAuthenticatorService,
+    authenticatorService: AuthenticatorService[SessionAuthenticator],
     eventBus: EventBus,
     credentialsProvider: CredentialsProvider,
     facebookProvider: FacebookProvider,
@@ -76,12 +80,12 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   /**
    * Provides the authenticator service.
    *
-   * @param fingerprintGenerator The cache layer implementation.
+   * @param fingerprintGenerator The fingerprint generator implementation.
    * @return The authenticator service.
    */
   @Provides
   def provideAuthenticatorService(
-    fingerprintGenerator: FingerprintGenerator): SessionAuthenticatorService = {
+    fingerprintGenerator: FingerprintGenerator): AuthenticatorService[SessionAuthenticator] = {
     new SessionAuthenticatorService(SessionAuthenticatorSettings(
       sessionKey = Play.configuration.getString("silhouette.authenticator.sessionKey").get,
       encryptAuthenticator = Play.configuration.getBoolean("silhouette.authenticator.encryptAuthenticator").get,
