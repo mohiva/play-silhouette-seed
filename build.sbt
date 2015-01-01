@@ -1,6 +1,6 @@
 import play.PlayScala
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.4"
 
 name := "play-silhouette-seed"
 
