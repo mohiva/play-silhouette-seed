@@ -62,7 +62,8 @@ class SignUpController @Inject() (
               user <- userService.save(user.copy(avatarURL = avatar))
               authInfo <- authInfoService.save(loginInfo, authInfo)
               authenticator <- env.authenticatorService.create(user.loginInfo)
-              result <- env.authenticatorService.init(authenticator, Future.successful(
+              value <- env.authenticatorService.init(authenticator)
+              result <- env.authenticatorService.embed(value, Future.successful(
                 Redirect(routes.ApplicationController.index)
               ))
             } yield  {

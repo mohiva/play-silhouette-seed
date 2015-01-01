@@ -10,8 +10,9 @@ import com.mohiva.play.silhouette.impl.providers._
 import forms.SignInForm
 import models.User
 import models.services.UserService
+import play.api.i18n.Messages
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.Action
+import play.api.mvc.{RequestHeader, Action}
 
 import scala.concurrent.Future
 
@@ -24,6 +25,18 @@ class CredentialsAuthController @Inject() (
   implicit val env: Environment[User, SessionAuthenticator],
   val userService: UserService,
   val authInfoService: AuthInfoService) extends Silhouette[User, SessionAuthenticator] {
+
+  /**
+   * Implement this to return a result when the user is not authenticated.
+   *
+   * As defined by RFC 2616, the status code of the response should be 401 Unauthorized.
+   *
+   * @param request The request header.
+   * @return The result to send to the client.
+   */
+  override protected def notAuthenticated(request: RequestHeader) = {
+    Some(Future.successful(Redirect(routes.ApplicationController.signIn).flashing("error" -> Messages("invalid.credentials"))))
+  }
 
   /**
    * Authenticates a user against the credentials provider.
@@ -41,7 +54,7 @@ class CredentialsAuthController @Inject() (
         userService.retrieve(loginInfo).flatMap {
           case Some(user) => env.authenticatorService.create(user.loginInfo).flatMap { authenticator =>
             env.eventBus.publish(LoginEvent(user, request, request2lang))
-            env.authenticatorService.init(authenticator, result)
+            env.authenticatorService.init(authenticator).flatMap(v => env.authenticatorService.embed(v ,result))
           }
           case None => Future.failed(new AuthenticationException("Couldn't find user"))
         }

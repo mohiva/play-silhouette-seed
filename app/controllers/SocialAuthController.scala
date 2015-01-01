@@ -40,7 +40,8 @@ class SocialAuthController @Inject() (
             user <- userService.save(profile)
             authInfo <- authInfoService.save(profile.loginInfo, authInfo)
             authenticator <- env.authenticatorService.create(user.loginInfo)
-            result <- env.authenticatorService.init(authenticator, Future.successful(
+            value <- env.authenticatorService.init(authenticator)
+            result <- env.authenticatorService.embed(value, Future.successful(
               Redirect(routes.ApplicationController.index)
             ))
           } yield {
