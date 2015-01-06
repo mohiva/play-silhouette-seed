@@ -23,7 +23,7 @@ class ApplicationController @Inject() (implicit val env: Environment[User, Sessi
    * @return The result to display.
    */
   def index = SecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.index(request.identity)))
+    Future.successful(Ok(views.html.home(request.identity)))
   }
 
   /**
