@@ -207,6 +207,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       consumerKey = Play.configuration.getString("silhouette.twitter.consumerKey").get,
       consumerSecret = Play.configuration.getString("silhouette.twitter.consumerSecret").get)
 
-    TwitterProvider(cacheLayer, httpLayer, new PlayOAuth1Service(settings), settings)
+    TwitterProvider(httpLayer, new PlayOAuth1Service(settings), settings)
   }
 }

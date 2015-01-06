@@ -1,6 +1,7 @@
 body {
     padding-top: 50px;
 }
+
 h1 {
     text-align: center;
     font-size: 30px;
@@ -9,12 +10,28 @@ h1 {
     padding: 40px 15px;
 }
 
+input, button {
+    margin: 5px 0;
+}
+
 fieldset {
     margin-top: 100px;
-    text-align: center;
 }
+legend {
+    font-family: 'Montserrat', sans-serif;
+    text-align: center;
+    font-size: 20px;
+    padding: 15px;
+}
+a {
+    cursor: pointer;
+}
+
 .social-providers,
-.sign-in-now {
+.sign-in-now,
+.already-member,
+.not-a-member {
+    text-align: center;
     margin-top: 20px;
 }
 
@@ -23,4 +40,35 @@ fieldset {
 }
 .user .data {
     margin-top: 10px;
+}
+
+.form-control {
+    border-radius: 0;
+}
+
+[class^='ion-'] {
+    font-size: 1.2em;
+}
+
+.has-feedback .form-control-feedback {
+    top: 0;
+    left: 0;
+    width: 46px;
+    height: 46px;
+    line-height: 46px;
+    color: #555;
+}
+
+.has-feedback .form-control {
+    padding-left: 42.5px;
+}
+
+.btn {
+    font-weight: bold;
+    border-radius: 2px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .26);
+}
+
+.btn-lg {
+    font-size: 18px;
 }

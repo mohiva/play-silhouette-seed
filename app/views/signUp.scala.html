@@ -9,19 +9,19 @@
             <strong>Error!</strong> @msg
         </div>
     }
-    <fieldset>
-        <legend class="col-md-6 col-md-offset-3">Sign up for a new account</legend>
+    <fieldset class="col-md-6 col-md-offset-3">
+        <legend>Sign up for a new account</legend>
         @helper.form(action = routes.SignUpController.signUp()) {
-            @text(signInForm("firstName"), "First name")
-            @text(signInForm("lastName"), "Last name")
-            @text(signInForm("email"), "Email")
-            @password(signInForm("password"), "Password")
+            @text(signInForm("firstName"), "First name", icon = "person")
+            @text(signInForm("lastName"), "Last name", icon = "person")
+            @text(signInForm("email"), "Email", icon = "at")
+            @password(signInForm("password"), "Password", icon = "key")
             <div class="form-group">
-                <div class="col-md-6 col-md-offset-3">
-                    <button id="submit" type="submit" value="submit" class="btn btn-primary btn-block">Submit</button>
+                <div>
+                    <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">Submit</button>
                 </div>
             </div>
-            <div class="sign-in-now col-md-6 col-md-offset-3">
+            <div class="sign-in-now">
                 <p>Already a member? <a href="@routes.ApplicationController.signIn">Sign in now</a></p>
             </div>
         }
