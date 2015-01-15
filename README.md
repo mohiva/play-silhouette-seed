@@ -7,7 +7,7 @@ The Silhouette Seed project is an Activator template which shows how [Silhouette
 
 ## Example
 
-You can find a running example of this template under the following URL: http://play-silhouette-seed.mohiva.cloudbees.net/
+You can find a running example of this template under the following URL: https://play-silhouette-seed.herokuapp.com/
 
 ## Features
 

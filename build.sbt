@@ -6,7 +6,9 @@ name := "play-silhouette-seed"
 
 version := "2.0-SNAPSHOT"
 
-resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+resolvers := ("Atlassian Releases" at "https://maven.atlassian.com/public/") +: resolvers.value
+
+resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
   "com.mohiva" %% "play-silhouette" % "2.0-SNAPSHOT",
