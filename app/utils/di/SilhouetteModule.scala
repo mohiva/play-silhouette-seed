@@ -167,8 +167,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       authorizationURL = Play.configuration.getString("silhouette.facebook.authorizationURL").get,
       accessTokenURL = Play.configuration.getString("silhouette.facebook.accessTokenURL").get,
       redirectURL = Play.configuration.getString("silhouette.facebook.redirectURL").get,
-      clientID = Play.configuration.getString("silhouette.facebook.clientID").get,
-      clientSecret = Play.configuration.getString("silhouette.facebook.clientSecret").get,
+      clientID = Play.configuration.getString("silhouette.facebook.clientID").getOrElse(""),
+      clientSecret = Play.configuration.getString("silhouette.facebook.clientSecret").getOrElse(""),
       scope = Play.configuration.getString("silhouette.facebook.scope")))
   }
 
@@ -185,8 +185,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       authorizationURL = Play.configuration.getString("silhouette.google.authorizationURL").get,
       accessTokenURL = Play.configuration.getString("silhouette.google.accessTokenURL").get,
       redirectURL = Play.configuration.getString("silhouette.google.redirectURL").get,
-      clientID = Play.configuration.getString("silhouette.google.clientID").get,
-      clientSecret = Play.configuration.getString("silhouette.google.clientSecret").get,
+      clientID = Play.configuration.getString("silhouette.google.clientID").getOrElse(""),
+      clientSecret = Play.configuration.getString("silhouette.google.clientSecret").getOrElse(""),
       scope = Play.configuration.getString("silhouette.google.scope")))
   }
 
@@ -204,8 +204,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       accessTokenURL = Play.configuration.getString("silhouette.twitter.accessTokenURL").get,
       authorizationURL = Play.configuration.getString("silhouette.twitter.authorizationURL").get,
       callbackURL = Play.configuration.getString("silhouette.twitter.callbackURL").get,
-      consumerKey = Play.configuration.getString("silhouette.twitter.consumerKey").get,
-      consumerSecret = Play.configuration.getString("silhouette.twitter.consumerSecret").get)
+      consumerKey = Play.configuration.getString("silhouette.twitter.consumerKey").getOrElse(""),
+      consumerSecret = Play.configuration.getString("silhouette.twitter.consumerSecret").getOrElse(""))
 
     TwitterProvider(httpLayer, new PlayOAuth1Service(settings), settings)
   }
