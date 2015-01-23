@@ -1,6 +1,6 @@
 package utils.di
 
-import com.google.inject.{AbstractModule, Provides}
+import com.google.inject.{Singleton, AbstractModule, Provides}
 import com.mohiva.play.silhouette.api.services._
 import com.mohiva.play.silhouette.api.util._
 import com.mohiva.play.silhouette.api.{Environment, EventBus}
@@ -11,6 +11,8 @@ import com.mohiva.play.silhouette.impl.providers.oauth1._
 import com.mohiva.play.silhouette.impl.providers.oauth1.services.PlayOAuth1Service
 import com.mohiva.play.silhouette.impl.providers.oauth2._
 import com.mohiva.play.silhouette.impl.providers.oauth2.state.{CookieStateProvider, CookieStateSettings}
+import com.mohiva.play.silhouette.impl.providers.openid.YahooProvider
+import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDService
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
 import models.User
@@ -34,6 +36,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAO]
     bind[DelegableAuthInfoDAO[OAuth1Info]].to[OAuth1InfoDAO]
     bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDAO]
+    bind[DelegableAuthInfoDAO[OpenIDInfo]].to[OpenIDInfoDAO]
     bind[CacheLayer].to[PlayCacheLayer]
     bind[HTTPLayer].to[PlayHTTPLayer]
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
@@ -52,6 +55,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * @param facebookProvider The Facebook provider implementation.
    * @param googleProvider The Google provider implementation.
    * @param twitterProvider The Twitter provider implementation.
+   * @param yahooProvider The Yahoo provider implementation.
    * @return The Silhouette environment.
    */
   @Provides
@@ -62,7 +66,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     credentialsProvider: CredentialsProvider,
     facebookProvider: FacebookProvider,
     googleProvider: GoogleProvider,
-    twitterProvider: TwitterProvider): Environment[User, SessionAuthenticator] = {
+    twitterProvider: TwitterProvider,
+    yahooProvider: YahooProvider): Environment[User, SessionAuthenticator] = {
 
     Environment[User, SessionAuthenticator](
       userService,
@@ -71,7 +76,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
         credentialsProvider.id -> credentialsProvider,
         facebookProvider.id -> facebookProvider,
         googleProvider.id -> googleProvider,
-        twitterProvider.id -> twitterProvider
+        twitterProvider.id -> twitterProvider,
+        yahooProvider.id -> yahooProvider
       ),
       eventBus
     )
@@ -101,15 +107,17 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * @param passwordInfoDAO The implementation of the delegable password auth info DAO.
    * @param oauth1InfoDAO The implementation of the delegable OAuth1 auth info DAO.
    * @param oauth2InfoDAO The implementation of the delegable OAuth2 auth info DAO.
+   * @param openIDInfoDAO The implementation of the delegable OpenID auth info DAO.
    * @return The auth info service instance.
    */
   @Provides
   def provideAuthInfoService(
     passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
-    oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info]): AuthInfoService = {
+    oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
+    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoService = {
 
-    new DelegableAuthInfoService(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO)
+    new DelegableAuthInfoService(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
   }
 
   /**
@@ -208,5 +216,26 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       consumerSecret = Play.configuration.getString("silhouette.twitter.consumerSecret").getOrElse(""))
 
     TwitterProvider(httpLayer, new PlayOAuth1Service(settings), settings)
+  }
+
+  /**
+   * Provides the Yahoo provider.
+   *
+   * @param cacheLayer The cache layer implementation.
+   * @param httpLayer The HTTP layer implementation.
+   * @return The Twitter provider.
+   */
+  @Provides
+  @Singleton
+  def provideYahooProvider(cacheLayer: CacheLayer, httpLayer: HTTPLayer): YahooProvider = {
+    import scala.collection.JavaConversions._
+    val settings = OpenIDSettings(
+      providerURL = Play.configuration.getString("silhouette.yahoo.providerURL").get,
+      callbackURL = Play.configuration.getString("silhouette.yahoo.callbackURL").get,
+      axRequired = Play.configuration.getObject("silhouette.yahoo.axRequired").map(_.mapValues(_.unwrapped().toString).toSeq).getOrElse(Seq()),
+      axOptional = Play.configuration.getObject("silhouette.yahoo.axOptional").map(_.mapValues(_.unwrapped().toString).toSeq).getOrElse(Seq()),
+      realm = Play.configuration.getString("silhouette.yahoo.realm"))
+
+    YahooProvider(httpLayer, new PlayOpenIDService(settings), settings)
   }
 }

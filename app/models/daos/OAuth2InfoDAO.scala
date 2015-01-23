@@ -10,6 +10,8 @@ import scala.concurrent.Future
 
 /**
  * The DAO to store the OAuth2 information.
+ *
+ * Note: Not thread safe, demo only.
  */
 class OAuth2InfoDAO extends DelegableAuthInfoDAO[OAuth2Info] {
 
