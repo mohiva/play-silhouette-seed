@@ -31,10 +31,11 @@
                 <div class="social-providers">
                     <p>Or use your existing account on one of the following services to sign in:</p>
                     <div>
-                    @for(p <- providers) {
+                    @for(p <- providers if p.id != "clef") {
                         <a href="@routes.SocialAuthController.authenticate(p.id)"><img src="@routes.Assets.at(s"images/providers/${p.id}.png")" style="width:60px;height:60px;"></a>
                     }
                     </div>
+                    <script type="text/javascript" src="https://clef.io/v3/clef.js" class="clef-button" data-app-id="afd0ca36b36631cf508dc73977ee11ec" data-color="blue" data-style="flat" data-redirect-url="http://localhost:9000/authenticate/clef" data-type="login"></script>
                 </div>
             }
         }
