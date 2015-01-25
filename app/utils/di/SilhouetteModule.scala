@@ -10,7 +10,7 @@ import com.mohiva.play.silhouette.impl.providers._
 import com.mohiva.play.silhouette.impl.providers.oauth1._
 import com.mohiva.play.silhouette.impl.providers.oauth1.services.PlayOAuth1Service
 import com.mohiva.play.silhouette.impl.providers.oauth2._
-import com.mohiva.play.silhouette.impl.providers.oauth2.state.{CookieStateProvider, CookieStateSettings}
+import com.mohiva.play.silhouette.impl.providers.oauth2.state.{DummyStateProvider, CookieStateProvider, CookieStateSettings}
 import com.mohiva.play.silhouette.impl.providers.openid.YahooProvider
 import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDService
 import com.mohiva.play.silhouette.impl.services._
@@ -66,6 +66,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     credentialsProvider: CredentialsProvider,
     facebookProvider: FacebookProvider,
     googleProvider: GoogleProvider,
+    clefProvider: ClefProvider,
     twitterProvider: TwitterProvider,
     yahooProvider: YahooProvider): Environment[User, SessionAuthenticator] = {
 
@@ -76,6 +77,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
         credentialsProvider.id -> credentialsProvider,
         facebookProvider.id -> facebookProvider,
         googleProvider.id -> googleProvider,
+        clefProvider.id -> clefProvider,
         twitterProvider.id -> twitterProvider,
         yahooProvider.id -> yahooProvider
       ),
@@ -196,6 +198,22 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       clientID = Play.configuration.getString("silhouette.google.clientID").getOrElse(""),
       clientSecret = Play.configuration.getString("silhouette.google.clientSecret").getOrElse(""),
       scope = Play.configuration.getString("silhouette.google.scope")))
+  }
+
+  /**
+   * Provides the Clef provider.
+   *
+   * @param httpLayer The HTTP layer implementation.
+   * @return The Clef provider.
+   */
+  @Provides
+  def provideClefProvider(httpLayer: HTTPLayer): ClefProvider = {
+    ClefProvider(httpLayer, new DummyStateProvider, OAuth2Settings(
+      authorizationURL = Play.configuration.getString("silhouette.clef.authorizationURL").get,
+      accessTokenURL = Play.configuration.getString("silhouette.clef.accessTokenURL").get,
+      redirectURL = Play.configuration.getString("silhouette.clef.redirectURL").get,
+      clientID = Play.configuration.getString("silhouette.clef.clientID").getOrElse(""),
+      clientSecret = Play.configuration.getString("silhouette.clef.clientSecret").getOrElse("")))
   }
 
   /**

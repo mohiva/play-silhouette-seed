@@ -35,6 +35,12 @@ a {
     margin-top: 20px;
 }
 
+.clef-button-wrapper {
+    width: 190px!important;
+    height: 34px!important;
+    margin: 20px auto 0 auto!important;
+}
+
 .user {
     margin-top: 50px;
 }
