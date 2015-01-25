@@ -2,6 +2,8 @@
 
 @import com.mohiva.play.silhouette.impl.providers._
 @import views.html.bootstrap._
+@import play.api.Play
+@import play.api.Play.current
 
 @main("Silhouette - Sign In") {
     @request.flash.get("error").map { msg =>
@@ -35,7 +37,7 @@
                         <a href="@routes.SocialAuthController.authenticate(p.id)"><img src="@routes.Assets.at(s"images/providers/${p.id}.png")" style="width:60px;height:60px;"></a>
                     }
                     </div>
-                    <script type="text/javascript" src="https://clef.io/v3/clef.js" class="clef-button" data-app-id="afd0ca36b36631cf508dc73977ee11ec" data-color="blue" data-style="flat" data-redirect-url="http://localhost:9000/authenticate/clef" data-type="login"></script>
+                    <script type="text/javascript" src="https://clef.io/v3/clef.js" class="clef-button" data-app-id="@Play.configuration.getString("silhouette.clef.clientID").getOrElse("")" data-color="blue" data-style="flat" data-redirect-url="@Play.configuration.getString("silhouette.clef.redirectURL").getOrElse("")" data-type="login"></script>
                 </div>
             }
         }
