@@ -83,5 +83,5 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
   /**
    * A Silhouette fake environment.
    */
-  implicit val env = FakeEnvironment[User, SessionAuthenticator](identity)
+  implicit val env = FakeEnvironment[User, SessionAuthenticator](Seq(identity.loginInfo -> identity))
 }
