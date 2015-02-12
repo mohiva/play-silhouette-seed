@@ -1,6 +1,6 @@
 package utils.di
 
-import com.google.inject.{Singleton, AbstractModule, Provides}
+import com.google.inject.{AbstractModule, Provides}
 import com.mohiva.play.silhouette.api.services._
 import com.mohiva.play.silhouette.api.util._
 import com.mohiva.play.silhouette.api.{Environment, EventBus}
@@ -244,7 +244,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * @return The Twitter provider.
    */
   @Provides
-  @Singleton
   def provideYahooProvider(cacheLayer: CacheLayer, httpLayer: HTTPLayer): YahooProvider = {
     import scala.collection.JavaConversions._
     val settings = OpenIDSettings(
