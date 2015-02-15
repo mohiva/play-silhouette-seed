@@ -4,7 +4,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api._
-import com.mohiva.play.silhouette.api.services.{AuthInfoService, AvatarService}
+import com.mohiva.play.silhouette.api.services.{ AuthInfoService, AvatarService }
 import com.mohiva.play.silhouette.api.util.PasswordHasher
 import com.mohiva.play.silhouette.impl.authenticators.SessionAuthenticator
 import com.mohiva.play.silhouette.impl.providers._
@@ -39,7 +39,7 @@ class SignUpController @Inject() (
    * @return The result to display.
    */
   def signUp = Action.async { implicit request =>
-    SignUpForm.form.bindFromRequest.fold (
+    SignUpForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.signUp(form))),
       data => {
         val loginInfo = LoginInfo(CredentialsProvider.ID, data.email)
@@ -66,7 +66,7 @@ class SignUpController @Inject() (
               result <- env.authenticatorService.embed(value, Future.successful(
                 Redirect(routes.ApplicationController.index)
               ))
-            } yield  {
+            } yield {
               env.eventBus.publish(SignUpEvent(user, request, request2lang))
               env.eventBus.publish(LoginEvent(user, request, request2lang))
               result

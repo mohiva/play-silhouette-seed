@@ -17,7 +17,8 @@ Or you can find a running example of this template under the following URL: http
 
 * Sign Up
 * Sign In (Credentials)
-* Social Auth (Facebook, Google+, Twitter)
+* Social Auth (Facebook, Google+, VK, Twitter, Xing, Yahoo)
+* Two-factor authentication with Clef
 * Dependency Injection with Guice
 * Publishing Events
 * Avatar service

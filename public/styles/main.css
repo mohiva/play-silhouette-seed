@@ -27,6 +27,20 @@ a {
     cursor: pointer;
 }
 
+.provider {
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+    border-radius: 4px;
+    outline: none;
+}
+.facebook { background: #3B5998; }
+.google { background: #D14836; }
+.twitter { background: #00ACED; }
+.yahoo { background: #731A8B; }
+.xing { background: #006567; }
+.vk { background: #567ca4; }
+
 .social-providers,
 .sign-in-now,
 .already-member,

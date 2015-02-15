@@ -4,14 +4,14 @@ import java.util.UUID
 
 import app.Global
 import com.google.inject.util.Modules
-import com.google.inject.{Guice, AbstractModule}
-import com.mohiva.play.silhouette.api.{Environment, LoginInfo}
+import com.google.inject.{ Guice, AbstractModule }
+import com.mohiva.play.silhouette.api.{ Environment, LoginInfo }
 import com.mohiva.play.silhouette.impl.authenticators.SessionAuthenticator
 import com.mohiva.play.silhouette.test._
 import models.User
 import net.codingwell.scalaguice.ScalaModule
 import org.specs2.mock.Mockito
-import play.api.test.{FakeApplication, FakeRequest, WithApplication, PlaySpecification}
+import play.api.test.{ FakeApplication, FakeRequest, WithApplication, PlaySpecification }
 import utils.di.SilhouetteModule
 
 /**

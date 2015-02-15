@@ -1,22 +1,24 @@
 import play.PlayScala
 
-scalaVersion := "2.11.4"
+import scalariform.formatter.preferences._
 
 name := "play-silhouette-seed"
 
-version := "2.0-SNAPSHOT"
+version := "2.0-RC1"
+
+scalaVersion := "2.11.4"
 
 resolvers := ("Atlassian Releases" at "https://maven.atlassian.com/public/") +: resolvers.value
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % "2.0-SNAPSHOT",
+  "com.mohiva" %% "play-silhouette" % "2.0-RC1",
   "org.webjars" %% "webjars-play" % "2.3.0",
   "org.webjars" % "bootstrap" % "3.1.1",
   "org.webjars" % "jquery" % "1.11.0",
-  "net.codingwell" %% "scala-guice" % "4.0.0-beta4",
-  "com.mohiva" %% "play-silhouette-testkit" % "2.0-SNAPSHOT" % "test",
+  "net.codingwell" %% "scala-guice" % "4.0.0-beta5",
+  "com.mohiva" %% "play-silhouette-testkit" % "2.0-RC1" % "test",
   cache
 )
 
@@ -34,3 +36,14 @@ scalacOptions ++= Seq(
   "-Ywarn-nullary-override", // Warn when non-nullary overrides nullary, e.g. def foo() over def foo.
   "-Ywarn-numeric-widen" // Warn when numerics are widened.
 )
+
+//********************************************************
+// Scalariform settings
+//********************************************************
+
+defaultScalariformSettings
+
+ScalariformKeys.preferences := ScalariformKeys.preferences.value
+  .setPreference(FormatXml, false)
+  .setPreference(DoubleIndentClassDeclaration, false)
+  .setPreference(PreserveDanglingCloseParenthesis, true)

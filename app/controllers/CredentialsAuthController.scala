@@ -12,7 +12,7 @@ import models.User
 import models.services.UserService
 import play.api.i18n.Messages
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.{RequestHeader, Action}
+import play.api.mvc.{ RequestHeader, Action }
 
 import scala.concurrent.Future
 
@@ -44,7 +44,7 @@ class CredentialsAuthController @Inject() (
    * @return The result to display.
    */
   def authenticate = Action.async { implicit request =>
-    SignInForm.form.bindFromRequest.fold (
+    SignInForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.signIn(form))),
       credentials => (env.providers.get(CredentialsProvider.ID) match {
         case Some(p: CredentialsProvider) => p.authenticate(credentials)
@@ -54,7 +54,7 @@ class CredentialsAuthController @Inject() (
         userService.retrieve(loginInfo).flatMap {
           case Some(user) => env.authenticatorService.create(user.loginInfo).flatMap { authenticator =>
             env.eventBus.publish(LoginEvent(user, request, request2lang))
-            env.authenticatorService.init(authenticator).flatMap(v => env.authenticatorService.embed(v ,result))
+            env.authenticatorService.init(authenticator).flatMap(v => env.authenticatorService.embed(v, result))
           }
           case None => Future.failed(new AuthenticationException("Couldn't find user"))
         }
