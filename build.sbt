@@ -4,16 +4,16 @@ import scalariform.formatter.preferences._
 
 name := "play-silhouette-seed"
 
-version := "2.0-RC1"
+version := "2.0-RC2"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.6"
 
 resolvers := ("Atlassian Releases" at "https://maven.atlassian.com/public/") +: resolvers.value
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % "2.0-RC1",
+  "com.mohiva" %% "play-silhouette" % "2.0-RC2",
   "org.webjars" %% "webjars-play" % "2.3.0",
   "org.webjars" % "bootstrap" % "3.1.1",
   "org.webjars" % "jquery" % "1.11.0",

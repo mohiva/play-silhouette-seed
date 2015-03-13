@@ -3,12 +3,13 @@ package controllers
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api._
-import com.mohiva.play.silhouette.api.exceptions.AuthenticationException
+import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.services.AuthInfoService
 import com.mohiva.play.silhouette.impl.authenticators.SessionAuthenticator
 import com.mohiva.play.silhouette.impl.providers._
 import models.User
 import models.services.UserService
+import play.api.i18n.Messages
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc.Action
 
@@ -22,7 +23,8 @@ import scala.concurrent.Future
 class SocialAuthController @Inject() (
   val env: Environment[User, SessionAuthenticator],
   val userService: UserService,
-  val authInfoService: AuthInfoService) extends Silhouette[User, SessionAuthenticator] {
+  val authInfoService: AuthInfoService)
+  extends Silhouette[User, SessionAuthenticator] with Logger {
 
   /**
    * Authenticates a user against a social provider.
@@ -42,14 +44,18 @@ class SocialAuthController @Inject() (
             authenticator <- env.authenticatorService.create(user.loginInfo)
             value <- env.authenticatorService.init(authenticator)
             result <- env.authenticatorService.embed(value, Future.successful(
-              Redirect(routes.ApplicationController.index)
+              Redirect(routes.ApplicationController.index())
             ))
           } yield {
             env.eventBus.publish(LoginEvent(user, request, request2lang))
             result
           }
         }
-      case _ => Future.failed(new AuthenticationException(s"Cannot authenticate with unexpected social provider $provider"))
-    }).recoverWith(exceptionHandler)
+      case _ => Future.failed(new ProviderException(s"Cannot authenticate with unexpected social provider $provider"))
+    }).recover {
+      case e: ProviderException =>
+        logger.error("Unexpected provider error", e)
+        Redirect(routes.ApplicationController.signIn()).flashing("error" -> Messages("could.not.authenticate"))
+    }
   }
 }
