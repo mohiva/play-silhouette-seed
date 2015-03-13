@@ -31,7 +31,8 @@ class SignUpController @Inject() (
   val userService: UserService,
   val authInfoService: AuthInfoService,
   val avatarService: AvatarService,
-  val passwordHasher: PasswordHasher) extends Silhouette[User, SessionAuthenticator] {
+  val passwordHasher: PasswordHasher)
+  extends Silhouette[User, SessionAuthenticator] {
 
   /**
    * Registers a new user.
@@ -64,7 +65,7 @@ class SignUpController @Inject() (
               authenticator <- env.authenticatorService.create(user.loginInfo)
               value <- env.authenticatorService.init(authenticator)
               result <- env.authenticatorService.embed(value, Future.successful(
-                Redirect(routes.ApplicationController.index)
+                Redirect(routes.ApplicationController.index())
               ))
             } yield {
               env.eventBus.publish(SignUpEvent(user, request, request2lang))
