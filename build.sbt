@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "bootstrap" % "3.1.1",
   "org.webjars" % "jquery" % "1.11.0",
   "net.codingwell" %% "scala-guice" % "4.0.0-beta5",
-  "com.mohiva" %% "play-silhouette-testkit" % "2.0-RC1" % "test",
+  "com.mohiva" %% "play-silhouette-testkit" % "2.0-RC2" % "test",
   cache
 )
 
