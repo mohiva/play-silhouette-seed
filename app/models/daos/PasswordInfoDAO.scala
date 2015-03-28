@@ -18,7 +18,7 @@ class PasswordInfoDAO extends DelegableAuthInfoDAO[PasswordInfo] {
    *
    * @param loginInfo The login info for which the auth info should be saved.
    * @param authInfo The password info to save.
-   * @return The saved password info or None if the password info couldn't be saved.
+   * @return The saved password info.
    */
   def save(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] = {
     data += (loginInfo -> authInfo)
