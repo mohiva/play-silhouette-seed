@@ -20,7 +20,7 @@ class OpenIDInfoDAO extends DelegableAuthInfoDAO[OpenIDInfo] {
    *
    * @param loginInfo The login info for which the auth info should be saved.
    * @param authInfo The OpenID info to save.
-   * @return The saved OpenID info or None if the OpenID info couldn't be saved.
+   * @return The saved OpenID info.
    */
   def save(loginInfo: LoginInfo, authInfo: OpenIDInfo): Future[OpenIDInfo] = {
     data += (loginInfo -> authInfo)
