@@ -42,7 +42,7 @@ class CredentialsAuthController @Inject() (
       }).flatMap { loginInfo =>
         val result = Future.successful(Redirect(routes.ApplicationController.index()))
         userService.retrieve(loginInfo).flatMap {
-          case Some(user) => env.authenticatorService.create(user.loginInfo).flatMap { authenticator =>
+          case Some(user) => env.authenticatorService.create(loginInfo).flatMap { authenticator =>
             env.eventBus.publish(LoginEvent(user, request, request2lang))
             env.authenticatorService.init(authenticator).flatMap(v => env.authenticatorService.embed(v, result))
           }
