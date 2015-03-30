@@ -18,12 +18,16 @@ import scala.concurrent.Future
 /**
  * The social auth controller.
  *
+ * @param userService The user service implementation.
+ * @param authInfoService The auth info service implementation.
+ * @param socialProviderRegistry The social provider registry.
  * @param env The Silhouette environment.
  */
 class SocialAuthController @Inject() (
-  val env: Environment[User, SessionAuthenticator],
-  val userService: UserService,
-  val authInfoService: AuthInfoService)
+  userService: UserService,
+  authInfoService: AuthInfoService,
+  socialProviderRegistry: SocialProviderRegistry,
+  protected val env: Environment[User, SessionAuthenticator])
   extends Silhouette[User, SessionAuthenticator] with Logger {
 
   /**
@@ -33,7 +37,7 @@ class SocialAuthController @Inject() (
    * @return The result to display.
    */
   def authenticate(provider: String) = Action.async { implicit request =>
-    (env.providers.get(provider) match {
+    (socialProviderRegistry.get(provider) match {
       case Some(p: SocialProvider with CommonSocialProfileBuilder) =>
         p.authenticate().flatMap {
           case Left(result) => Future.successful(result)
