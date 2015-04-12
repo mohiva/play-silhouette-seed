@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api._
-import com.mohiva.play.silhouette.api.exceptions.{ConfigurationException, ProviderException}
+import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.services.AuthInfoService
 import com.mohiva.play.silhouette.impl.authenticators.SessionAuthenticator
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
@@ -20,12 +20,18 @@ import scala.concurrent.Future
 /**
  * The credentials auth controller.
  *
+ * @param userService The user service implementation.
+ * @param authInfoService The auth info service implementation.
+ * @param credentialsProvider The credentials provider.
+ * @param socialProviderRegistry The social provider registry.
  * @param env The Silhouette environment.
  */
 class CredentialsAuthController @Inject() (
-  implicit val env: Environment[User, SessionAuthenticator],
-  val userService: UserService,
-  val authInfoService: AuthInfoService)
+  userService: UserService,
+  authInfoService: AuthInfoService,
+  credentialsProvider: CredentialsProvider,
+  socialProviderRegistry: SocialProviderRegistry,
+  protected val env: Environment[User, SessionAuthenticator])
   extends Silhouette[User, SessionAuthenticator] {
 
   /**
@@ -35,11 +41,8 @@ class CredentialsAuthController @Inject() (
    */
   def authenticate = Action.async { implicit request =>
     SignInForm.form.bindFromRequest.fold(
-      form => Future.successful(BadRequest(views.html.signIn(form))),
-      credentials => (env.providers.get(CredentialsProvider.ID) match {
-        case Some(p: CredentialsProvider) => p.authenticate(credentials)
-        case _ => Future.failed(new ConfigurationException(s"Cannot find credentials provider"))
-      }).flatMap { loginInfo =>
+      form => Future.successful(BadRequest(views.html.signIn(form, socialProviderRegistry))),
+      credentials => credentialsProvider.authenticate(credentials).flatMap { loginInfo =>
         val result = Future.successful(Redirect(routes.ApplicationController.index()))
         userService.retrieve(loginInfo).flatMap {
           case Some(user) => env.authenticatorService.create(loginInfo).flatMap { authenticator =>

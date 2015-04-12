@@ -23,8 +23,6 @@ import net.codingwell.scalaguice.ScalaModule
 import play.api.Play
 import play.api.Play.current
 
-import scala.collection.immutable.ListMap
-
 /**
  * The Guice module which wires all Silhouette dependencies.
  */
@@ -54,7 +52,25 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * @param userService The user service implementation.
    * @param authenticatorService The authentication service implementation.
    * @param eventBus The event bus instance.
-   * @param credentialsProvider The credentials provider implementation.
+   * @return The Silhouette environment.
+   */
+  @Provides
+  def provideEnvironment(
+    userService: UserService,
+    authenticatorService: AuthenticatorService[SessionAuthenticator],
+    eventBus: EventBus): Environment[User, SessionAuthenticator] = {
+
+    Environment[User, SessionAuthenticator](
+      userService,
+      authenticatorService,
+      Seq(),
+      eventBus
+    )
+  }
+
+  /**
+   * Provides the social provider registry.
+   *
    * @param facebookProvider The Facebook provider implementation.
    * @param googleProvider The Google provider implementation.
    * @param vkProvider The VK provider implementation.
@@ -65,34 +81,24 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * @return The Silhouette environment.
    */
   @Provides
-  def provideEnvironment(
-    userService: UserService,
-    authenticatorService: AuthenticatorService[SessionAuthenticator],
-    eventBus: EventBus,
-    credentialsProvider: CredentialsProvider,
+  def provideSocialProviderRegistry(
     facebookProvider: FacebookProvider,
     googleProvider: GoogleProvider,
     vkProvider: VKProvider,
     clefProvider: ClefProvider,
     twitterProvider: TwitterProvider,
     xingProvider: XingProvider,
-    yahooProvider: YahooProvider): Environment[User, SessionAuthenticator] = {
+    yahooProvider: YahooProvider): SocialProviderRegistry = {
 
-    Environment[User, SessionAuthenticator](
-      userService,
-      authenticatorService,
-      ListMap(
-        credentialsProvider.id -> credentialsProvider,
-        googleProvider.id -> googleProvider,
-        facebookProvider.id -> facebookProvider,
-        twitterProvider.id -> twitterProvider,
-        vkProvider.id -> vkProvider,
-        xingProvider.id -> xingProvider,
-        yahooProvider.id -> yahooProvider,
-        clefProvider.id -> clefProvider
-      ),
-      eventBus
-    )
+    SocialProviderRegistry(Seq(
+      googleProvider,
+      facebookProvider,
+      twitterProvider,
+      vkProvider,
+      xingProvider,
+      yahooProvider,
+      clefProvider
+    ))
   }
 
   /**
