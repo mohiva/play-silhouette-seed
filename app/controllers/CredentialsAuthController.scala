@@ -43,7 +43,7 @@ class CredentialsAuthController @Inject() (
     SignInForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.signIn(form, socialProviderRegistry))),
       credentials => credentialsProvider.authenticate(credentials).flatMap { loginInfo =>
-        val result = Future.successful(Redirect(routes.ApplicationController.index()))
+        val result = Redirect(routes.ApplicationController.index())
         userService.retrieve(loginInfo).flatMap {
           case Some(user) => env.authenticatorService.create(loginInfo).flatMap { authenticator =>
             env.eventBus.publish(LoginEvent(user, request, request2lang))

@@ -64,9 +64,7 @@ class SignUpController @Inject() (
               authInfo <- authInfoService.save(loginInfo, authInfo)
               authenticator <- env.authenticatorService.create(loginInfo)
               value <- env.authenticatorService.init(authenticator)
-              result <- env.authenticatorService.embed(value, Future.successful(
-                Redirect(routes.ApplicationController.index())
-              ))
+              result <- env.authenticatorService.embed(value, Redirect(routes.ApplicationController.index()))
             } yield {
               env.eventBus.publish(SignUpEvent(user, request, request2lang))
               env.eventBus.publish(LoginEvent(user, request, request2lang))
