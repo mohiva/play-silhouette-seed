@@ -1,4 +1,4 @@
-@(signInForm: Form[com.mohiva.play.silhouette.api.util.Credentials], socialProviders: com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry)(implicit request: RequestHeader)
+@(signInForm: Form[com.mohiva.play.silhouette.api.util.Credentials], socialProviders: com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry)(implicit request: RequestHeader, messages: Messages)
 
 @import com.mohiva.play.silhouette.impl.providers.oauth2.ClefProvider
 @import views.html.bootstrap._

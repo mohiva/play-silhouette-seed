@@ -1,10 +1,8 @@
-import play.PlayScala
-
 import scalariform.formatter.preferences._
 
 name := "play-silhouette-seed"
 
-version := "2.1-SNAPSHOT"
+version := "3.0.0-SNAPSHOT"
 
 scalaVersion := "2.11.6"
 
@@ -13,16 +11,19 @@ resolvers := ("Atlassian Releases" at "https://maven.atlassian.com/public/") +: 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % "2.1-SNAPSHOT",
-  "org.webjars" %% "webjars-play" % "2.3.0",
+  "com.mohiva" %% "play-silhouette" % "3.0.0-SNAPSHOT",
+  "org.webjars" %% "webjars-play" % "2.4.0-RC1",
   "org.webjars" % "bootstrap" % "3.1.1",
   "org.webjars" % "jquery" % "1.11.0",
-  "net.codingwell" %% "scala-guice" % "4.0.0-beta5",
-  "com.mohiva" %% "play-silhouette-testkit" % "2.1-SNAPSHOT" % "test",
+  "net.codingwell" %% "scala-guice" % "4.0.0-SNAPSHOT",
+  "com.mohiva" %% "play-silhouette-testkit" % "3.0.0-SNAPSHOT" % "test",
+  specs2 % Test,
   cache
 )
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
+
+routesGenerator := InjectedRoutesGenerator
 
 scalacOptions ++= Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.

@@ -1,6 +1,7 @@
-package utils.di
+package modules
 
 import com.google.inject.{ AbstractModule, Provides }
+import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services._
 import com.mohiva.play.silhouette.api.util._
 import com.mohiva.play.silhouette.api.{ Environment, EventBus }
@@ -8,12 +9,13 @@ import com.mohiva.play.silhouette.impl.authenticators._
 import com.mohiva.play.silhouette.impl.daos.DelegableAuthInfoDAO
 import com.mohiva.play.silhouette.impl.providers._
 import com.mohiva.play.silhouette.impl.providers.oauth1._
-import com.mohiva.play.silhouette.impl.providers.oauth1.secrets.{ CookieSecretSettings, CookieSecretProvider }
+import com.mohiva.play.silhouette.impl.providers.oauth1.secrets.{ CookieSecretProvider, CookieSecretSettings }
 import com.mohiva.play.silhouette.impl.providers.oauth1.services.PlayOAuth1Service
 import com.mohiva.play.silhouette.impl.providers.oauth2._
-import com.mohiva.play.silhouette.impl.providers.oauth2.state.{ DummyStateProvider, CookieStateProvider, CookieStateSettings }
+import com.mohiva.play.silhouette.impl.providers.oauth2.state.{ CookieStateProvider, CookieStateSettings, DummyStateProvider }
 import com.mohiva.play.silhouette.impl.providers.openid.YahooProvider
 import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDService
+import com.mohiva.play.silhouette.impl.repositories.DelegableAuthInfoRepository
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
 import models.User
@@ -120,22 +122,22 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   }
 
   /**
-   * Provides the auth info service.
+   * Provides the auth info repository.
    *
    * @param passwordInfoDAO The implementation of the delegable password auth info DAO.
    * @param oauth1InfoDAO The implementation of the delegable OAuth1 auth info DAO.
    * @param oauth2InfoDAO The implementation of the delegable OAuth2 auth info DAO.
    * @param openIDInfoDAO The implementation of the delegable OpenID auth info DAO.
-   * @return The auth info service instance.
+   * @return The auth info repository instance.
    */
   @Provides
-  def provideAuthInfoService(
+  def provideAuthInfoRepository(
     passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
-    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoService = {
+    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoRepository = {
 
-    new DelegableAuthInfoService(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
+    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
   }
 
   /**
@@ -185,16 +187,16 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   /**
    * Provides the credentials provider.
    *
-   * @param authInfoService The auth info service implemenetation.
+   * @param authInfoRepository The auth info repository implementation.
    * @param passwordHasher The default password hasher implementation.
    * @return The credentials provider.
    */
   @Provides
   def provideCredentialsProvider(
-    authInfoService: AuthInfoService,
+    authInfoRepository: AuthInfoRepository,
     passwordHasher: PasswordHasher): CredentialsProvider = {
 
-    new CredentialsProvider(authInfoService, passwordHasher, Seq(passwordHasher))
+    new CredentialsProvider(authInfoRepository, passwordHasher, Seq(passwordHasher))
   }
 
   /**
@@ -206,7 +208,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    */
   @Provides
   def provideFacebookProvider(httpLayer: HTTPLayer, stateProvider: OAuth2StateProvider): FacebookProvider = {
-    FacebookProvider(httpLayer, stateProvider, OAuth2Settings(
+    new FacebookProvider(httpLayer, stateProvider, OAuth2Settings(
       authorizationURL = Play.configuration.getString("silhouette.facebook.authorizationURL"),
       accessTokenURL = Play.configuration.getString("silhouette.facebook.accessTokenURL").get,
       redirectURL = Play.configuration.getString("silhouette.facebook.redirectURL").get,
@@ -224,7 +226,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    */
   @Provides
   def provideGoogleProvider(httpLayer: HTTPLayer, stateProvider: OAuth2StateProvider): GoogleProvider = {
-    GoogleProvider(httpLayer, stateProvider, OAuth2Settings(
+    new GoogleProvider(httpLayer, stateProvider, OAuth2Settings(
       authorizationURL = Play.configuration.getString("silhouette.google.authorizationURL"),
       accessTokenURL = Play.configuration.getString("silhouette.google.accessTokenURL").get,
       redirectURL = Play.configuration.getString("silhouette.google.redirectURL").get,
@@ -242,7 +244,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    */
   @Provides
   def provideVKProvider(httpLayer: HTTPLayer, stateProvider: OAuth2StateProvider): VKProvider = {
-    VKProvider(httpLayer, stateProvider, OAuth2Settings(
+    new VKProvider(httpLayer, stateProvider, OAuth2Settings(
       authorizationURL = Play.configuration.getString("silhouette.vk.authorizationURL"),
       accessTokenURL = Play.configuration.getString("silhouette.vk.accessTokenURL").get,
       redirectURL = Play.configuration.getString("silhouette.vk.redirectURL").get,
@@ -259,7 +261,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    */
   @Provides
   def provideClefProvider(httpLayer: HTTPLayer): ClefProvider = {
-    ClefProvider(httpLayer, new DummyStateProvider, OAuth2Settings(
+    new ClefProvider(httpLayer, new DummyStateProvider, OAuth2Settings(
       accessTokenURL = Play.configuration.getString("silhouette.clef.accessTokenURL").get,
       redirectURL = Play.configuration.getString("silhouette.clef.redirectURL").get,
       clientID = Play.configuration.getString("silhouette.clef.clientID").getOrElse(""),
@@ -283,7 +285,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       consumerKey = Play.configuration.getString("silhouette.twitter.consumerKey").getOrElse(""),
       consumerSecret = Play.configuration.getString("silhouette.twitter.consumerSecret").getOrElse(""))
 
-    TwitterProvider(httpLayer, new PlayOAuth1Service(settings), tokenSecretProvider, settings)
+    new TwitterProvider(httpLayer, new PlayOAuth1Service(settings), tokenSecretProvider, settings)
   }
 
   /**
@@ -303,7 +305,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       consumerKey = Play.configuration.getString("silhouette.xing.consumerKey").getOrElse(""),
       consumerSecret = Play.configuration.getString("silhouette.xing.consumerSecret").getOrElse(""))
 
-    XingProvider(httpLayer, new PlayOAuth1Service(settings), tokenSecretProvider, settings)
+    new XingProvider(httpLayer, new PlayOAuth1Service(settings), tokenSecretProvider, settings)
   }
 
   /**
@@ -323,6 +325,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       axOptional = Play.configuration.getObject("silhouette.yahoo.axOptional").map(_.mapValues(_.unwrapped().toString).toSeq).getOrElse(Seq()),
       realm = Play.configuration.getString("silhouette.yahoo.realm"))
 
-    YahooProvider(httpLayer, new PlayOpenIDService(settings), settings)
+    new YahooProvider(httpLayer, new PlayOpenIDService(settings), settings)
   }
 }

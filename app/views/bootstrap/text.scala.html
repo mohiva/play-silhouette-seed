@@ -1,4 +1,4 @@
-@(field: Field, label: String = "", help: String = "", icon: String = "")
+@(field: Field, label: String = "", help: String = "", icon: String = "")(implicit messages: Messages)
 
 <div class="form-group has-feedback @if(field.hasErrors) {has-error}">
     <div>
