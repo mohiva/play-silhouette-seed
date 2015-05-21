@@ -7,18 +7,21 @@ import com.mohiva.play.silhouette.impl.authenticators.SessionAuthenticator
 import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 import forms._
 import models.User
+import play.api.i18n.MessagesApi
 
 import scala.concurrent.Future
 
 /**
  * The basic application controller.
  *
- * @param socialProviderRegistry The social provider registry.
+ * @param messagesApi The Play messages API.
  * @param env The Silhouette environment.
+ * @param socialProviderRegistry The social provider registry.
  */
 class ApplicationController @Inject() (
-  socialProviderRegistry: SocialProviderRegistry,
-  protected val env: Environment[User, SessionAuthenticator])
+  val messagesApi: MessagesApi,
+  val env: Environment[User, SessionAuthenticator],
+  socialProviderRegistry: SocialProviderRegistry)
   extends Silhouette[User, SessionAuthenticator] {
 
   /**
@@ -61,7 +64,7 @@ class ApplicationController @Inject() (
    */
   def signOut = SecuredAction.async { implicit request =>
     val result = Redirect(routes.ApplicationController.index())
-    env.eventBus.publish(LogoutEvent(request.identity, request, request2lang))
+    env.eventBus.publish(LogoutEvent(request.identity, request, request2Messages))
 
     env.authenticatorService.discard(request.authenticator, result)
   }
