@@ -1,23 +1,28 @@
-package app
+package utils
 
-import com.mohiva.play.silhouette.api.{ Logger, SecuredSettings }
+import javax.inject.Inject
+
+import com.mohiva.play.silhouette.api.SecuredErrorHandler
 import controllers.routes
-import play.api.GlobalSettings
+import play.api.http.DefaultHttpErrorHandler
 import play.api.i18n.Messages
 import play.api.mvc.Results._
-import play.api.mvc.{ RequestHeader, Result }
+import play.api.mvc.{ Result, RequestHeader }
+import play.api.routing.Router
+import play.api.{ OptionalSourceMapper, Configuration }
 
 import scala.concurrent.Future
 
 /**
- * The global object.
+ * A secured error handler.
  */
-object Global extends Global
-
-/**
- * The global configuration.
- */
-trait Global extends GlobalSettings with SecuredSettings with Logger {
+class ErrorHandler @Inject() (
+  env: play.api.Environment,
+  config: Configuration,
+  sourceMapper: OptionalSourceMapper,
+  router: javax.inject.Provider[Router])
+  extends DefaultHttpErrorHandler(env, config, sourceMapper, router)
+  with SecuredErrorHandler {
 
   /**
    * Called when a user is not authenticated.
