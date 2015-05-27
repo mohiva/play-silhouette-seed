@@ -24,6 +24,7 @@ import models.services.{ UserService, UserServiceImpl }
 import net.codingwell.scalaguice.ScalaModule
 import play.api.Play
 import play.api.Play.current
+import play.api.libs.concurrent.Execution.Implicits._
 
 /**
  * The Guice module which wires all Silhouette dependencies.
@@ -41,7 +42,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDAO]
     bind[DelegableAuthInfoDAO[OpenIDInfo]].to[OpenIDInfoDAO]
     bind[CacheLayer].to[PlayCacheLayer]
-    bind[HTTPLayer].to[PlayHTTPLayer]
+    bind[HTTPLayer].toInstance(new PlayHTTPLayer)
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
     bind[PasswordHasher].toInstance(new BCryptPasswordHasher)
     bind[FingerprintGenerator].toInstance(new DefaultFingerprintGenerator(false))
