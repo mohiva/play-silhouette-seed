@@ -14,10 +14,10 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
   "com.mohiva" %% "play-silhouette" % "3.0.0-SNAPSHOT",
-  "org.webjars" %% "webjars-play" % "2.4.0-RC1",
+  "org.webjars" %% "webjars-play" % "2.4.0",
   "org.webjars" % "bootstrap" % "3.1.1",
   "org.webjars" % "jquery" % "1.11.0",
-  "net.codingwell" %% "scala-guice" % "4.0.0-SNAPSHOT",
+  "net.codingwell" %% "scala-guice" % "4.0.0",
   "com.mohiva" %% "play-silhouette-testkit" % "3.0.0-SNAPSHOT" % "test",
   specs2 % Test,
   cache
