@@ -25,6 +25,7 @@ import net.codingwell.scalaguice.ScalaModule
 import play.api.Play
 import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.openid.OpenIdClient
 
 /**
  * The Guice module which wires all Silhouette dependencies.
@@ -314,10 +315,11 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    *
    * @param cacheLayer The cache layer implementation.
    * @param httpLayer The HTTP layer implementation.
-   * @return The Twitter provider.
+   * @param client The OpenID client implementation.
+   * @return The Yahoo provider.
    */
   @Provides
-  def provideYahooProvider(cacheLayer: CacheLayer, httpLayer: HTTPLayer): YahooProvider = {
+  def provideYahooProvider(cacheLayer: CacheLayer, httpLayer: HTTPLayer, client: OpenIdClient): YahooProvider = {
     import scala.collection.JavaConversions._
     val settings = OpenIDSettings(
       providerURL = Play.configuration.getString("silhouette.yahoo.providerURL").get,
@@ -326,6 +328,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       axOptional = Play.configuration.getObject("silhouette.yahoo.axOptional").map(_.mapValues(_.unwrapped().toString).toSeq).getOrElse(Seq()),
       realm = Play.configuration.getString("silhouette.yahoo.realm"))
 
-    new YahooProvider(httpLayer, new PlayOpenIDService(settings), settings)
+    new YahooProvider(httpLayer, new PlayOpenIDService(client, settings), settings)
   }
 }
