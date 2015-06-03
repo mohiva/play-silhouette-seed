@@ -2,7 +2,7 @@ import scalariform.formatter.preferences._
 
 name := "play-silhouette-seed"
 
-version := "3.0.0-SNAPSHOT"
+version := "3.0.0-RC1"
 
 scalaVersion := "2.11.6"
 
@@ -13,12 +13,12 @@ resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % "3.0.0-SNAPSHOT",
+  "com.mohiva" %% "play-silhouette" % "3.0.0-RC1",
   "org.webjars" %% "webjars-play" % "2.4.0",
   "org.webjars" % "bootstrap" % "3.1.1",
   "org.webjars" % "jquery" % "1.11.0",
   "net.codingwell" %% "scala-guice" % "4.0.0",
-  "com.mohiva" %% "play-silhouette-testkit" % "3.0.0-SNAPSHOT" % "test",
+  "com.mohiva" %% "play-silhouette-testkit" % "3.0.0-RC1" % "test",
   specs2 % Test,
   cache
 )
