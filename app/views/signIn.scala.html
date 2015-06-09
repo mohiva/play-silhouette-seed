@@ -13,6 +13,7 @@
     <fieldset class="col-md-6 col-md-offset-3">
         <legend>Sign in with your credentials</legend>
         @helper.form(action = routes.CredentialsAuthController.authenticate()) {
+            @helper.CSRF.formField
             @text(signInForm("identifier"), "Email", icon = "at")
             @password(signInForm("password"), "Password", icon = "key")
             <div class="form-group">

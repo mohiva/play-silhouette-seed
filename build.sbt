@@ -20,7 +20,8 @@ libraryDependencies ++= Seq(
   "net.codingwell" %% "scala-guice" % "4.0.0",
   "com.mohiva" %% "play-silhouette-testkit" % "3.0.0-RC1" % "test",
   specs2 % Test,
-  cache
+  cache,
+  filters
 )
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
