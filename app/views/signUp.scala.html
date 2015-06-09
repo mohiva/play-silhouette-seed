@@ -12,6 +12,7 @@
     <fieldset class="col-md-6 col-md-offset-3">
         <legend>Sign up for a new account</legend>
         @helper.form(action = routes.SignUpController.signUp()) {
+            @helper.CSRF.formField
             @text(signInForm("firstName"), "First name", icon = "person")
             @text(signInForm("lastName"), "Last name", icon = "person")
             @text(signInForm("email"), "Email", icon = "at")
