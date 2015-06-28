@@ -20,6 +20,7 @@ Or you can find a running example of this template under the following URL: http
 * Dependency Injection with Guice
 * Publishing Events
 * Avatar service
+* Remember me functionality
 
 ## Documentation
 
