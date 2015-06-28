@@ -1,7 +1,7 @@
-@(signInForm: Form[com.mohiva.play.silhouette.api.util.Credentials], socialProviders: com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry)(implicit request: RequestHeader, messages: Messages)
+@(signInForm: Form[forms.SignInForm.Data], socialProviders: com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry)(implicit request: RequestHeader, messages: Messages)
 
 @import com.mohiva.play.silhouette.impl.providers.oauth2.ClefProvider
-@import views.html.bootstrap._
+@import b3.inline.fieldConstructor
 
 @main("Silhouette - Sign In") {
     @request.flash.get("error").map { msg =>
@@ -14,8 +14,9 @@
         <legend>Sign in with your credentials</legend>
         @helper.form(action = routes.CredentialsAuthController.authenticate()) {
             @helper.CSRF.formField
-            @text(signInForm("identifier"), "Email", icon = "at")
-            @password(signInForm("password"), "Password", icon = "key")
+            @b3.text(signInForm("email"), '_hiddenLabel -> "Email", 'placeholder -> "Email", 'class -> "form-control input-lg")
+            @b3.password(signInForm("password"), '_hiddenLabel -> "Password", 'placeholder -> "Password", 'class -> "form-control input-lg")
+            @b3.checkbox(signInForm("rememberMe"), '_text -> "Remember my login on this computer", 'checked -> true)
             <div class="form-group">
                 <div>
                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">Submit</button>

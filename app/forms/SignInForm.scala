@@ -1,6 +1,5 @@
 package forms
 
-import com.mohiva.play.silhouette.api.util.Credentials
 import play.api.data.Form
 import play.api.data.Forms._
 
@@ -14,8 +13,21 @@ object SignInForm {
    */
   val form = Form(
     mapping(
-      "identifier" -> email,
-      "password" -> nonEmptyText
-    )(Credentials.apply)(Credentials.unapply)
+      "email" -> email,
+      "password" -> nonEmptyText,
+      "rememberMe" -> boolean
+    )(Data.apply)(Data.unapply)
   )
+
+  /**
+   * The form data.
+   *
+   * @param email The email of the user.
+   * @param password The password of the user.
+   * @param rememberMe Indicates if the user should stay logged in on the next visit.
+   */
+  case class Data(
+    email: String,
+    password: String,
+    rememberMe: Boolean)
 }

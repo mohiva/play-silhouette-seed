@@ -5,7 +5,7 @@ import javax.inject.Inject
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
-import com.mohiva.play.silhouette.impl.authenticators.SessionAuthenticator
+import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
 import com.mohiva.play.silhouette.impl.providers._
 import models.User
 import models.services.UserService
@@ -26,11 +26,11 @@ import scala.concurrent.Future
  */
 class SocialAuthController @Inject() (
   val messagesApi: MessagesApi,
-  val env: Environment[User, SessionAuthenticator],
+  val env: Environment[User, CookieAuthenticator],
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
   socialProviderRegistry: SocialProviderRegistry)
-  extends Silhouette[User, SessionAuthenticator] with Logger {
+  extends Silhouette[User, CookieAuthenticator] with Logger {
 
   /**
    * Authenticates a user against a social provider.

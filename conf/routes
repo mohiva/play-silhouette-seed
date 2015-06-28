@@ -3,13 +3,13 @@
 # ~~~~
 
 # Home page
-GET         /                                @controllers.ApplicationController.index
-GET         /signIn                          @controllers.ApplicationController.signIn
-GET         /signUp                          @controllers.ApplicationController.signUp
-GET         /signOut                         @controllers.ApplicationController.signOut
-GET         /authenticate/:provider          @controllers.SocialAuthController.authenticate(provider)
-POST        /authenticate/credentials        @controllers.CredentialsAuthController.authenticate
-POST        /signUp                          @controllers.SignUpController.signUp
+GET         /                                controllers.ApplicationController.index
+GET         /signIn                          controllers.ApplicationController.signIn
+GET         /signUp                          controllers.ApplicationController.signUp
+GET         /signOut                         controllers.ApplicationController.signOut
+GET         /authenticate/:provider          controllers.SocialAuthController.authenticate(provider)
+POST        /authenticate/credentials        controllers.CredentialsAuthController.authenticate
+POST        /signUp                          controllers.SignUpController.signUp
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                    controllers.Assets.at(path="/public", file)

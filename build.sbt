@@ -13,12 +13,12 @@ resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % "3.0.0-RC1",
+  "com.mohiva" %% "play-silhouette" % "3.0.0-RC2",
   "org.webjars" %% "webjars-play" % "2.4.0",
-  "org.webjars" % "bootstrap" % "3.1.1",
-  "org.webjars" % "jquery" % "1.11.0",
   "net.codingwell" %% "scala-guice" % "4.0.0",
-  "com.mohiva" %% "play-silhouette-testkit" % "3.0.0-RC1" % "test",
+  "net.ceedubs" %% "ficus" % "1.1.2",
+  "com.adrianhurt" %% "play-bootstrap3" % "0.4.4-P24",
+  "com.mohiva" %% "play-silhouette-testkit" % "3.0.0-RC2" % "test",
   specs2 % Test,
   cache,
   filters

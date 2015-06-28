@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.{ Environment, LogoutEvent, Silhouette }
-import com.mohiva.play.silhouette.impl.authenticators.SessionAuthenticator
+import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
 import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 import forms._
 import models.User
@@ -20,9 +20,9 @@ import scala.concurrent.Future
  */
 class ApplicationController @Inject() (
   val messagesApi: MessagesApi,
-  val env: Environment[User, SessionAuthenticator],
+  val env: Environment[User, CookieAuthenticator],
   socialProviderRegistry: SocialProviderRegistry)
-  extends Silhouette[User, SessionAuthenticator] {
+  extends Silhouette[User, CookieAuthenticator] {
 
   /**
    * Handles the index action.
