@@ -1,6 +1,6 @@
 @(signInForm: Form[forms.SignUpForm.Data])(implicit request: RequestHeader, messages: Messages)
 
-@import views.html.bootstrap._
+@import b3.inline.fieldConstructor
 
 @main("Silhouette - Sign Up") {
     @request.flash.get("error").map { msg =>
@@ -13,10 +13,10 @@
         <legend>Sign up for a new account</legend>
         @helper.form(action = routes.SignUpController.signUp()) {
             @helper.CSRF.formField
-            @text(signInForm("firstName"), "First name", icon = "person")
-            @text(signInForm("lastName"), "Last name", icon = "person")
-            @text(signInForm("email"), "Email", icon = "at")
-            @password(signInForm("password"), "Password", icon = "key")
+            @b3.text(signInForm("firstName"), '_hiddenLabel -> "First name", 'placeholder -> "First name", 'class -> "form-control input-lg")
+            @b3.text(signInForm("lastName"), '_hiddenLabel -> "Last name", 'placeholder -> "Last name", 'class -> "form-control input-lg")
+            @b3.text(signInForm("email"), '_hiddenLabel -> "Email", 'placeholder -> "Email", 'class -> "form-control input-lg")
+            @b3.password(signInForm("password"), '_hiddenLabel -> "Password", 'placeholder -> "Password", 'class -> "form-control input-lg")
             <div class="form-group">
                 <div>
                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">Submit</button>

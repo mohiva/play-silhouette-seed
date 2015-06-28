@@ -7,7 +7,7 @@ import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.AvatarService
 import com.mohiva.play.silhouette.api.util.PasswordHasher
-import com.mohiva.play.silhouette.impl.authenticators.SessionAuthenticator
+import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
 import com.mohiva.play.silhouette.impl.providers._
 import forms.SignUpForm
 import models.User
@@ -30,12 +30,12 @@ import scala.concurrent.Future
  */
 class SignUpController @Inject() (
   val messagesApi: MessagesApi,
-  val env: Environment[User, SessionAuthenticator],
+  val env: Environment[User, CookieAuthenticator],
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
   avatarService: AvatarService,
   passwordHasher: PasswordHasher)
-  extends Silhouette[User, SessionAuthenticator] {
+  extends Silhouette[User, CookieAuthenticator] {
 
   /**
    * Registers a new user.
