@@ -1,10 +1,10 @@
-@(user: models.User)
+@(user: models.User)(implicit messages: Messages)
 
-@main("Silhouette - Home", Some(user)) {
+@main(Messages("home.title"), Some(user)) {
     <div class="user col-md-6 col-md-offset-3">
         <div class="row">
             <hr class="col-md-12" />
-            <h4 class="col-md-8">Welcome, you are now signed in!</h4>
+            <h4 class="col-md-8">@Messages("welcome.signed.in")</h4>
             <div class="col-md-4 text-right">
                 <img src="@user.avatarURL.getOrElse(routes.Assets.at("images/silhouette.png"))" height="40px" />
             </div>
@@ -13,16 +13,16 @@
         <div class="row data">
             <div class="col-md-12">
                 <div class="row">
-                    <p class="col-md-6"><strong>First name:</strong></p><p class="col-md-6">@user.firstName.getOrElse("None")</p>
+                    <p class="col-md-6"><strong>@Messages("first.name"):</strong></p><p class="col-md-6">@user.firstName.getOrElse("None")</p>
                 </div>
                 <div class="row">
-                    <p class="col-md-6"><strong>Last name:</strong></p><p class="col-md-6">@user.lastName.getOrElse("None")</p>
+                    <p class="col-md-6"><strong>@Messages("last.name"):</strong></p><p class="col-md-6">@user.lastName.getOrElse("None")</p>
                 </div>
                 <div class="row">
-                    <p class="col-md-6"><strong>Full name:</strong></p><p class="col-md-6">@user.fullName.getOrElse("None")</p>
+                    <p class="col-md-6"><strong>@Messages("full.name"):</strong></p><p class="col-md-6">@user.fullName.getOrElse("None")</p>
                 </div>
                 <div class="row">
-                    <p class="col-md-6"><strong>Email:</strong></p><p class="col-md-6">@user.email.getOrElse("None")</p>
+                    <p class="col-md-6"><strong>@Messages("email"):</strong></p><p class="col-md-6">@user.email.getOrElse("None")</p>
                 </div>
             </div>
         </div>

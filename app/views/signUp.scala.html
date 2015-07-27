@@ -2,28 +2,28 @@
 
 @import b3.inline.fieldConstructor
 
-@main("Silhouette - Sign Up") {
+@main(Messages("sign.up.title")) {
     @request.flash.get("error").map { msg =>
         <div class="col-md-6 col-md-offset-3 alert alert-danger alert-error">
             <a href="#" class="close" data-dismiss="alert">&times;</a>
-            <strong>Error!</strong> @msg
+            <strong>@Messages("error")</strong> @msg
         </div>
     }
     <fieldset class="col-md-6 col-md-offset-3">
-        <legend>Sign up for a new account</legend>
+        <legend>@Messages("sign.up.account")</legend>
         @helper.form(action = routes.SignUpController.signUp()) {
             @helper.CSRF.formField
-            @b3.text(signInForm("firstName"), '_hiddenLabel -> "First name", 'placeholder -> "First name", 'class -> "form-control input-lg")
-            @b3.text(signInForm("lastName"), '_hiddenLabel -> "Last name", 'placeholder -> "Last name", 'class -> "form-control input-lg")
-            @b3.text(signInForm("email"), '_hiddenLabel -> "Email", 'placeholder -> "Email", 'class -> "form-control input-lg")
-            @b3.password(signInForm("password"), '_hiddenLabel -> "Password", 'placeholder -> "Password", 'class -> "form-control input-lg")
+            @b3.text(signInForm("firstName"), '_hiddenLabel -> Messages("first.name"), 'placeholder -> Messages("first.name"), 'class -> "form-control input-lg")
+            @b3.text(signInForm("lastName"), '_hiddenLabel -> Messages("last.name"), 'placeholder -> Messages("last.name"), 'class -> "form-control input-lg")
+            @b3.text(signInForm("email"), '_hiddenLabel -> Messages("email"), 'placeholder -> Messages("email"), 'class -> "form-control input-lg")
+            @b3.password(signInForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
             <div class="form-group">
                 <div>
-                    <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">Submit</button>
+                    <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@Messages("sign.up")</button>
                 </div>
             </div>
             <div class="sign-in-now">
-                <p>Already a member? <a href="@routes.ApplicationController.signIn">Sign in now</a></p>
+                <p>@Messages("already.a.member") <a href="@routes.ApplicationController.signIn">@Messages("sign.in.now")</a></p>
             </div>
         }
     </fieldset>
