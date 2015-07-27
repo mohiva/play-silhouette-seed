@@ -3,37 +3,37 @@
 @import com.mohiva.play.silhouette.impl.providers.oauth2.ClefProvider
 @import b3.inline.fieldConstructor
 
-@main("Silhouette - Sign In") {
+@main(Messages("sign.in.title")) {
     @request.flash.get("error").map { msg =>
         <div class="col-md-6 col-md-offset-3 alert alert-danger alert-error">
             <a href="#" class="close" data-dismiss="alert">&times;</a>
-            <strong>Error!</strong> @msg
+            <strong>@Messages("error")</strong> @msg
         </div>
     }
     <fieldset class="col-md-6 col-md-offset-3">
-        <legend>Sign in with your credentials</legend>
+        <legend>@Messages("sign.in.credentials")</legend>
         @helper.form(action = routes.CredentialsAuthController.authenticate()) {
             @helper.CSRF.formField
-            @b3.text(signInForm("email"), '_hiddenLabel -> "Email", 'placeholder -> "Email", 'class -> "form-control input-lg")
-            @b3.password(signInForm("password"), '_hiddenLabel -> "Password", 'placeholder -> "Password", 'class -> "form-control input-lg")
-            @b3.checkbox(signInForm("rememberMe"), '_text -> "Remember my login on this computer", 'checked -> true)
+            @b3.email(signInForm("email"), '_hiddenLabel -> Messages("email"), 'placeholder -> Messages("email"), 'class -> "form-control input-lg")
+            @b3.password(signInForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
+            @b3.checkbox(signInForm("rememberMe"), '_text -> Messages("remember.me"), 'checked -> true)
             <div class="form-group">
                 <div>
-                    <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">Submit</button>
+                    <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@Messages("sign.in")</button>
                 </div>
             </div>
         }
 
         <div>
-            <p class="not-a-member">Not a member? <a href="@routes.ApplicationController.signUp">Sign up now</a></p>
+            <p class="not-a-member">@Messages("not.a.member") <a href="@routes.ApplicationController.signUp">@Messages("sign.up.now")</a></p>
         </div>
 
         @if(socialProviders.providers.nonEmpty) {
             <div class="social-providers">
-                <p>Or use your existing account on one of the following services to sign in:</p>
+                <p>@Messages("or.use.social")</p>
                 <div>
                 @for(p <- socialProviders.providers if p.id != "clef") {
-                    <a href="@routes.SocialAuthController.authenticate(p.id)" class="provider @p.id"><img src="@routes.Assets.at(s"images/providers/${p.id}.png")" style="width:64px;height:64px;"></a>
+                    <a href="@routes.SocialAuthController.authenticate(p.id)" class="provider @p.id" title="@Messages(p.id)"><img src="@routes.Assets.at(s"images/providers/${p.id}.png")" width="64px" height="64px" alt="@Messages(p.id)"></a>
                 }
                 </div>
                 @defining(socialProviders.get[ClefProvider]) { clef =>
