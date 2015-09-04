@@ -18,9 +18,9 @@ import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDServi
 import com.mohiva.play.silhouette.impl.repositories.DelegableAuthInfoRepository
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
-import models.User
+import models.{TokenUser, User}
 import models.daos._
-import models.services.{ UserService, UserServiceImpl }
+import models.services.{TokenServiceImpl, TokenService, UserService, UserServiceImpl}
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 import net.codingwell.scalaguice.ScalaModule
@@ -28,6 +28,8 @@ import play.api.Configuration
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.openid.OpenIdClient
 import play.api.libs.ws.WSClient
+import utils.{MailServiceImpl, MailService}
+
 
 /**
  * The Guice module which wires all Silhouette dependencies.
@@ -38,6 +40,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * Configures the module.
    */
   def configure() {
+    bind[MailService].to[MailServiceImpl]
+    bind[TokenService[TokenUser]].to[TokenServiceImpl]
     bind[UserService].to[UserServiceImpl]
     bind[UserDAO].to[UserDAOImpl]
     bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAO]

@@ -64,6 +64,7 @@ class OAuth1InfoDAO extends DelegableAuthInfoDAO[OAuth1Info] {
     find(loginInfo).flatMap {
       case Some(_) => update(loginInfo, authInfo)
       case None => add(loginInfo, authInfo)
+      case unknown => Future.failed(new RuntimeException(s"find(loginInfo) returned an unexpected type $unknown"))
     }
   }
 

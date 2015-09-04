@@ -11,13 +11,14 @@ object SignUpForm {
   /**
    * A play framework form.
    */
-  val form = Form(
+  val formSignUp = Form(
     mapping(
       "firstName" -> nonEmptyText,
       "lastName" -> nonEmptyText,
       "email" -> email,
+      "emailConfirmed" -> ignored(""),
       "password" -> nonEmptyText
-    )(Data.apply)(Data.unapply)
+    )(SignUpData.apply)(SignUpData.unapply)
   )
 
   /**
@@ -28,9 +29,10 @@ object SignUpForm {
    * @param email The email of the user.
    * @param password The password of the user.
    */
-  case class Data(
+  case class SignUpData(
     firstName: String,
     lastName: String,
     email: String,
+    emailConfirmed: String,
     password: String)
 }

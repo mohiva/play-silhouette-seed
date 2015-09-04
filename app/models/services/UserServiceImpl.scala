@@ -32,7 +32,7 @@ class UserServiceImpl @Inject() (userDAO: UserDAO) extends UserService {
    * @param user The user to save.
    * @return The saved user.
    */
-  def save(user: User) = userDAO.save(user)
+  def save(user: User): Future[User] = userDAO.save(user)
 
   /**
    * Saves the social profile for a user.
@@ -42,7 +42,7 @@ class UserServiceImpl @Inject() (userDAO: UserDAO) extends UserService {
    * @param profile The social profile to save.
    * @return The user for whom the profile was saved.
    */
-  def save(profile: CommonSocialProfile) = {
+  def save(profile: CommonSocialProfile): Future[User] = {
     userDAO.find(profile.loginInfo).flatMap {
       case Some(user) => // Update user with profile
         userDAO.save(user.copy(
@@ -62,6 +62,7 @@ class UserServiceImpl @Inject() (userDAO: UserDAO) extends UserService {
           email = profile.email,
           avatarURL = profile.avatarURL
         ))
+      case unknown => Future.failed(new RuntimeException(s"userDAO.find(profile.loginInfo) returned an unexpected type $unknown"))
     }
   }
 }
