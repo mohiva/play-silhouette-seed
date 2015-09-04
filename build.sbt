@@ -1,3 +1,5 @@
+import sbt.Keys._
+
 import scalariform.formatter.preferences._
 
 name := "play-silhouette-seed"
@@ -19,6 +21,7 @@ libraryDependencies ++= Seq(
   "net.ceedubs" %% "ficus" % "1.1.2",
   "com.adrianhurt" %% "play-bootstrap3" % "0.4.4-P24",
   "com.mohiva" %% "play-silhouette-testkit" % "3.0.0" % "test",
+  "com.typesafe.play" %% "play-mailer" % "3.0.1",
   specs2 % Test,
   cache,
   filters
@@ -27,6 +30,10 @@ libraryDependencies ++= Seq(
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 routesGenerator := InjectedRoutesGenerator
+
+incOptions := incOptions.value.withNameHashing(true)
+
+updateOptions := updateOptions.value.withCachedResolution(true)
 
 scalacOptions ++= Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
