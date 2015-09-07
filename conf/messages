@@ -22,6 +22,7 @@ last.name = Last name
 full.name = Full name
 email = Email
 emailConfirm = Confirm Email
+emailConfirm.not.same=Email addresses does not match the one above
 password = Password
 sign.up = Sign up
 sign.in = Sign in
