@@ -18,6 +18,9 @@ object TokenUser {
   def apply (email: String, isSignUp: Boolean, firstName: String, lastName: String): TokenUser =
     TokenUser(UUID.randomUUID().toString, email, (new DateTime()).plusHours(hoursTillExpiry), isSignUp, firstName, lastName)
 
+  def apply (email: String): TokenUser =
+    TokenUser(UUID.randomUUID().toString, email, (new DateTime()).plusHours(hoursTillExpiry), false, "", "") //naughty!
+
   val tokens = scala.collection.mutable.HashMap[String, TokenUser]()
 
   def findById (id: String): Future[Option[TokenUser]] = {

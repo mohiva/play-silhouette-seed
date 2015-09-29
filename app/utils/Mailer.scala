@@ -27,4 +27,17 @@ object Mailer {
       bodyText = link
     )
   }
+
+  def forgotPasswordUnknowAddress (email: String)(implicit mailService:MailService) {
+
+    def getText()(implicit messages: Messages): String = {
+      views.html.mails.unknownEmail.render(messages)
+    }
+
+    mailService.sendEmailAsync(email)(
+      subject = Messages("mail.forgotpwd.subject"),
+      bodyHtml = views.html.mails.unknownEmail.apply(),
+      bodyText = getText()
+    )
+  }
 }

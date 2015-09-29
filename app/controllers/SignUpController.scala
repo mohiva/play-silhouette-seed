@@ -124,7 +124,7 @@ class SignUpController @Inject() (
     tokenService.retrieve(token).flatMap[Result]{ optTokenUser =>
       optTokenUser match {
         case Some(t) if !t.isExpired && t.isSignUp == isSignUp => f(t)
-        case _ => Future.successful(Ok(views.html.auth.invalidToken()))
+        case _ => Future.successful(NotFound(views.html.auth.invalidToken()))
       }
     }
   }

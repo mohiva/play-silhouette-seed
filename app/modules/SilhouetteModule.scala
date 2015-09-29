@@ -4,7 +4,7 @@ import com.google.inject.{ AbstractModule, Provides }
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services._
 import com.mohiva.play.silhouette.api.util._
-import com.mohiva.play.silhouette.api.{ Environment, EventBus }
+import com.mohiva.play.silhouette.api.{LoginInfo, Environment, EventBus}
 import com.mohiva.play.silhouette.impl.authenticators._
 import com.mohiva.play.silhouette.impl.daos.DelegableAuthInfoDAO
 import com.mohiva.play.silhouette.impl.providers._
@@ -78,6 +78,15 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     userService: UserService,
     authenticatorService: AuthenticatorService[CookieAuthenticator],
     eventBus: EventBus): Environment[User, CookieAuthenticator] = {
+
+    /* TODO: Remove this default user  */
+    userService.save(User(java.util.UUID.randomUUID(),
+      LoginInfo(CredentialsProvider.ID,"default@default.com"),
+      Some("Default"),
+      Some("User"),
+      Some("Default User"),
+      Some("default@default.com"),
+      None))
 
     Environment[User, CookieAuthenticator](
       userService,
@@ -155,6 +164,9 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
     openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoRepository = {
+
+    /* TODO: Remove this default user  */
+    passwordInfoDAO.add(LoginInfo(CredentialsProvider.ID,"default@default.com"), PasswordInfo("bcrypt","$2a$10$78XF67MGvcWEtwDInxOsKuJitVjyI1sHat1mph7NXmRbILIskg5rG"))
 
     new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
   }
