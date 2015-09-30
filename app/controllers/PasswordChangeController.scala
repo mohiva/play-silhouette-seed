@@ -1,14 +1,17 @@
+// scalastyle:off
 package controllers
 
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.Silhouette
+import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.AvatarService
-import com.mohiva.play.silhouette.api.util.{PasswordInfo, PasswordHasher}
+import com.mohiva.play.silhouette.api.util.{Credentials, PasswordInfo, PasswordHasher}
 import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
+import controllers.PasswordChangeController.ChangeInfo
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
@@ -34,6 +37,7 @@ class PasswordChangeController @Inject() (
     val env: Environment[User, CookieAuthenticator],
     userService: UserService,
     authInfoRepository: AuthInfoRepository,
+    credentialsProvider: CredentialsProvider,
     avatarService: AvatarService,
     passwordHasher: PasswordHasher,
     tokenService: TokenService[TokenUser],
@@ -42,15 +46,24 @@ class PasswordChangeController @Inject() (
 
   val providerId = CredentialsProvider.ID
   val Email = "email"
-
+  val passwordValidation = nonEmptyText(minLength = 6)
 
   /*
-   * PASSWORD RESET
+   * PASSWORD RESET  - When user has forgotten their password and can't login
    */
 
   val pwResetForm = Form[String] (
     Email -> email.verifying( nonEmpty )
   )
+
+  val passwordsForm = Form( tuple(
+    "password1" -> passwordValidation,
+    "password2" -> nonEmptyText,
+    "token" -> nonEmptyText
+  ) verifying(Messages("passwords.not.equal"), passwords => passwords._2 == passwords._1 ))
+
+  private def notFoundDefault (implicit request: RequestHeader) =
+    Future.successful(NotFound(views.html.auth.invalidToken()))
 
   def startResetPassword = Action.async { implicit request =>
     Future.successful(Ok(views.html.auth.startResetPassword(pwResetForm)))
@@ -76,33 +89,9 @@ class PasswordChangeController @Inject() (
     )
   }
 
-  val passwordsForm = Form( tuple(
-    "password1" -> nonEmptyText(minLength = 6),
-    "password2" -> nonEmptyText,
-    "token" -> nonEmptyText
-  ) verifying(Messages("passwords.not.equal"), passwords => passwords._2 == passwords._1 ))
-
-  case class ChangeInfo(currentPassword: String, newPassword: String)
-
-  private def notFoundDefault (implicit request: RequestHeader) =
-    Future.successful(NotFound(views.html.auth.invalidToken()))
-
   /**
-   * Confirms the user's link based on the token and shows him a form to reset the password
+   * Confirms the user's link based on the token and shows them a form to reset the password
    */
-  def resetPassword (tokenId: String) = Action.async { implicit request =>
-    tokenService.retrieve(tokenId).flatMap {
-      case Some(token) if (!token.isSignUp && !token.isExpired) => {
-        Future.successful(Ok(views.html.auth.specifyResetPassword(tokenId, passwordsForm)))
-      }
-      case Some(token) => {
-        tokenService.consume(tokenId)
-        notFoundDefault
-      }
-      case None => notFoundDefault
-    }
-  }
-
   def specifyResetPassword (tokenId: String) = Action.async { implicit request =>
     tokenService.retrieve(tokenId).flatMap {
       case Some(token) if (!token.isSignUp && !token.isExpired) => {
@@ -116,7 +105,6 @@ class PasswordChangeController @Inject() (
         notFoundDefault
       }
     }
-
   }
 
   /**
@@ -155,4 +143,53 @@ class PasswordChangeController @Inject() (
       }
     )
   }
+
+  /*
+   * CHANGE PASSWORD - Can only be done whilst user is logged in
+   */
+
+  val changePasswordForm = Form[ChangeInfo](
+    mapping(
+      "currentPassword" -> nonEmptyText,
+      "newPassword" -> tuple(
+        "password1" -> passwordValidation,
+        "password2" -> nonEmptyText
+      ).verifying( Messages("passwords.not.equal"), newPassword => newPassword._2 == newPassword._1 )
+    )
+      ((currentPassword, newPassword) => ChangeInfo(currentPassword, newPassword._1)) //apply
+      (data => Some((data.currentPassword, (data.newPassword, data.newPassword))))    //unapply
+  )
+
+  def startChangePassword = SecuredAction.async { implicit request =>
+    Future.successful(Ok(views.html.auth.changePassword(request.identity,changePasswordForm)))
+  }
+
+  /**
+   * Saves the new password and authenticates the user
+   */
+  def handleChangePassword = SecuredAction.async { implicit request =>
+    changePasswordForm.bindFromRequest.fold(
+      formWithErrors => Future.successful(BadRequest(views.html.auth.changePassword(request.identity,formWithErrors))),
+      changeInfo => {
+        val user = request.identity
+
+        credentialsProvider.authenticate( Credentials(user.email.getOrElse(""), changeInfo.currentPassword) ).flatMap { loginInfo =>
+          authInfoRepository.save(loginInfo, passwordHasher.hash(changeInfo.newPassword))
+          env.authenticatorService.create(user.loginInfo).flatMap { authenticator =>
+            env.eventBus.publish(LoginEvent(user, request, request2Messages))
+            env.authenticatorService.init(authenticator)
+            Future.successful(Ok(views.html.auth.confirmResetPassword(user)))
+          }
+        }.recover {
+          case e: ProviderException =>
+            BadRequest(views.html.auth.changePassword(request.identity,changePasswordForm.withError("currentPassword","Does not match current password!")))
+        }
+      }
+    )
+  }
 }
+
+object PasswordChangeController {
+  case class ChangeInfo(currentPassword: String, newPassword: String)
+}
+// scalastyle:on

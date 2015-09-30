@@ -13,9 +13,10 @@ Or you can find a running example of this template under the following URL: http
 
 ## Features
 
-* Sign Up
+* Sign Up (via email)
 * Sign In (Credentials)
 * Social Auth (Facebook, Google+, VK, Twitter, Xing, Yahoo)
+* Update/reset forgotten password
 * Two-factor authentication with Clef
 * Dependency Injection with Guice
 * Publishing Events
@@ -25,6 +26,11 @@ Or you can find a running example of this template under the following URL: http
 * [CSRF Protection](https://www.playframework.com/documentation/2.4.x/ScalaCsrf)
 
 ## Documentation
+
+Default user login:
+
+* email: default@default.com
+* password: password
 
 Consulate the [Silhouette documentation](http://silhouette.mohiva.com/docs) for more information. If you need help with the integration of Silhouette into your project, don't hesitate and ask questions in our [mailing list](https://groups.google.com/forum/#!forum/play-silhouette) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/playframework).
 

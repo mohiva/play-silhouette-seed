@@ -18,6 +18,9 @@ POST        /reset                           controllers.PasswordChangeControlle
 GET         /reset/:token                    controllers.PasswordChangeController.specifyResetPassword(token)
 POST        /reset/                          controllers.PasswordChangeController.handleResetPassword
 
+GET         /change                          controllers.PasswordChangeController.startChangePassword
+POST        /change                          controllers.PasswordChangeController.handleChangePassword
+
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                    controllers.Assets.at(path="/public", file)
 GET         /webjars/*file                   controllers.WebJarAssets.at(file)

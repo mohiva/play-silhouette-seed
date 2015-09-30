@@ -166,7 +166,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoRepository = {
 
     /* TODO: Remove this default user  */
-    passwordInfoDAO.add(LoginInfo(CredentialsProvider.ID,"default@default.com"), PasswordInfo("bcrypt","$2a$10$78XF67MGvcWEtwDInxOsKuJitVjyI1sHat1mph7NXmRbILIskg5rG"))
+    passwordInfoDAO.add(LoginInfo(CredentialsProvider.ID,"default@default.com"),
+      PasswordInfo("bcrypt","$2a$10$78XF67MGvcWEtwDInxOsKuJitVjyI1sHat1mph7NXmRbILIskg5rG"))
 
     new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
   }

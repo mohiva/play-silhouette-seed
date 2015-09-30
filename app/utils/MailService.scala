@@ -17,7 +17,7 @@ trait MailService {
 
 class MailServiceImpl @Inject() (mailerClient: MailerClient) extends MailService  {
 
-  def from = current.configuration.getString("play.mailer.from").getOrElse("UNKNOWN")
+  def from: String = current.configuration.getString("play.mailer.from").getOrElse("UNKNOWN")
 
   def sendEmailAsync (recipients: String*)(subject: String, bodyHtml: String, bodyText: String = ""): Unit = {
     Akka.system.scheduler.scheduleOnce(100 milliseconds) {
