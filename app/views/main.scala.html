@@ -39,10 +39,11 @@
                     <ul class="nav navbar-nav navbar-right">
                         @user.map { u =>
                             <li><a href="@routes.ApplicationController.index">@u.fullName</a></li>
+                            <li><a href="@routes.PasswordChangeController.startChangePassword">@Messages("specify.password.button")</a></li>
                             <li><a href="@routes.ApplicationController.signOut">@Messages("sign.out")</a></li>
                         }.getOrElse {
                             <li><a href="@routes.ApplicationController.signIn">@Messages("sign.in")</a></li>
-                            <li><a href="@routes.ApplicationController.signUp">@Messages("sign.up")</a></li>
+                            <li><a href="@routes.SignUpController.signUpRequest">@Messages("sign.up")</a></li>
                         }
                     </ul>
                 </nav>

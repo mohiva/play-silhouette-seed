@@ -1,4 +1,4 @@
-@(signInForm: Form[forms.SignUpForm.Data])(implicit request: RequestHeader, messages: Messages)
+@(signInForm: Form[forms.SignUpForm.SignUpData])(implicit request: RequestHeader, messages: Messages)
 
 @import b3.inline.fieldConstructor
 
@@ -11,11 +11,12 @@
     }
     <fieldset class="col-md-6 col-md-offset-3">
         <legend>@Messages("sign.up.account")</legend>
-        @helper.form(action = routes.SignUpController.signUp()) {
+        @helper.form(action = routes.SignUpController.signUpRequestRegistration()) {
             @helper.CSRF.formField
             @b3.text(signInForm("firstName"), '_hiddenLabel -> Messages("first.name"), 'placeholder -> Messages("first.name"), 'class -> "form-control input-lg")
             @b3.text(signInForm("lastName"), '_hiddenLabel -> Messages("last.name"), 'placeholder -> Messages("last.name"), 'class -> "form-control input-lg")
-            @b3.text(signInForm("email"), '_hiddenLabel -> Messages("email"), 'placeholder -> Messages("email"), 'class -> "form-control input-lg")
+            @b3.text(signInForm("emails.email"), '_hiddenLabel -> Messages("email"), 'placeholder -> Messages("email"), 'class -> "form-control input-lg")
+            @b3.text(signInForm("emails.emailConfirmed"), '_hiddenLabel -> Messages("emailConfirm"), '_error -> signInForm.error("emails"), 'placeholder -> Messages("emailConfirm"), 'class -> "form-control input-lg")
             @b3.password(signInForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
             <div class="form-group">
                 <div>

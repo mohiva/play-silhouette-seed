@@ -4,12 +4,22 @@
 
 # Home page
 GET         /                                controllers.ApplicationController.index
-GET         /signIn                          controllers.ApplicationController.signIn
-GET         /signUp                          controllers.ApplicationController.signUp
-GET         /signOut                         controllers.ApplicationController.signOut
+GET         /signin                          controllers.ApplicationController.signIn
+GET         /signout                         controllers.ApplicationController.signOut
 GET         /authenticate/:provider          controllers.SocialAuthController.authenticate(provider)
 POST        /authenticate/credentials        controllers.CredentialsAuthController.authenticate
-POST        /signUp                          controllers.SignUpController.signUp
+
+GET         /signup                          controllers.SignUpController.signUpRequest
+POST        /signup                          controllers.SignUpController.signUpRequestRegistration
+GET         /signup/:token                   controllers.SignUpController.signUpCompletion(token)
+
+GET         /reset                           controllers.PasswordChangeController.startResetPassword
+POST        /reset                           controllers.PasswordChangeController.handleStartResetPassword
+GET         /reset/:token                    controllers.PasswordChangeController.specifyResetPassword(token)
+POST        /reset/                          controllers.PasswordChangeController.handleResetPassword
+
+GET         /change                          controllers.PasswordChangeController.startChangePassword
+POST        /change                          controllers.PasswordChangeController.handleChangePassword
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                    controllers.Assets.at(path="/public", file)

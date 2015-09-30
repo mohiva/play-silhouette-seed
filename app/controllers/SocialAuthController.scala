@@ -1,3 +1,4 @@
+// scalastyle:off
 package controllers
 
 import javax.inject.Inject
@@ -11,7 +12,7 @@ import models.User
 import models.services.UserService
 import play.api.i18n.{ MessagesApi, Messages }
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.Action
+import play.api.mvc.{Result, Action}
 
 import scala.concurrent.Future
 
@@ -54,6 +55,7 @@ class SocialAuthController @Inject() (
             env.eventBus.publish(LoginEvent(user, request, request2Messages))
             result
           }
+          case unknown => Future.failed(new RuntimeException(s"p.authenticate returned an unexpected type $unknown"))
         }
       case _ => Future.failed(new ProviderException(s"Cannot authenticate with unexpected social provider $provider"))
     }).recover {
@@ -63,3 +65,4 @@ class SocialAuthController @Inject() (
     }
   }
 }
+// scalastyle:on

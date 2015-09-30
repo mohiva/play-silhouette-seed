@@ -1,3 +1,4 @@
+// scalastyle:off
 package controllers
 
 import javax.inject.Inject
@@ -8,6 +9,7 @@ import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 import forms._
 import models.User
 import play.api.i18n.MessagesApi
+import play.api.libs.mailer.MailerClient
 
 import scala.concurrent.Future
 
@@ -21,7 +23,8 @@ import scala.concurrent.Future
 class ApplicationController @Inject() (
   val messagesApi: MessagesApi,
   val env: Environment[User, CookieAuthenticator],
-  socialProviderRegistry: SocialProviderRegistry)
+  socialProviderRegistry: SocialProviderRegistry,
+  mailerClient: MailerClient)
   extends Silhouette[User, CookieAuthenticator] {
 
   /**
@@ -42,18 +45,7 @@ class ApplicationController @Inject() (
     request.identity match {
       case Some(user) => Future.successful(Redirect(routes.ApplicationController.index()))
       case None => Future.successful(Ok(views.html.signIn(SignInForm.form, socialProviderRegistry)))
-    }
-  }
-
-  /**
-   * Handles the Sign Up action.
-   *
-   * @return The result to display.
-   */
-  def signUp = UserAwareAction.async { implicit request =>
-    request.identity match {
-      case Some(user) => Future.successful(Redirect(routes.ApplicationController.index()))
-      case None => Future.successful(Ok(views.html.signUp(SignUpForm.form)))
+      case unknown => Future.failed(new RuntimeException(s"request.identity returned an unexpected type $unknown"))
     }
   }
 
@@ -69,3 +61,4 @@ class ApplicationController @Inject() (
     env.authenticatorService.discard(request.authenticator, result)
   }
 }
+// scalastyle:on

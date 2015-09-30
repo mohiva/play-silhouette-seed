@@ -13,9 +13,10 @@ Or you can find a running example of this template under the following URL: http
 
 ## Features
 
-* Sign Up
+* Sign Up (via email)
 * Sign In (Credentials)
 * Social Auth (Facebook, Google+, VK, Twitter, Xing, Yahoo)
+* Update/reset forgotten password
 * Two-factor authentication with Clef
 * Dependency Injection with Guice
 * Publishing Events
@@ -26,6 +27,11 @@ Or you can find a running example of this template under the following URL: http
 
 ## Documentation
 
+Default user login:
+
+* email: default@default.com
+* password: password
+
 Consulate the [Silhouette documentation](http://silhouette.mohiva.com/docs) for more information. If you need help with the integration of Silhouette into your project, don't hesitate and ask questions in our [mailing list](https://groups.google.com/forum/#!forum/play-silhouette) or on [Stack Overflow](http://stackoverflow.com/questions/tagged/playframework).
 
 ## Activator
@@ -35,3 +41,5 @@ See https://typesafe.com/activator/template/play-silhouette-seed
 # License
 
 The code is licensed under [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
+SEE Blog [Play framework security with Silhouette](http://blog.knoldus.com/2015/05/11/play-framework-security-with-silhouette/)

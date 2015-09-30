@@ -4,7 +4,7 @@ import com.google.inject.{ AbstractModule, Provides }
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services._
 import com.mohiva.play.silhouette.api.util._
-import com.mohiva.play.silhouette.api.{ Environment, EventBus }
+import com.mohiva.play.silhouette.api.{LoginInfo, Environment, EventBus}
 import com.mohiva.play.silhouette.impl.authenticators._
 import com.mohiva.play.silhouette.impl.daos.DelegableAuthInfoDAO
 import com.mohiva.play.silhouette.impl.providers._
@@ -18,9 +18,9 @@ import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDServi
 import com.mohiva.play.silhouette.impl.repositories.DelegableAuthInfoRepository
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
-import models.User
+import models.{TokenUser, User}
 import models.daos._
-import models.services.{ UserService, UserServiceImpl }
+import models.services.{TokenServiceImpl, TokenService, UserService, UserServiceImpl}
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 import net.codingwell.scalaguice.ScalaModule
@@ -28,6 +28,8 @@ import play.api.Configuration
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.openid.OpenIdClient
 import play.api.libs.ws.WSClient
+import utils.{MailServiceImpl, MailService}
+
 
 /**
  * The Guice module which wires all Silhouette dependencies.
@@ -38,6 +40,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * Configures the module.
    */
   def configure() {
+    bind[MailService].to[MailServiceImpl]
+    bind[TokenService[TokenUser]].to[TokenServiceImpl]
     bind[UserService].to[UserServiceImpl]
     bind[UserDAO].to[UserDAOImpl]
     bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAO]
@@ -74,6 +78,15 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     userService: UserService,
     authenticatorService: AuthenticatorService[CookieAuthenticator],
     eventBus: EventBus): Environment[User, CookieAuthenticator] = {
+
+    /* TODO: Remove this default user  */
+    userService.save(User(java.util.UUID.randomUUID(),
+      LoginInfo(CredentialsProvider.ID,"default@default.com"),
+      Some("Default"),
+      Some("User"),
+      Some("Default User"),
+      Some("default@default.com"),
+      None))
 
     Environment[User, CookieAuthenticator](
       userService,
@@ -151,6 +164,10 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
     openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoRepository = {
+
+    /* TODO: Remove this default user  */
+    passwordInfoDAO.add(LoginInfo(CredentialsProvider.ID,"default@default.com"),
+      PasswordInfo("bcrypt","$2a$10$78XF67MGvcWEtwDInxOsKuJitVjyI1sHat1mph7NXmRbILIskg5rG"))
 
     new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
   }

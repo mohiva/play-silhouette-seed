@@ -16,6 +16,7 @@
             @helper.CSRF.formField
             @b3.email(signInForm("email"), '_hiddenLabel -> Messages("email"), 'placeholder -> Messages("email"), 'class -> "form-control input-lg")
             @b3.password(signInForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
+                <a href="@routes.PasswordChangeController.startResetPassword">@Messages("forgot.password")</a>
             @b3.checkbox(signInForm("rememberMe"), '_text -> Messages("remember.me"), 'checked -> true)
             <div class="form-group">
                 <div>
@@ -25,7 +26,7 @@
         }
 
         <div>
-            <p class="not-a-member">@Messages("not.a.member") <a href="@routes.ApplicationController.signUp">@Messages("sign.up.now")</a></p>
+            <p class="not-a-member">@Messages("not.a.member") <a href="@routes.SignUpController.signUpRequest">@Messages("sign.up.now")</a></p>
         </div>
 
         @if(socialProviders.providers.nonEmpty) {

@@ -1,3 +1,4 @@
+// scalastyle:off
 package controllers
 
 import javax.inject.Inject
@@ -76,6 +77,7 @@ class CredentialsAuthController @Inject() (
                 }
               }
             case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
+            case unknown => Future.failed(new RuntimeException(s"userService.retrieve(loginInfo) returned an unexpected type $unknown"))
           }
         }.recover {
           case e: ProviderException =>
@@ -85,3 +87,4 @@ class CredentialsAuthController @Inject() (
     )
   }
 }
+// scalastyle:on
