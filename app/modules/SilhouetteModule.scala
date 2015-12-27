@@ -15,6 +15,7 @@ import com.mohiva.play.silhouette.impl.providers.oauth2._
 import com.mohiva.play.silhouette.impl.providers.oauth2.state.{ CookieStateProvider, CookieStateSettings, DummyStateProvider }
 import com.mohiva.play.silhouette.impl.providers.openid.YahooProvider
 import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDService
+import com.mohiva.play.silhouette.impl.providers.cas._
 import com.mohiva.play.silhouette.impl.repositories.DelegableAuthInfoRepository
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
@@ -44,6 +45,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[DelegableAuthInfoDAO[OAuth1Info]].to[OAuth1InfoDAO]
     bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDAO]
     bind[DelegableAuthInfoDAO[OpenIDInfo]].to[OpenIDInfoDAO]
+    bind[DelegableAuthInfoDAO[CASAuthInfo]].to[CASAuthInfoDAO]
     bind[CacheLayer].to[PlayCacheLayer]
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
     bind[PasswordHasher].toInstance(new BCryptPasswordHasher)
@@ -93,6 +95,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * @param twitterProvider The Twitter provider implementation.
    * @param xingProvider The Xing provider implementation.
    * @param yahooProvider The Yahoo provider implementation.
+   * @param casProvider The CAS provider implementation.
    * @return The Silhouette environment.
    */
   @Provides
@@ -103,7 +106,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     clefProvider: ClefProvider,
     twitterProvider: TwitterProvider,
     xingProvider: XingProvider,
-    yahooProvider: YahooProvider): SocialProviderRegistry = {
+    yahooProvider: YahooProvider,
+    casProvider: CASProvider): SocialProviderRegistry = {
 
     SocialProviderRegistry(Seq(
       googleProvider,
@@ -112,7 +116,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       vkProvider,
       xingProvider,
       yahooProvider,
-      clefProvider
+      clefProvider,
+      casProvider
     ))
   }
 
@@ -150,9 +155,10 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
-    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoRepository = {
+    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo],
+    casAuthInfoDAO: DelegableAuthInfoDAO[CASAuthInfo]): AuthInfoRepository = {
 
-    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
+    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO, casAuthInfoDAO)
   }
 
   /**
@@ -239,6 +245,24 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
 
     new GoogleProvider(httpLayer, stateProvider, configuration.underlying.as[OAuth2Settings]("silhouette.google"))
   }
+
+  /**
+   * Provides the CAS provider.
+   *
+   * @param httpLayer The HTTP layer implementation.
+   * @param configuration The Play configuration.
+   * @return The CAS provider.
+   */
+  @Provides
+  def provideCASProvider(httpLayer: HTTPLayer,configuration: Configuration): CASProvider = {
+    /*implicit object casProtocolReader extends ValueReader[Option[CasProtocol.Value]] {
+      override def read(config: Config, path: String): Option[CasProtocol.Value] =
+        config.getAs[String](path).map(CasProtocol.withName)
+    }*/
+    val s=configuration.underlying.as[CASSettings]("silhouette.cas")
+    new CASProvider(httpLayer,s,new CASClient(s))
+  }
+
 
   /**
    * Provides the VK provider.
