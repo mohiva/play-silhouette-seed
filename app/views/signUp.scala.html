@@ -1,4 +1,4 @@
-@(signInForm: Form[forms.SignUpForm.Data])(implicit request: RequestHeader, messages: Messages)
+@(signInForm: Form[forms.SignUpForm.Data])(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
 
 @import b3.inline.fieldConstructor
 
@@ -11,7 +11,7 @@
     }
     <fieldset class="col-md-6 col-md-offset-3">
         <legend>@Messages("sign.up.account")</legend>
-        @helper.form(action = routes.SignUpController.signUp()) {
+        @helper.form(action = routes.SignUpController.submit()) {
             @helper.CSRF.formField
             @b3.text(signInForm("firstName"), '_hiddenLabel -> Messages("first.name"), 'placeholder -> Messages("first.name"), 'class -> "form-control input-lg")
             @b3.text(signInForm("lastName"), '_hiddenLabel -> Messages("last.name"), 'placeholder -> Messages("last.name"), 'class -> "form-control input-lg")
@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="sign-in-now">
-                <p>@Messages("already.a.member") <a href="@routes.ApplicationController.signIn">@Messages("sign.in.now")</a></p>
+                <p>@Messages("already.a.member") <a href="@routes.SignInController.view">@Messages("sign.in.now")</a></p>
             </div>
         }
     </fieldset>
