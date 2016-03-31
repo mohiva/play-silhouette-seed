@@ -1,4 +1,4 @@
-@(signInForm: Form[forms.SignInForm.Data], socialProviders: com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry)(implicit request: RequestHeader, messages: Messages)
+@(signInForm: Form[forms.SignInForm.Data], socialProviders: com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry)(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
 
 @import com.mohiva.play.silhouette.impl.providers.oauth2.ClefProvider
 @import b3.inline.fieldConstructor
@@ -12,7 +12,7 @@
     }
     <fieldset class="col-md-6 col-md-offset-3">
         <legend>@Messages("sign.in.credentials")</legend>
-        @helper.form(action = routes.CredentialsAuthController.authenticate()) {
+        @helper.form(action = routes.SignInController.submit()) {
             @helper.CSRF.formField
             @b3.email(signInForm("email"), '_hiddenLabel -> Messages("email"), 'placeholder -> Messages("email"), 'class -> "form-control input-lg")
             @b3.password(signInForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
@@ -25,7 +25,7 @@
         }
 
         <div>
-            <p class="not-a-member">@Messages("not.a.member") <a href="@routes.ApplicationController.signUp">@Messages("sign.up.now")</a></p>
+            <p class="not-a-member">@Messages("not.a.member") <a href="@routes.SignUpController.view">@Messages("sign.up.now")</a></p>
         </div>
 
         @if(socialProviders.providers.nonEmpty) {

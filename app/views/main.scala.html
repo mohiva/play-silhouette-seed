@@ -1,4 +1,4 @@
-@(title: String, user: Option[models.User] = None)(content: Html)(implicit messages: Messages)
+@(title: String, user: Option[models.User] = None)(content: Html)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -10,8 +10,8 @@
         <title>@title</title>
         <link href="//fonts.googleapis.com/css?family=Roboto|Montserrat:400,700|Open+Sans:400,300,600" rel="stylesheet">
         <link href="//cdnjs.cloudflare.com/ajax/libs/ionicons/1.5.2/css/ionicons.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))">
-        <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap-theme.min.css"))">
+        <link rel="stylesheet" href="@routes.WebJarAssets.at(webJarAssets.locate("bootstrap.min.css"))">
+        <link rel="stylesheet" href="@routes.WebJarAssets.at(webJarAssets.locate("bootstrap-theme.min.css"))">
         <link rel="stylesheet" href="@routes.Assets.at("styles/main.css")">
             <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
             <!--[if lt IE 9]>
@@ -41,8 +41,8 @@
                             <li><a href="@routes.ApplicationController.index">@u.fullName</a></li>
                             <li><a href="@routes.ApplicationController.signOut">@Messages("sign.out")</a></li>
                         }.getOrElse {
-                            <li><a href="@routes.ApplicationController.signIn">@Messages("sign.in")</a></li>
-                            <li><a href="@routes.ApplicationController.signUp">@Messages("sign.up")</a></li>
+                            <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
+                            <li><a href="@routes.SignUpController.view">@Messages("sign.up")</a></li>
                         }
                     </ul>
                 </nav>
@@ -53,7 +53,7 @@
                 @content
             </div>
         </main>
-        <script type="text/javascript" src="@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))"></script>
-        <script type="text/javascript" src="@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))"></script>
+        <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("jquery.min.js"))"></script>
+        <script type="text/javascript" src="@routes.WebJarAssets.at(webJarAssets.locate("bootstrap.min.js"))"></script>
     </body>
 </html>
