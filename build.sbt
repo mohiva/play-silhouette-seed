@@ -10,6 +10,8 @@ scalaVersion := "2.11.8"
 
 resolvers := ("Atlassian Releases" at "https://maven.atlassian.com/public/") +: resolvers.value
 
+resolvers += Resolver.jcenterRepo
+
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
