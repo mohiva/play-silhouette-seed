@@ -33,6 +33,14 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.openid.OpenIdClient
 import play.api.libs.ws.WSClient
 import utils.auth.{ CustomSecuredErrorHandler, CustomUnsecuredErrorHandler, DefaultEnv }
+import com.mohiva.play.silhouette.impl.providers.cas._
+import net.ceedubs.ficus.readers.ValueReader
+import com.typesafe.config.Config
+import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
+import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
+import javax.inject
+import com.google.inject.util.Modules.OverrideModule
+import play.api.inject.guice.GuiceApplicationBuilder
 
 /**
  * The Guice module which wires all Silhouette dependencies.
@@ -113,7 +121,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     clefProvider: ClefProvider,
     twitterProvider: TwitterProvider,
     xingProvider: XingProvider,
-    yahooProvider: YahooProvider): SocialProviderRegistry = {
+    yahooProvider: YahooProvider,
+    casProvider: CasProvider): SocialProviderRegistry = {
 
     SocialProviderRegistry(Seq(
       googleProvider,
@@ -122,7 +131,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       vkProvider,
       xingProvider,
       yahooProvider,
-      clefProvider
+      clefProvider,
+      casProvider
     ))
   }
 
@@ -235,6 +245,27 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
 
     new CookieAuthenticatorService(config, None, cookieSigner, encoder, fingerprintGenerator, idGenerator, clock)
   }
+
+  /**
+   * Provides the auth info repository.
+   *
+   * @param passwordInfoDAO The implementation of the delegable password auth info DAO.
+   * @param oauth1InfoDAO The implementation of the delegable OAuth1 auth info DAO.
+   * @param oauth2InfoDAO The implementation of the delegable OAuth2 auth info DAO.
+   * @param openIDInfoDAO The implementation of the delegable OpenID auth info DAO.
+   * @return The auth info repository instance.
+   */
+  //  @Provides
+  //  @Override
+  //  def provideAuthInfoRepository(
+  //    passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
+  //    oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
+  //    oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
+  //    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo],
+  //    casAuthInfoDAO: DelegableAuthInfoDAO[CasAuthInfo]): AuthInfoRepository = {
+  //
+  //    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO, casAuthInfoDAO)
+  //  }
 
   /**
    * Provides the avatar service.
@@ -428,5 +459,26 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
 
     val settings = configuration.underlying.as[OpenIDSettings]("silhouette.yahoo")
     new YahooProvider(httpLayer, new PlayOpenIDService(client, settings), settings)
+  }
+
+  /**
+   * Provides the CAS provider.
+   *
+   * @param httpLayer The HTTP layer implementation.
+   * @param configuration The Play configuration.
+   * @return The CAS provider.
+   */
+  @Provides
+  def provideCASProvider(
+    httpLayer: HTTPLayer,
+    configuration: Configuration): CasProvider = {
+
+    implicit object casProtocolReader extends ValueReader[Option[CasProtocol.Value]] {
+      override def read(config: Config, path: String): Option[CasProtocol.Value] =
+        config.getAs[String](path).map(CasProtocol.withName)
+    }
+
+    val settings = configuration.underlying.as[CasSettings]("silhouette.cas")
+    new CasProvider(httpLayer, settings, new CasClient(settings))
   }
 }
