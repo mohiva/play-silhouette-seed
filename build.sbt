@@ -12,6 +12,8 @@ resolvers := ("Atlassian Releases" at "https://maven.atlassian.com/public/") +: 
 
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
+resolvers += Resolver.sonatypeRepo("releases")
+
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
