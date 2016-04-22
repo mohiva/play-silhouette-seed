@@ -16,6 +16,8 @@ resolvers += Resolver.sonatypeRepo("releases")
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
+resolvers += Resolver.jcenterRepo
+
 libraryDependencies ++= Seq(
   "com.mohiva" %% "play-silhouette" % "4.0.0-BETA4",
   "com.mohiva" %% "play-silhouette-password-bcrypt" % "4.0.0-BETA4",
