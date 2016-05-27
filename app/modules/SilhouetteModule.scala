@@ -38,7 +38,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * Configures the module.
    */
   def configure() {
-    import java.time.Clock
     bind[Silhouette[DefaultEnv]].to[SilhouetteProvider[DefaultEnv]]
     bind[UnsecuredErrorHandler].to[CustomUnsecuredErrorHandler]
     bind[SecuredErrorHandler].to[CustomSecuredErrorHandler]
@@ -49,7 +48,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[PasswordHasher].toInstance(new BCryptPasswordHasher)
     bind[FingerprintGenerator].toInstance(new DefaultFingerprintGenerator(false))
     bind[EventBus].toInstance(EventBus())
-    bind[Clock].toInstance(Clock())
+    bind[Clock].toInstance(Clock.apply())
   }
 
   /**
