@@ -29,20 +29,20 @@ class UserServiceImpl @Inject() (userDAO: UserDAO) extends UserService {
   /**
    * Saves a user.
    *
-   * @param user The user to save.
+   * @param user The user to upsert.
    * @return The saved user.
    */
-  def save(user: User) = userDAO.save(user)
+  def save(user: User): Future[User] = userDAO.save(user)
 
   /**
    * Saves the social profile for a user.
    *
    * If a user exists for this profile then update the user, otherwise create a new user with the given profile.
    *
-   * @param profile The social profile to save.
+   * @param profile The social profile to upsert.
    * @return The user for whom the profile was saved.
    */
-  def save(profile: CommonSocialProfile) = {
+  def upsert(profile: CommonSocialProfile): Future[User] = {
     userDAO.find(profile.loginInfo).flatMap {
       case Some(user) => // Update user with profile
         userDAO.save(user.copy(

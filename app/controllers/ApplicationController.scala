@@ -11,7 +11,7 @@ import utils.auth.DefaultEnv
 import scala.concurrent.Future
 
 /**
- * The basic application controller.
+ * A minimal application controller. Replace this with your application controller.
  *
  * @param messagesApi The Play messages API.
  * @param silhouette The Silhouette stack.

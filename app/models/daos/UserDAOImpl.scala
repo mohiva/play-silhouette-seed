@@ -33,7 +33,7 @@ class UserDAOImpl extends UserDAO {
   def find(userID: UUID) = Future.successful(users.get(userID))
 
   /**
-   * Saves a user.
+   * Saves a new user.
    *
    * @param user The user to save.
    * @return The saved user.
