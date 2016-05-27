@@ -67,7 +67,7 @@ class SignInController @Inject() (
       data => {
         val credentials = Credentials(data.email, data.password)
         credentialsProvider.authenticate(credentials).flatMap { loginInfo =>
-          val result = Redirect(routes.ApplicationController.index())
+          val result = Redirect(routes.ApplicationController.index()) // todo provide a function that determines the redirect according to the User - possibly enhance UserService?
           userService.retrieve(loginInfo).flatMap {
             case Some(user) =>
               val c = configuration.underlying

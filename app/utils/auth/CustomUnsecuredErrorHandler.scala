@@ -20,6 +20,7 @@ class CustomUnsecuredErrorHandler extends UnsecuredErrorHandler {
    * @return The result to send to the client.
    */
   override def onNotAuthorized(implicit request: RequestHeader) = {
+    // todo provide a function that determines the redirect according to the User - possibly enhance UserService and inject?
     Future.successful(Redirect(controllers.routes.ApplicationController.index()))
   }
 }
