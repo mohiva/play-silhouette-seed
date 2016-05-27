@@ -14,7 +14,7 @@ trait UserService extends IdentityService[User] {
   /**
    * Saves a user.
    *
-   * @param user The user to save.
+   * @param user The user to upsert.
    * @return The saved user.
    */
   def save(user: User): Future[User]
@@ -24,8 +24,8 @@ trait UserService extends IdentityService[User] {
    *
    * If a user exists for this profile then update the user, otherwise create a new user with the given profile.
    *
-   * @param profile The social profile to save.
+   * @param profile The social profile to upsert.
    * @return The user for whom the profile was saved.
    */
-  def save(profile: CommonSocialProfile): Future[User]
+  def upsert(profile: CommonSocialProfile): Future[User]
 }
