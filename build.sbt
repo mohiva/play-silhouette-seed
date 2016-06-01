@@ -4,29 +4,22 @@ import scalariform.formatter.preferences._
 
 name := "play-silhouette-seed"
 
-version := "4.0.0-BETA4"
+version := "4.0.0-RC1"
 
 scalaVersion := "2.11.8"
-
-resolvers := ("Atlassian Releases" at "https://maven.atlassian.com/public/") +: resolvers.value
-
-resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
-
-resolvers += Resolver.sonatypeRepo("releases")
-
-resolvers += Resolver.sonatypeRepo("snapshots")
 
 resolvers += Resolver.jcenterRepo
 
 libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % "4.0.0-BETA4",
-  "com.mohiva" %% "play-silhouette-password-bcrypt" % "4.0.0-BETA4",
-  "com.mohiva" %% "play-silhouette-persistence-memory" % "4.0.0-BETA4",
-  "org.webjars" %% "webjars-play" % "2.5.0",
+  "com.mohiva" %% "play-silhouette" % "4.0.0-RC1",
+  "com.mohiva" %% "play-silhouette-password-bcrypt" % "4.0.0-RC1",
+  "com.mohiva" %% "play-silhouette-persistence" % "4.0.0-RC1",
+  "com.mohiva" %% "play-silhouette-crypto-jca" % "4.0.0-RC1",
+  "org.webjars" %% "webjars-play" % "2.5.0-2",
   "net.codingwell" %% "scala-guice" % "4.0.1",
-  "com.iheart" %% "ficus" % "1.2.0",
+  "com.iheart" %% "ficus" % "1.2.6",
   "com.adrianhurt" %% "play-bootstrap" % "1.0-P25-B3",
-  "com.mohiva" %% "play-silhouette-testkit" % "4.0.0-BETA4" % "test",
+  "com.mohiva" %% "play-silhouette-testkit" % "4.0.0-RC1" % "test",
   specs2 % Test,
   cache,
   filters
