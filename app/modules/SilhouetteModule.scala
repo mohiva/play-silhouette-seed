@@ -33,7 +33,6 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.openid.OpenIdClient
 import play.api.libs.ws.WSClient
 import utils.auth.{ CustomSecuredErrorHandler, CustomUnsecuredErrorHandler, DefaultEnv }
-import com.mohiva.play.silhouette.impl.providers.cas._
 import net.ceedubs.ficus.readers.ValueReader
 import com.typesafe.config.Config
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
@@ -68,6 +67,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[DelegableAuthInfoDAO[OAuth1Info]].toInstance(new InMemoryAuthInfoDAO[OAuth1Info])
     bind[DelegableAuthInfoDAO[OAuth2Info]].toInstance(new InMemoryAuthInfoDAO[OAuth2Info])
     bind[DelegableAuthInfoDAO[OpenIDInfo]].toInstance(new InMemoryAuthInfoDAO[OpenIDInfo])
+    bind[DelegableAuthInfoDAO[CasInfo]].toInstance(new InMemoryAuthInfoDAO[CasInfo])
   }
 
   /**
@@ -215,9 +215,10 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
-    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoRepository = {
+    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo],
+    casInfoDAO: DelegableAuthInfoDAO[CasInfo]): AuthInfoRepository = {
 
-    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
+    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO, casInfoDAO)
   }
 
   /**
@@ -245,27 +246,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
 
     new CookieAuthenticatorService(config, None, cookieSigner, encoder, fingerprintGenerator, idGenerator, clock)
   }
-
-  /**
-   * Provides the auth info repository.
-   *
-   * @param passwordInfoDAO The implementation of the delegable password auth info DAO.
-   * @param oauth1InfoDAO The implementation of the delegable OAuth1 auth info DAO.
-   * @param oauth2InfoDAO The implementation of the delegable OAuth2 auth info DAO.
-   * @param openIDInfoDAO The implementation of the delegable OpenID auth info DAO.
-   * @return The auth info repository instance.
-   */
-  //  @Provides
-  //  @Override
-  //  def provideAuthInfoRepository(
-  //    passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
-  //    oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
-  //    oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
-  //    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo],
-  //    casAuthInfoDAO: DelegableAuthInfoDAO[CasAuthInfo]): AuthInfoRepository = {
-  //
-  //    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO, casAuthInfoDAO)
-  //  }
 
   /**
    * Provides the avatar service.
