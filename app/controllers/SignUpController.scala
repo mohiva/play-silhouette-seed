@@ -35,9 +35,10 @@ class SignUpController @Inject() (
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
   avatarService: AvatarService,
-  passwordHasher: PasswordHasher,
-  implicit val webJarAssets: WebJarAssets)
-  extends Controller with I18nSupport {
+  passwordHasher: PasswordHasher
+)(
+  implicit val webJarAssets: WebJarAssets
+) extends Controller with I18nSupport {
 
   /**
    * Views the `Sign Up` page.
