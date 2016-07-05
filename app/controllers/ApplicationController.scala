@@ -23,7 +23,8 @@ class ApplicationController @Inject() (
   silhouette: Silhouette[DefaultEnv],
   socialProviderRegistry: SocialProviderRegistry
 )(
-  implicit val webJarAssets: WebJarAssets
+  implicit
+  webJarAssets: WebJarAssets
 ) extends Controller with I18nSupport {
 
   /**

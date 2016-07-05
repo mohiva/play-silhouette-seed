@@ -37,7 +37,8 @@ class SignUpController @Inject() (
   avatarService: AvatarService,
   passwordHasher: PasswordHasher
 )(
-  implicit val webJarAssets: WebJarAssets
+  implicit
+  webJarAssets: WebJarAssets
 ) extends Controller with I18nSupport {
 
   /**

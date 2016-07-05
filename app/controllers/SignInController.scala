@@ -45,7 +45,8 @@ class SignInController @Inject() (
   configuration: Configuration,
   clock: Clock
 )(
-  implicit val webJarAssets: WebJarAssets
+  implicit
+  webJarAssets: WebJarAssets
 ) extends Controller with I18nSupport {
 
   /**
