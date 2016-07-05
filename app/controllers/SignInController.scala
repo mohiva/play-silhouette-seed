@@ -43,9 +43,11 @@ class SignInController @Inject() (
   credentialsProvider: CredentialsProvider,
   socialProviderRegistry: SocialProviderRegistry,
   configuration: Configuration,
-  clock: Clock,
-  implicit val webJarAssets: WebJarAssets)
-  extends Controller with I18nSupport {
+  clock: Clock
+)(
+  implicit
+  webJarAssets: WebJarAssets
+) extends Controller with I18nSupport {
 
   /**
    * Views the `Sign In` page.

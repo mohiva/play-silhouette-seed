@@ -29,9 +29,11 @@ class SocialAuthController @Inject() (
   silhouette: Silhouette[DefaultEnv],
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
-  socialProviderRegistry: SocialProviderRegistry,
-  implicit val webJarAssets: WebJarAssets)
-  extends Controller with I18nSupport with Logger {
+  socialProviderRegistry: SocialProviderRegistry
+)(
+  implicit
+  webJarAssets: WebJarAssets
+) extends Controller with I18nSupport with Logger {
 
   /**
    * Authenticates a user against a social provider.

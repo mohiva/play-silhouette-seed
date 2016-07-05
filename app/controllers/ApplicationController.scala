@@ -21,9 +21,11 @@ import scala.concurrent.Future
 class ApplicationController @Inject() (
   val messagesApi: MessagesApi,
   silhouette: Silhouette[DefaultEnv],
-  socialProviderRegistry: SocialProviderRegistry,
-  implicit val webJarAssets: WebJarAssets)
-  extends Controller with I18nSupport {
+  socialProviderRegistry: SocialProviderRegistry
+)(
+  implicit
+  webJarAssets: WebJarAssets
+) extends Controller with I18nSupport {
 
   /**
    * Handles the index action.
