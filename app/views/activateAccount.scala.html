@@ -1,0 +1,13 @@
+@(email: String)(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
+
+@main(Messages("activate.account.title")) {
+    <fieldset class="col-md-6 col-md-offset-3">
+        <legend>@Messages("activate.account")</legend>
+        <div class="info">
+            <p>@Messages("activate.account.text1")</p>
+            <p><b>@email</b></p>
+            <p>@Messages("activate.account.text2")</p>
+            <p>@Html(Messages("activate.account.text3", routes.ActivateAccountController.send(helper.urlEncode(email))))</p>
+        </div>
+    </fieldset>
+}

@@ -21,6 +21,9 @@ Or you can find a running example of this template under the following URL: http
 * Publishing Events
 * Avatar service
 * Remember me functionality
+* Password reset/change functionality
+* Account activation functionality
+* Email sending and auth token cleanup
 * [Security headers](https://www.playframework.com/documentation/2.4.x/SecurityHeaders)
 * [CSRF Protection](https://www.playframework.com/documentation/2.4.x/ScalaCsrf)
 

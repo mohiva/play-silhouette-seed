@@ -19,6 +19,14 @@ import scala.concurrent.Future
 class UserServiceImpl @Inject() (userDAO: UserDAO) extends UserService {
 
   /**
+   * Retrieves a user that matches the specified ID.
+   *
+   * @param id The ID to retrieve a user.
+   * @return The retrieved user or None if no user could be retrieved for the given ID.
+   */
+  def retrieve(id: UUID) = userDAO.find(id)
+
+  /**
    * Retrieves a user that matches the specified login info.
    *
    * @param loginInfo The login info to retrieve a user.
@@ -60,7 +68,8 @@ class UserServiceImpl @Inject() (userDAO: UserDAO) extends UserService {
           lastName = profile.lastName,
           fullName = profile.fullName,
           email = profile.email,
-          avatarURL = profile.avatarURL
+          avatarURL = profile.avatarURL,
+          activated = true
         ))
     }
   }

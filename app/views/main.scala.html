@@ -1,4 +1,4 @@
-@(title: String, user: Option[models.User] = None)(content: Html)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@(title: String, user: Option[models.User] = None)(content: Html)(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -38,7 +38,8 @@
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         @user.map { u =>
-                            <li><a href="@routes.ApplicationController.index">@u.fullName</a></li>
+                            <li><a href="@routes.ApplicationController.index">@u.name</a></li>
+                            <li><a href="@routes.ChangePasswordController.view">@Messages("change.password")</a></li>
                             <li><a href="@routes.ApplicationController.signOut">@Messages("sign.out")</a></li>
                         }.getOrElse {
                             <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
@@ -50,6 +51,24 @@
         </header>
         <main class="container">
             <div class="starter-template row">
+                @request.flash.get("error").map { msg =>
+                    <div class="col-md-6 col-md-offset-3 alert alert-danger">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <strong>@Messages("error")</strong> @msg
+                    </div>
+                }
+                @request.flash.get("info").map { msg =>
+                    <div class="col-md-6 col-md-offset-3 alert alert-info">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <strong>@Messages("info")</strong> @msg
+                    </div>
+                }
+                @request.flash.get("success").map { msg =>
+                    <div class="col-md-6 col-md-offset-3 alert alert-success">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <strong>@Messages("success")</strong> @msg
+                    </div>
+                }
                 @content
             </div>
         </main>
