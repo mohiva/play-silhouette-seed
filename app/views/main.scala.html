@@ -39,7 +39,9 @@
                     <ul class="nav navbar-nav navbar-right">
                         @user.map { u =>
                             <li><a href="@routes.ApplicationController.index">@u.name</a></li>
-                            <li><a href="@routes.ChangePasswordController.view">@Messages("change.password")</a></li>
+                            @if(u.loginInfo.providerID == com.mohiva.play.silhouette.impl.providers.CredentialsProvider.ID) {
+                                <li><a href="@routes.ChangePasswordController.view">@Messages("change.password")</a></li>
+                            }
                             <li><a href="@routes.ApplicationController.signOut">@Messages("sign.out")</a></li>
                         }.getOrElse {
                             <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
