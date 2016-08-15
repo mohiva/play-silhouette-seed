@@ -12,11 +12,53 @@
     "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-scala.git",
     "PLAY_CONF_FILE": "application.prod.conf",
     "PLAY_APP_SECRET": "changeme",
-    "FACEBOOK_CLIENT_ID": "",
-    "FACEBOOK_CLIENT_SECRET": "",
-    "GOOGLE_CLIENT_ID": "",
-    "GOOGLE_CLIENT_SECRET": "",
-    "TWITTER_CONSUMER_KEY": "",
-    "TWITTER_CONSUMER_SECRET": ""
+    "FACEBOOK_CLIENT_ID": {
+      "description": "The Facebook OAuth2 client ID",
+      "required": false
+    },
+    "FACEBOOK_CLIENT_SECRET": {
+      "description": "The Facebook OAuth2 client secret",
+      "required": false
+    },
+    "GOOGLE_CLIENT_ID": {
+      "description": "The Google OAuth2 client ID",
+      "required": false
+    },
+    "GOOGLE_CLIENT_SECRET": {
+      "description": "The Google OAuth2 client secret",
+      "required": false
+    },
+    "VK_CLIENT_ID": {
+      "description": "The VK OAuth2 client ID",
+      "required": false
+    },
+    "VK_CLIENT_SECRET": {
+      "description": "The VK OAuth2 client secret",
+      "required": false
+    },
+    "CLEF_CLIENT_ID": {
+      "description": "The Clef OAuth2 client ID",
+      "required": false
+    },
+    "CLEF_CLIENT_SECRET": {
+      "description": "The Clef OAuth2 client secret",
+      "required": false
+    },
+    "TWITTER_CONSUMER_KEY": {
+      "description": "The Twitter OAuth1 consumer key",
+      "required": false
+    },
+    "TWITTER_CONSUMER_SECRET": {
+      "description": "The Twitter OAuth1 consumer secret",
+      "required": false
+    },
+    "XING_CONSUMER_KEY": {
+      "description": "The Xing OAuth1 consumer key",
+      "required": false
+    },
+    "XING_CONSUMER_SECRET": {
+      "description": "The Xing OAuth1 consumer secret",
+      "required": false
+    }
   }
 }
