@@ -1,0 +1,137 @@
+<body>
+    <div>
+        <h2>Introduction</h2>
+        <h4>What is the purpose of this tutorial ?</h4>
+        <p>
+            This tutorial is not really meant as a manual to use this seed, but more as a first step to begin to understand how Silhouette works. You should refer to the <a href="https://www.silhouette.rocks/docs">documentation</a> for detailed explanations and you can ask questions on the <a href="http://discourse.silhouette.rocks/">Silhouette Forum</a>.
+        </p>
+
+        <h4>Overview</h4>
+        <ul>
+            <li><a href="#tutorial/1">Run Your Application</a> : quick setup to see the result.</li>
+            <li><a href="#tutorial/2">Endpoints</a> : the tip of the iceberg.</li>
+            <li><a href="#tutorial/3">Modules</a> : how things are wired up.</li>
+            <li><a href="#tutorial/4">Handle errors in endpoints</a> : customize the behaviour in case of <i>not authenticated</i> or <i>not authorized</i> users.</li>
+            <li><a href="#tutorial/5">Identity/IdentityService</a> : the structure of a user object and how to get one.</li>
+            <li><a href="#tutorial/6">DAOs</a> : store the data.</li>
+            <li><a href="#tutorial/7">Authorization</a> : who can access what.</li>
+            <li><a href="#tutorial/8">Conclusion</a></li>
+        </ul>
+    </div>
+    <div>
+        <h2>Run Your Application</h2>
+        <p>
+            You can already run your app through the <code>activator ui</code> or with the <code>activator run</code> command and visit <a href="http://localhost:9000">http://localhost:9000</a>. But you will not be able to sign up because the application tries to send an email through SendGrid, which has to be configured. And the same goes for the other authentication providers (Google, Facebook, ...) : you have to register your application and set the provider key and secret in <a href="#code/conf/silhouette.conf">silhouette.conf</a> for each of them to work.
+            <br/>
+            Therefore, if you just want to experiment with this project, you can make two small changes allowing you to signup. First you have to set the Play mailer into <code>mock</code> mode by adding the following line to your <a href="#code/conf/application.conf">application.conf</a> file :
+            <pre><code>play.mailer.mock = true</code></pre>
+            This tells the Play mailer to log the email instead of trying to send it. But now you will not be able to activate your account after signing up, so you have to initialize new accounts as already activated by slightly modifiying the <a href="#code/app/controllers/SignUpController.scala">SignUpController</a> :
+<pre><code>val user = User(
+  userID = UUID.randomUUID(),
+  loginInfo = loginInfo,
+  firstName = Some(data.firstName),
+  lastName = Some(data.lastName),
+  fullName = Some(data.firstName + " " + data.lastName),
+  email = Some(data.email),
+  avatarURL = None,
+  //activated = false
+  activated = true // TODO delete to avoid activating all users by default
+)</code></pre>
+            You should now be able to <a href="http://localhost:9000/signUp">sign up</a> and then <a href="http://localhost:9000/signIn">sign in</a>.
+        </p>
+    </div>
+    <div>
+        <h2>Endpoints</h2>
+        <p>
+            As explained in the <a href="houette.rocks/docs/endpoints">documentation</a>, the endpoints are the <code>Action</code>s and the <code>WebSocket</code>s that are managed by Silhouette. This means, for example, that to make sure that only registered users can access to an endpoint of your application, you simply have to use a <code>silhouette.SecuredAction</code> instead of a standard <code>Action</code>, like for <code>index</code> in the <a href="#code/app/controllers/ApplicationController.scala">ApplicationController</a>.
+        </p>
+        <p>
+            These endpoints are provided by the <code>silhouette: Silhouette[DefaultEnv]</code> object which is injected in each controller using <a href="https://www.playframework.com/documentation/2.5.x/ScalaDependencyInjection">dependency injection</a>. To see where it comes from you have to examine the <em>modules</em> (next section).
+        </p>
+    </div>
+    <div>
+        <h2>Modules</h2>
+        <p>
+            Silhouette uses <a href="https://www.playframework.com/documentation/2.5.x/ScalaDependencyInjection">dependency injection</a> to separate the API definition from its implementation. The modules to customize the bindings from the traits to their implementation can be found in the <a href="#code/app/modules/">modules</a> package. We are in particular interested by the <a href="#code/app/modules/SilhouetteModule.scala">SilhouetteModule</a>.
+            <br/>
+            This file contains all the bindings related to Silhouette and is therefore rather long. We are going to look at the part concerning the <code>Silhouette[DefaultEnv]</code> object, which provides the endpoints. After that, the structure of the file should be clear enough for you to find what you need.
+        </p>
+        <p>
+            We see in the first line of the <code>configure</code> method that the <code>Silhouette[DefaultEnv]</code> we came across in the controller is bound to the class <code>SilhouetteProvider[DefaultEnv]</code>. To discover from where this one comes from you have to look into the Silhouette library itself. At the bottom of the <a href="https://github.com/mohiva/play-silhouette/blob/master/silhouette/app/com/mohiva/play/silhouette/api/Silhouette.scala">Silhouette.scala</a> file, you can observe that <code>SilhouetteProvider[E <: Env]</code> depends on <code>Environment[E]</code>, <code>SecuredAction</code>, <code>UnsecuredAction</code> and <code>UserAwareAction</code>. The three <code>Action</code>s already have a default implementation bound (in <a href="https://github.com/mohiva/play-silhouette/blob/master/silhouette/app/com/mohiva/play/silhouette/api/actions/SecuredAction.scala">SecuredAction</a> for example), so the only one left to be bound is the <code>Environment</code>. We can now go back to the <a href="#code/app/modules/SilhouetteModule.scala">SilhouetteModule</a> to find the <code>provideEnvironment</code> method.
+            <br/>
+            The <code>@Provides</code> annotation means that every time an intance of <code>Environment[DefaultEnv]</code> has to be injected, this method will provide it. The dependencies of <code>provideEnvironment</code> are themselves bound in the <code>configure</code> method. The <code>Environment</code> provided here has the type parameter <code>DefaultEnv</code>, an arbitrary name chosen for the environment type of this application, defined in <a href="#code/app/utils/auth/Env.scala">Env.scala</a>. This trait defines which <code>Identity</code> (i.e. structure of a user, <a href="houette.rocks/docs/identity">doc</a>) and which <code>Authenticator</code> (i.e. mean of authentication, <a href="houette.rocks/docs/authenticator">doc</a>) are used in this project. See the <a href="houette.rocks/docs/environment">documentation</a> about the environment for more information.
+        </p>
+        <p>
+            In summary, a module has a <code>configure</code> method where all the bindings are declared and other methods annotated with <code>@Provides</code> to provide instances with specific arguments.
+        </p>
+    </div>
+
+    <div>
+        <h2>Handle errors in endpoints</h2>
+        <p>
+            If a user tries to access a secured enpoint without being authenticated, the default behaviour of Silhouette is to send a simple "not authenticated" message. The same goes if an authenticated user requests a page he is not authorized to access. To customize this behaviour, this seed defines two custom error handlers, <a href="#code/app/utils/auth/CustomSecuredErrorHandler.scala">CustomSecuredErrorHandler</a> and <a href="#code/app/utils/auth/CustomUnsecuredErrorHandler.scala">CustomUnsecuredErrorHandler</a>.
+            <br/>
+            To enable them, the defauld handlers have first to be disabled. This is done in the <a href="#code/conf/application.conf">application.conf</a> file with the following lines :
+            <pre><code>play.modules.disabled += "com.mohiva.play.silhouette.api.actions.SecuredErrorHandlerModule"
+ play.modules.disabled += "com.mohiva.play.silhouette.api.actions.UnsecuredErrorHandlerModule"</code></pre>
+             The new handlers can then be bound to the error handler traits in the <a href="#code/app/modules/SilhouetteModule.scala">SilhouetteModule</a> :
+            <pre><code>bind[UnsecuredErrorHandler].to[CustomUnsecuredErrorHandler]
+ bind[SecuredErrorHandler].to[CustomSecuredErrorHandler]</code></pre>
+        </p>
+    </div>
+
+    <div>
+        <h2>Identity/IdentityService</h2>
+        <p>
+            <code>Identity</code> is a trait in Silhouette representing a user (<a href="houette.rocks/docs/identity">documentation</a>). Its implementation in this seed is the <a href="#code/app/models/User.scala">User</a> class. This class has to be specified in the environment type, here <a href="#code/app/utils/auth/Env.scala">DefaultEnv</a> (see the <a href="houette.rocks/docs/environment">documentation</a> about the environment).
+        </p>
+        <p>
+            Silhouette also needs an <code>IdentityService</code>, extended here by <a href="#code/app/models/services/UserService.scala">UserService</a> and then implemented by <a href="#code/app/models/services/UserServiceImpl.scala">UserServiceImpl</a>. You can find the binding concerning these in the <a href="#code/app/modules/SilhouetteModule.scala">SilhouetteModule</a>. The <code>IdentityService</code> is needed in the authentication process to get a user given his identity provider and his identifier, bundled in a <a href="houette.rocks/docs/identity#section-login-information">LoginInfo</a> object. Here a <code>UserService</code> also allows to save a user, making it an additional layer of abstraction above the user data access object (<code>UserDAO</code>) to simplify the saving process.
+        </p>
+        <p>
+            The identity of a user is accessible in every <i>secured</i> or <i>user aware</i> endpoint via its <code>Request</code> object. In the case of a <code>SecuredAction</code> you directly get the <code>Identity</code> from <code>request.identity</code>, and for an <code>UserAwareAction</code> it is an <code>Option[Identity]</code> since this type of endpoint also accepts unauthentified users.
+        </p>
+    </div>
+
+    <div>
+        <h2>DAOs</h2>
+        <p>
+            As you can see in the <a href="#code/app/models/daos/">daos</a> package, this seed contains data access objects (DAOs) for <code>User</code>s and for <code>AuthToken</code>s (tokens to activate a user via email or change the password). They are implemented to store the data in an in-memory <code>HashMap</code> for the example. To keep the data over a restart of your application you have to give these DAOs an other implementation storing the values in a <a href="https://www.playframework.com/documentation/2.5.x/ScalaDatabase">database</a>. You can then replace the implementation bound in the <a href="#code/app/modules/SilhouetteModule.scala">SilhouetteModule</a> (or <a href="#code/app/modules/BaseModule.scala">BaseModule</a> for the AuthToken).
+        </p>
+        <p>
+            There are other DAOs in this application, but their implementation comes from Silhouette. You can find the bindings in the <a href="#code/app/modules/SilhouetteModule.scala">SilhouetteModule</a> :
+</p><p><pre><code>// Replace this with the bindings to your concrete DAOs
+bind[DelegableAuthInfoDAO[PasswordInfo]].toInstance(new InMemoryAuthInfoDAO[PasswordInfo])
+bind[DelegableAuthInfoDAO[OAuth1Info]].toInstance(new InMemoryAuthInfoDAO[OAuth1Info])
+bind[DelegableAuthInfoDAO[OAuth2Info]].toInstance(new InMemoryAuthInfoDAO[OAuth2Info])
+bind[DelegableAuthInfoDAO[OpenIDInfo]].toInstance(new InMemoryAuthInfoDAO[OpenIDInfo])
+</code></pre></p><p>
+            These are all <code>AuthInfoDAO</code>s which store the information concerning authentication, like the password for users signing in with credentials. You may wonder why not directly store the password in the <code>User</code> object, but remember that we want users to be able to sign in via other authentication providers like Google or Facebook. Our application will not have to store a password for these users, but other authentication information depending on the protocol (OAuth1, OAuth2 or OpenID). Therefore it makes more sense to split the auth info from the rest of the user and store it in a different DAO.
+            <br/>
+            Like for the <code>UserDAO</code>, you will have to provide other implementations to persist the data.
+        </p>
+    </div>
+
+    <div>
+        <h2>Authorization</h2>
+        <p>
+            To specify which endpoints a user can access in your application, you can implement an <code>Authorization</code> (<a href="https://www.silhouette.rocks/docs/authorization">documentation</a>). <a href="#code/app/utils/auth/WithProvider.scala">WithProvider</a> is an example allowing only users which are authenticated via a specified provider. You can implement your own logic and combine authorizations with logical operators like described in the <a href="https://www.silhouette.rocks/docs/authorization#section-logic-operator">documentation</a>.
+        </p>
+    </div>
+
+    <div>
+        <h2>Conclusion</h2>
+        <p>
+            If you are planning to use Silhouette in your project, you may think that this seed contains quite a lot of features and maybe you want to take only what is necessary. So here is a list of the classes and files you absolutely need to make Silhouette work :
+        </p>
+        <ul>
+            <li>A module binding the necessary implementations, or providing the instances when you need to specify the constructor arguments</li>
+            <li>An implementation of <code>Identity</code></li>
+            <li>An implementation of <code>IdentityService</code></li>
+            <li>A trait extending <code>Env</code>, like <a href="#code/app/utils/auth/Env.scala">DefaultEnv</a></li>
+        </ul>
+        <p>
+            But if you are planning to use your application in production, this project contains a few things that come in handy (<a href="#code/app/jobs/AuthTokenCleaner.scala">AuthTokenCleaner</a>, <a href="https://www.playframework.com/documentation/2.5.x/SecurityHeaders">security headers</a>, ...) and it may therefore be easier to use it as seed from the beginning.
+        </p>
+    </div>
+</body>
