@@ -9,33 +9,37 @@ import com.mohiva.play.silhouette.api.util.{ PasswordHasherRegistry, PasswordInf
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import forms.ResetPasswordForm
 import models.services.{ AuthTokenService, UserService }
-import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
-import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.Controller
+import org.webjars.play.WebJarsUtil
+import play.api.i18n.{ I18nSupport, Messages }
+import play.api.mvc.{ AbstractController, AnyContent, ControllerComponents, Request }
 import utils.auth.DefaultEnv
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * The `Reset Password` controller.
  *
- * @param messagesApi            The Play messages API.
+ * @param components             The Play controller components.
  * @param silhouette             The Silhouette stack.
  * @param userService            The user service implementation.
  * @param authInfoRepository     The auth info repository.
  * @param passwordHasherRegistry The password hasher registry.
  * @param authTokenService       The auth token service implementation.
- * @param webJarAssets           The WebJar assets locator.
+ * @param webJarsUtil            The webjar util.
+ * @param ex                     The execution context.
  */
 class ResetPasswordController @Inject() (
-  val messagesApi: MessagesApi,
+  components: ControllerComponents,
   silhouette: Silhouette[DefaultEnv],
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
   passwordHasherRegistry: PasswordHasherRegistry,
-  authTokenService: AuthTokenService,
-  implicit val webJarAssets: WebJarAssets)
-  extends Controller with I18nSupport {
+  authTokenService: AuthTokenService
+)(
+  implicit
+  webJarsUtil: WebJarsUtil,
+  ex: ExecutionContext
+) extends AbstractController(components) with I18nSupport {
 
   /**
    * Views the `Reset Password` page.
@@ -43,9 +47,9 @@ class ResetPasswordController @Inject() (
    * @param token The token to identify a user.
    * @return The result to display.
    */
-  def view(token: UUID) = silhouette.UnsecuredAction.async { implicit request =>
+  def view(token: UUID) = silhouette.UnsecuredAction.async { implicit request: Request[AnyContent] =>
     authTokenService.validate(token).map {
-      case Some(authToken) => Ok(views.html.resetPassword(ResetPasswordForm.form, token))
+      case Some(_) => Ok(views.html.resetPassword(ResetPasswordForm.form, token))
       case None => Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.reset.link"))
     }
   }
@@ -56,7 +60,7 @@ class ResetPasswordController @Inject() (
    * @param token The token to identify a user.
    * @return The result to display.
    */
-  def submit(token: UUID) = silhouette.UnsecuredAction.async { implicit request =>
+  def submit(token: UUID) = silhouette.UnsecuredAction.async { implicit request: Request[AnyContent] =>
     authTokenService.validate(token).flatMap {
       case Some(authToken) =>
         ResetPasswordForm.form.bindFromRequest.fold(

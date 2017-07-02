@@ -1,4 +1,7 @@
-@(user: User, url: String)(implicit messages: Messages)
+@import play.api.i18n.Messages
+@import play.twirl.api.Html
+
+@(user: models.User, url: String)(implicit messages: Messages)
 
 <html>
     <body>
