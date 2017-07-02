@@ -16,7 +16,7 @@ object Binders {
     def bind(key: String, value: String) = try {
       Right(UUID.fromString(value))
     } catch {
-      case e: Exception => Left("Cannot parse parameter '" + key + "' with value '" + value + "' as UUID")
+      case _: Exception => Left("Cannot parse parameter '" + key + "' with value '" + value + "' as UUID")
     }
 
     def unbind(key: String, value: UUID): String = value.toString

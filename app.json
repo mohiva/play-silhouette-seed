@@ -36,14 +36,6 @@
       "description": "The VK OAuth2 client secret",
       "required": false
     },
-    "CLEF_CLIENT_ID": {
-      "description": "The Clef OAuth2 client ID",
-      "required": false
-    },
-    "CLEF_CLIENT_SECRET": {
-      "description": "The Clef OAuth2 client secret",
-      "required": false
-    },
     "TWITTER_CONSUMER_KEY": {
       "description": "The Twitter OAuth1 consumer key",
       "required": false

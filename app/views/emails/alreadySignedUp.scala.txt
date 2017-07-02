@@ -1,4 +1,6 @@
-@(user: User, url: String)(implicit messages: Messages)
+@import play.api.i18n.Messages
+
+@(user: models.User, url: String)(implicit messages: Messages)
 @messages("email.already.signed.up.hello", user.name.getOrElse("user"))
 
 @messages("email.already.signed.up.txt.text", url)
