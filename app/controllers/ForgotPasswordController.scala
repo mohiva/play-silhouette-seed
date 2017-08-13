@@ -23,6 +23,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param authTokenService The auth token service implementation.
  * @param mailerClient     The mailer client.
  * @param webJarsUtil      The webjar util.
+ * @param assets           The Play assets finder.
  * @param ex               The execution context.
  */
 class ForgotPasswordController @Inject() (
@@ -34,6 +35,7 @@ class ForgotPasswordController @Inject() (
 )(
   implicit
   webJarsUtil: WebJarsUtil,
+  assets: AssetsFinder,
   ex: ExecutionContext
 ) extends AbstractController(components) with I18nSupport {
 

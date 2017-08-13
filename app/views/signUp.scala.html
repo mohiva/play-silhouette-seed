@@ -2,10 +2,11 @@
 @import play.api.i18n.Messages
 @import play.api.mvc.RequestHeader
 @import org.webjars.play.WebJarsUtil
+@import controllers.AssetsFinder
 @import forms.SignUpForm.Data
 @import b3.inline.fieldConstructor
 
-@(signUpForm: Form[Data])(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil)
+@(signUpForm: Form[Data])(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
 
 @main(messages("sign.up.title")) {
     <fieldset class="col-md-6 col-md-offset-3">

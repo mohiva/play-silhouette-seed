@@ -31,6 +31,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param configuration          The Play configuration.
  * @param clock                  The clock instance.
  * @param webJarsUtil            The webjar util.
+ * @param assets                 The Play assets finder.
  */
 class SignInController @Inject() (
   components: ControllerComponents,
@@ -43,6 +44,7 @@ class SignInController @Inject() (
 )(
   implicit
   webJarsUtil: WebJarsUtil,
+  assets: AssetsFinder,
   ex: ExecutionContext
 ) extends AbstractController(components) with I18nSupport {
 
