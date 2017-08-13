@@ -2,11 +2,12 @@
 @import play.api.i18n.Messages
 @import play.api.mvc.RequestHeader
 @import org.webjars.play.WebJarsUtil
+@import controllers.AssetsFinder
 @import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 @import forms.SignInForm.Data
 @import b3.inline.fieldConstructor
 
-@(signInForm: Form[Data], socialProviders: SocialProviderRegistry)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil)
+@(signInForm: Form[Data], socialProviders: SocialProviderRegistry)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
 
 @main(messages("sign.in.title")) {
     <fieldset class="col-md-6 col-md-offset-3">
@@ -32,7 +33,7 @@
                 <p>@messages("or.use.social")</p>
                 <div>
                 @for(p <- socialProviders.providers) {
-                    <a href="@controllers.routes.SocialAuthController.authenticate(p.id)" class="provider @p.id" title="@messages(p.id)"><img src="@controllers.routes.Assets.at(s"images/providers/${p.id}.png")" width="64px" height="64px" alt="@messages(p.id)"></a>
+                    <a href="@controllers.routes.SocialAuthController.authenticate(p.id)" class="provider @p.id" title="@messages(p.id)"><img src="@assets.path(s"images/providers/${p.id}.png")" width="64px" height="64px" alt="@messages(p.id)"></a>
                 }
                 </div>
             </div>

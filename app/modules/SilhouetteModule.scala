@@ -20,7 +20,7 @@ import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDServi
 import com.mohiva.play.silhouette.impl.providers.state.{ CsrfStateItemHandler, CsrfStateSettings }
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
-import com.mohiva.play.silhouette.password.BCryptPasswordHasher
+import com.mohiva.play.silhouette.password.{ BCryptPasswordHasher, BCryptSha256PasswordHasher }
 import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, InMemoryAuthInfoDAO }
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
 import models.daos._
@@ -52,7 +52,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[UserDAO].to[UserDAOImpl]
     bind[CacheLayer].to[PlayCacheLayer]
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
-    bind[PasswordHasher].toInstance(new BCryptPasswordHasher)
     bind[FingerprintGenerator].toInstance(new DefaultFingerprintGenerator(false))
     bind[EventBus].toInstance(EventBus())
     bind[Clock].toInstance(Clock())
@@ -313,12 +312,11 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   /**
    * Provides the password hasher registry.
    *
-   * @param passwordHasher The default password hasher implementation.
    * @return The password hasher registry.
    */
   @Provides
-  def providePasswordHasherRegistry(passwordHasher: PasswordHasher): PasswordHasherRegistry = {
-    PasswordHasherRegistry(passwordHasher)
+  def providePasswordHasherRegistry(): PasswordHasherRegistry = {
+    PasswordHasherRegistry(new BCryptSha256PasswordHasher(), Seq(new BCryptPasswordHasher()))
   }
 
   /**

@@ -1,8 +1,9 @@
 @import play.api.i18n.Messages
 @import play.api.mvc.RequestHeader
 @import org.webjars.play.WebJarsUtil
+@import controllers.AssetsFinder
 
-@(user: models.User)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil)
+@(user: models.User)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
 
 @main(messages("home.title"), Some(user)) {
     <div class="user col-md-6 col-md-offset-3">
@@ -10,7 +11,7 @@
             <hr class="col-md-12" />
             <h4 class="col-md-8">@messages("welcome.signed.in")</h4>
             <div class="col-md-4 text-right">
-                <img src="@user.avatarURL.getOrElse(controllers.routes.Assets.at("images/silhouette.png"))" height="40px" />
+                <img src="@user.avatarURL.getOrElse(assets.path("images/silhouette.png"))" height="40px" />
             </div>
             <hr class="col-md-12" />
         </div>

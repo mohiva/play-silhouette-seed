@@ -25,6 +25,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param authInfoRepository     The auth info repository.
  * @param passwordHasherRegistry The password hasher registry.
  * @param webJarsUtil            The webjar util.
+ * @param assets                 The Play assets finder.
  * @param ex                     The execution context.
  */
 class ChangePasswordController @Inject() (
@@ -36,6 +37,7 @@ class ChangePasswordController @Inject() (
 )(
   implicit
   webJarsUtil: WebJarsUtil,
+  assets: AssetsFinder,
   ex: ExecutionContext
 ) extends AbstractController(components) with I18nSupport {
 
