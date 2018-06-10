@@ -4,29 +4,29 @@ import scalariform.formatter.preferences._
 
 name := "play-silhouette-seed"
 
-version := "5.0.0"
+version := "5.0.5"
 
-scalaVersion := "2.12.3"
+scalaVersion := "2.12.6"
 
 resolvers += Resolver.jcenterRepo
 
 resolvers += "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
 libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % "5.0.0",
-  "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.0",
-  "com.mohiva" %% "play-silhouette-persistence" % "5.0.0",
-  "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.0",
-  "org.webjars" %% "webjars-play" % "2.6.1",
+  "com.mohiva" %% "play-silhouette" % "5.0.5",
+  "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.5",
+  "com.mohiva" %% "play-silhouette-persistence" % "5.0.5",
+  "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.5",
+  "org.webjars" %% "webjars-play" % "2.6.3",
   "org.webjars" % "bootstrap" % "3.3.7-1" exclude("org.webjars", "jquery"),
   "org.webjars" % "jquery" % "3.2.1",
   "net.codingwell" %% "scala-guice" % "4.1.0",
-  "com.iheart" %% "ficus" % "1.4.1",
+  "com.iheart" %% "ficus" % "1.4.3",
   "com.typesafe.play" %% "play-mailer" % "6.0.1",
   "com.typesafe.play" %% "play-mailer-guice" % "6.0.1",
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.1-akka-2.5.x",
-  "com.adrianhurt" %% "play-bootstrap" % "1.2-P26-B3",
-  "com.mohiva" %% "play-silhouette-testkit" % "5.0.0" % "test",
+  "com.adrianhurt" %% "play-bootstrap" % "1.4-P26-B3-SNAPSHOT",
+  "com.mohiva" %% "play-silhouette-testkit" % "5.0.5" % "test",
   specs2 % Test,
   ehcache,
   guice,
@@ -34,8 +34,6 @@ libraryDependencies ++= Seq(
 )
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
-
-routesGenerator := InjectedRoutesGenerator
 
 routesImport += "utils.route.Binders._"
 
@@ -63,9 +61,9 @@ scalacOptions ++= Seq(
 // Scalariform settings
 //********************************************************
 
-defaultScalariformSettings
+scalariformAutoformat := true
 
 ScalariformKeys.preferences := ScalariformKeys.preferences.value
   .setPreference(FormatXml, false)
-  .setPreference(DoubleIndentClassDeclaration, false)
+  .setPreference(DoubleIndentConstructorArguments, false)
   .setPreference(DanglingCloseParenthesis, Preserve)
