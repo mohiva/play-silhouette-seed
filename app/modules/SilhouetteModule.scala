@@ -23,15 +23,17 @@ import com.mohiva.play.silhouette.impl.util._
 import com.mohiva.play.silhouette.password.{ BCryptPasswordHasher, BCryptSha256PasswordHasher }
 import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, InMemoryAuthInfoDAO }
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
+import com.typesafe.config.Config
 import models.daos._
 import models.services.{ UserService, UserServiceImpl }
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
+import net.ceedubs.ficus.readers.ValueReader
 import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
 import play.api.libs.openid.OpenIdClient
 import play.api.libs.ws.WSClient
-import play.api.mvc.CookieHeaderEncoding
+import play.api.mvc.{ Cookie, CookieHeaderEncoding }
 import utils.auth.{ CustomSecuredErrorHandler, CustomUnsecuredErrorHandler, DefaultEnv }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -40,6 +42,25 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * The Guice module which wires all Silhouette dependencies.
  */
 class SilhouetteModule extends AbstractModule with ScalaModule {
+
+  /**
+   * A very nested optional reader, to support these cases:
+   * Not set, set None, will use default ('Lax')
+   * Set to null, set Some(None), will use 'No Restriction'
+   * Set to a string value try to match, Some(Option(string))
+   */
+  implicit val sameSiteReader: ValueReader[Option[Option[Cookie.SameSite]]] =
+    (config: Config, path: String) => {
+      if (config.hasPathOrNull(path)) {
+        if (config.getIsNull(path))
+          Some(None)
+        else {
+          Some(Cookie.SameSite.parse(config.getString(path)))
+        }
+      } else {
+        None
+      }
+    }
 
   /**
    * Configures the module.
