@@ -4,7 +4,7 @@ import scalariform.formatter.preferences._
 
 name := "play-silhouette-seed"
 
-version := "5.0.5"
+version := "5.0.7"
 
 scalaVersion := "2.12.6"
 
@@ -13,10 +13,10 @@ resolvers += Resolver.jcenterRepo
 resolvers += "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
 libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % "5.0.5",
-  "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.5",
-  "com.mohiva" %% "play-silhouette-persistence" % "5.0.5",
-  "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.5",
+  "com.mohiva" %% "play-silhouette" % "5.0.7",
+  "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.7",
+  "com.mohiva" %% "play-silhouette-persistence" % "5.0.7",
+  "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.7",
   "org.webjars" %% "webjars-play" % "2.6.3",
   "org.webjars" % "bootstrap" % "3.3.7-1" exclude("org.webjars", "jquery"),
   "org.webjars" % "jquery" % "3.2.1",
