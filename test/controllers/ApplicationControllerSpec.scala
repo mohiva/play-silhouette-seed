@@ -62,7 +62,7 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
      * A fake Guice module.
      */
     class FakeModule extends AbstractModule with ScalaModule {
-      def configure() = {
+      override def configure() = {
         bind[Environment[DefaultEnv]].toInstance(env)
       }
     }
