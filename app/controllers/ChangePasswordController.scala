@@ -60,11 +60,10 @@ class ChangePasswordController @Inject() (
     implicit request: SecuredRequest[DefaultEnv, AnyContent] =>
       ChangePasswordForm.form.bindFromRequest.fold(
         form => Future.successful(BadRequest(views.html.changePassword(form, request.identity))),
-        password => {
-          val (currentPassword, newPassword) = password
-          val credentials = Credentials(request.identity.email.getOrElse(""), currentPassword)
+        data => {
+          val credentials = Credentials(request.identity.email.getOrElse(""), data.currentPassword)
           credentialsProvider.authenticate(credentials).flatMap { loginInfo =>
-            val passwordInfo = passwordHasherRegistry.current.hash(newPassword)
+            val passwordInfo = passwordHasherRegistry.current.hash(data.newPassword)
             authInfoRepository.update[PasswordInfo](loginInfo, passwordInfo).map { _ =>
               Redirect(routes.ChangePasswordController.view()).flashing("success" -> Messages("password.changed"))
             }
