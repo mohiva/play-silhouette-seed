@@ -26,6 +26,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-mailer-guice" % "7.0.0",
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.1-akka-2.5.x",
   "com.adrianhurt" %% "play-bootstrap" % "1.4-P26-B3-SNAPSHOT",
+  "com.nappin" %% "play-recaptcha" % "2.3",
   "com.mohiva" %% "play-silhouette-testkit" % "6.0.0-SNAPSHOT" % "test",
   specs2 % Test,
   ehcache,

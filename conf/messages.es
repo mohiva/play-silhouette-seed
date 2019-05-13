@@ -35,6 +35,7 @@ sign.in = Iniciar sesión
 sign.out = Cerrar sesión
 sign.in.now = Iniciar sesión ahora
 sign.up.error.passwords.not.same = Las contraseñas no coinciden.
+signup.captcha = Por favor, completar la siguente prueba:
 repeat.password = Repetir contraseña
 sign.up.now = Regístrese ahora
 already.a.member = ¿Ya eres miembro?

@@ -1,11 +1,13 @@
 @import play.api.data.Form
-@import play.api.i18n.Messages
-@import play.api.mvc.RequestHeader
+@import play.api.i18n._
+@import play.api.mvc._
 @import org.webjars.play.WebJarsUtil
 @import controllers.AssetsFinder
 @import forms.SignUpForm.Data
+@import com.nappin.play.recaptcha.{RecaptchaVerifier, RecaptchaErrorCode, WidgetHelper}
 
-@(signUpForm: Form[Data])(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+@(signUpForm: Form[Data], recaptchaWidget: recaptcha.recaptchaWidget, widgetHelper: WidgetHelper)(implicit request: RequestHeader,
+  messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
 
 @implicitFieldConstructor = @{ b3.vertical.fieldConstructor() }
 
@@ -20,7 +22,8 @@
             @b3.text(signUpForm("firstName"), '_hiddenLabel -> messages("first.name"), 'placeholder -> messages("first.name"), 'class -> "form-control input-lg")
             @b3.text(signUpForm("lastName"), '_hiddenLabel -> messages("last.name"), 'placeholder -> messages("last.name"), 'class -> "form-control input-lg")
             @b3.text(signUpForm("email"), '_hiddenLabel -> messages("email"), 'placeholder -> messages("email"), 'class -> "form-control input-lg")
-            @passwordStrength(signUpForm("password"), '_hiddenLabel -> messages("password"), 'placeholder -> messages("password"), 'class -> "form-control input-lg")(signUpForm("repeatPassword"), '_hiddenLabel -> messages("repeat.password"), 'placeholder -> messages("repeat.password"), 'class -> "form-control input-lg")
+            @_passwordStrengthPartial(signUpForm("password"), '_hiddenLabel -> messages("password"), 'placeholder -> messages("password"), 'class -> "form-control input-lg")(signUpForm("repeatPassword"), '_hiddenLabel -> messages("repeat.password"), 'placeholder -> messages("repeat.password"), 'class -> "form-control input-lg")
+            @_recaptchaFieldPartial(form=signUpForm, recaptchaWidget=recaptchaWidget, fieldName="signup.captcha")(widgetHelper, request.asInstanceOf[Request[AnyContent]], messages)
             <div class="form-group">
                 <div>
                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@messages("sign.up")</button>

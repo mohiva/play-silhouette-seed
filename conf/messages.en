@@ -36,6 +36,7 @@ sign.out = Sign out
 sign.in.now = Sign in now
 sign.up.now = Sign up now
 sign.up.error.passwords.not.same = Passwords do not match.
+signup.captcha = Please complete the following captcha:
 repeat.password = Repeat password
 already.a.member = Already a member?
 not.a.member = Not a member?

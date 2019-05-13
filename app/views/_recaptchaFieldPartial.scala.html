@@ -1,0 +1,46 @@
+@import play.api.data.Form
+@import play.api.mvc._
+@import play.api.i18n._
+@import com.nappin.play.recaptcha.{RecaptchaVerifier, RecaptchaErrorCode, WidgetHelper}
+
+@****************************************************************************************
+* High-level API: Renders a Google Recaptcha Widget, using the Play Forms API.
+*
+* @param form              The current form
+* @param fieldName         The logical field name
+* @param tabindex          The tabindex of the field (if any)
+* @param includeNoScript   Whether to include the noscript block, default is true
+* @param isRequired        Whether the field is to be shown as required (default is true)
+* @param widgetHelper      (Implicit) Helper utility needed for accessing settings, urls, etc in the widget
+* @param request           (Implicit) The current request
+* @param messages          (Implicit) The current I18n messages
+****************************************************************************************@
+@(form: Form[_], recaptchaWidget: recaptcha.recaptchaWidget, fieldName: String, tabindex: Int = 0, includeNoScript: Boolean = true,
+  isRequired: Boolean = true)(implicit widgetHelper: WidgetHelper, request: Request[AnyContent], messages: Messages)
+
+@messageOrDefault(key: String, default: String) = @{ if (messages.isDefinedAt(key)) { messages(key) } else { default } }
+@errorCode = @{ form.error(RecaptchaVerifier.formErrorKey).map(e => { Some(e.message) }).getOrElse(None) }
+
+<div class="form-group @if(errorCode.isDefined) {has-error}">
+    <label for="@fieldName" class="control-label">@messages(fieldName)</label>
+    <div class="row">
+        <div class="col-md-7">@recaptchaWidget(includeNoScript = includeNoScript, tabindex = tabindex)</div>
+    </div>
+    @errorCode match {
+        case Some(RecaptchaErrorCode.captchaIncorrect) => {
+            <span class="help-block">@messageOrDefault("error.captchaIncorrect", "Incorrect, please try again")</span>
+        }
+        case Some(RecaptchaErrorCode.recaptchaNotReachable) => {
+            <span class="help-block">@messageOrDefault("error.recaptchaNotReachable", "Unable to contact Recaptcha")</span>
+        }
+        case Some(RecaptchaErrorCode.apiError) => {
+            <span class="help-block">@messageOrDefault("error.apiError", "Invalid response from Recaptcha")</span>
+        }
+        case Some(RecaptchaErrorCode.responseMissing) => {
+            <span class="help-block">@messages("constraint.required")</span>
+        }
+        case _ => {
+            <span class="help-block text-muted">@messages("constraint.required")</span>
+        }
+    }
+</div>
