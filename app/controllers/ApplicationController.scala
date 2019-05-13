@@ -1,11 +1,10 @@
 package controllers
 
 import javax.inject.Inject
-
 import com.mohiva.play.silhouette.api.actions.SecuredRequest
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import org.webjars.play.WebJarsUtil
-import play.api.i18n.I18nSupport
+import play.api.i18n.{ I18nSupport, Lang, MessagesApi }
 import play.api.mvc.{ AbstractController, AnyContent, ControllerComponents }
 import utils.auth.DefaultEnv
 
@@ -46,5 +45,18 @@ class ApplicationController @Inject() (
     val result = Redirect(routes.ApplicationController.index())
     silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))
     silhouette.env.authenticatorService.discard(request.authenticator, result)
+  }
+
+  /**
+   * Handles language change.
+   * @param lang The language to set
+   * @return The result to display.
+   */
+  def selectLang(lang: String) = silhouette.UserAwareAction.async { implicit request =>
+    request.headers.get(REFERER).map { referer =>
+      Future.successful(Redirect(referer).withLang(Lang(lang)))
+    }.getOrElse {
+      Future.successful(Redirect(routes.ApplicationController.index).withLang(Lang(lang)))
+    }
   }
 }

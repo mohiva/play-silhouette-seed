@@ -6,6 +6,7 @@
 GET         /                                controllers.ApplicationController.index
 GET         /signOut                         controllers.ApplicationController.signOut
 GET         /authenticate/:provider          controllers.SocialAuthController.authenticate(provider)
+GET         /lang/$lang<(en|es)>             controllers.ApplicationController.selectLang(lang: String)
 
 GET         /signUp                          controllers.SignUpController.view
 POST        /signUp                          controllers.SignUpController.submit
