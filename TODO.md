@@ -1,6 +1,6 @@
 TODO:
 - [X] Implement dynamic language change
-- [ ] Make all dialogs the same data e.g. repeat password on Sign in
+- [X] For the SignUpForm, ResetPasswordForm and ChangePasswordForm add repeat password
 - [ ] Migrate database and DAO using Slick
 - [ ] Migrate Bootstrap 3.x look and feel
 - [ ] Migrate recaptcha
