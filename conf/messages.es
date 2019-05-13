@@ -10,7 +10,7 @@ sign.in.title = Silhouette - Iniciar sesión
 forgot.password.title = Silhouette - Olvidé mi contraseña
 reset.password.title = Silhouette - Restablecer contraseña
 change.password.title = Silhouette - Cambiar contraseña
-enable.account.title = Silhouette - Activar cuenta
+activate.account.title = Silhouette - Activar cuenta
 
 toggle.navigation = Alternar navegación
 welcome.signed.in = ¡Bienvenido, ya has iniciado sesión!
@@ -20,15 +20,15 @@ sign.in.credentials = Inicie sesión con sus credenciales
 
 error = error!
 info = Info!
-éxito = éxito!
-casa = casa
+success = éxito!
+home = Inicio
 first.name = Nombre
 last.name = Apellido
 full.name = Nombre completo
 email = Email
-contraseña = contraseña
-enviar = Enviar
-cambio = cambio
+password = contraseña
+send = Enviar
+change = cambio
 reset = reiniciar
 sign.up = Registrarse
 sign.in = Iniciar sesión
@@ -41,7 +41,7 @@ forgot.your.password = ¿Olvidó su contraseña?
 forgot.password = Olvidé mi contraseña
 reset.password = restablecer contraseña
 change.password = Cambiar contraseña
-enable.account = Activar cuenta
+activate.account = Activar cuenta
 current.password = contraseña actual
 new.password = Nueva contraseña
 
@@ -50,9 +50,9 @@ or.use.social = O use su cuenta existente en uno de los siguientes servicios par
 forgot.password.info = Introduzca su dirección de correo electrónico y le enviaremos un correo electrónico con más instrucciones para restablecer su contraseña.
 strong.password.info = Las contraseñas seguras incluyen números, letras y signos de puntuación.
 current.password.invalid = La contraseña ingresada no es válida. ¡Por favor ingrese la contraseña correcta!
-enable.account.text1 = No puedes iniciar sesión todavía. Anteriormente le enviamos un correo electrónico de activación a:
-enable.account.text2 = Siga las instrucciones en ese correo electrónico para activar su cuenta.
-enable.account.text3 = Haga clic en <a href="{0}"> aquí </a> para enviar de nuevo el correo electrónico de activación.
+activate.account.text1 = No puedes iniciar sesión todavía. Anteriormente le enviamos un correo electrónico de activación a:
+activate.account.text2 = Siga las instrucciones en ese correo electrónico para activar su cuenta.
+activate.account.text3 = Haga clic en <a href="{0}"> aquí </a> para enviar de nuevo el correo electrónico de activación.
 
 sign.up.email.sent = ¡Ya casi terminas! Enviamos un correo de activación a {0}. Por favor, siga las instrucciones en el correo electrónico para activar su cuenta. Si no llega, revise su carpeta de correo no deseado o intente iniciar sesión nuevamente para enviar otro correo de activación.
 activation.email.sent = Le enviamos otro correo electrónico de activación al {0}. Puede tardar unos minutos en llegar; Asegúrese de revisar su carpeta de spam.

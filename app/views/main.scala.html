@@ -43,6 +43,13 @@
                         <li><a href="https://github.com/mohiva/play-silhouette-seed">GitHub</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
+                        <ul class="nav navbar-nav">
+                            @if(messages.lang.code == "en") {
+                            <li><a href="@controllers.routes.ApplicationController.selectLang("es")">Español</a></li>
+                            } else {
+                            <li><a href="@controllers.routes.ApplicationController.selectLang("en")">English</a></li>
+                            }
+                        </ul>
                         @user.map { u =>
                             <li><a href="@controllers.routes.ApplicationController.index">@u.name</a></li>
                             @if(u.loginInfo.providerID == com.mohiva.play.silhouette.impl.providers.CredentialsProvider.ID) {
