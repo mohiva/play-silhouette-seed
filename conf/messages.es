@@ -45,7 +45,7 @@ forgot.password = Olvidé mi contraseña
 reset.password = restablecer contraseña
 change.password = Cambiar contraseña
 activate.account = Activar cuenta
-current.password = contraseña actual
+current.password = Contraseña actual
 new.password = Nueva contraseña
 
 remember.me = Recordar mi inicio de sesión en esta computadora
