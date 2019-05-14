@@ -8,7 +8,6 @@ import play.api.libs.concurrent.AkkaGuiceSupport
  * The job module.
  */
 class JobModule extends ScalaModule with AkkaGuiceSupport {
-
   /**
    * Configures the module.
    */

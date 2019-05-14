@@ -42,7 +42,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * The Guice module which wires all Silhouette dependencies.
  */
 class SilhouetteModule extends AbstractModule with ScalaModule {
-
   /**
    * A very nested optional reader, to support these cases:
    * Not set, set None, will use default ('Lax')

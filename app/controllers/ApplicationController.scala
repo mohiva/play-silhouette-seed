@@ -2,16 +2,15 @@ package controllers
 
 import javax.inject.Inject
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
+import constants.SessionKeys
 import org.webjars.play.WebJarsUtil
 import play.api.i18n.{ I18nSupport, Lang }
 import play.api.mvc.{ AbstractController, ControllerComponents }
 import utils.auth.DefaultEnv
-
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * The basic application controller.
- *
  * @param components  The Play controller components.
  * @param silhouette  The Silhouette stack.
  * @param webJarsUtil The webjar util.
@@ -23,12 +22,12 @@ class ApplicationController @Inject() (
 )(
   implicit
   webJarsUtil: WebJarsUtil,
-  assets: AssetsFinder
+  assets: AssetsFinder,
+  ex: ExecutionContext
 ) extends AbstractController(components) with I18nSupport {
 
   /**
    * Handles the index action.
-   *
    * @return The result to display.
    */
   def index = silhouette.SecuredAction.async { implicit request =>
@@ -37,11 +36,10 @@ class ApplicationController @Inject() (
 
   /**
    * Handles the Sign Out action.
-   *
    * @return The result to display.
    */
   def signOut = silhouette.SecuredAction.async { implicit request =>
-    val result = Redirect(routes.ApplicationController.index())
+    val result = Redirect(routes.ApplicationController.index()).withSession(request.session - SessionKeys.HAS_SUDO_ACCESS)
     silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))
     silhouette.env.authenticatorService.discard(request.authenticator, result)
   }

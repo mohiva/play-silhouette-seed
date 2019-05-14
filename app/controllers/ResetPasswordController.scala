@@ -1,12 +1,13 @@
 package controllers
 
 import java.util.UUID
-import javax.inject.Inject
 
+import javax.inject.Inject
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{ PasswordHasherRegistry, PasswordInfo }
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
+import constants.SessionKeys
 import forms.ResetPasswordForm
 import models.services.{ AuthTokenService, UserService }
 import org.webjars.play.WebJarsUtil
@@ -71,12 +72,17 @@ class ResetPasswordController @Inject() (
             case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
               val passwordInfo = passwordHasherRegistry.current.hash(data.password)
               authInfoRepository.update[PasswordInfo](user.loginInfo, passwordInfo).map { _ =>
-                Redirect(routes.SignInController.view()).flashing("success" -> Messages("password.reset"))
+                Redirect(routes.SignInController.view()).flashing("success" -> Messages("password.reset")).
+                  withSession(request.session - SessionKeys.HAS_SUDO_ACCESS)
               }
-            case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.reset.link")))
+            case _ => Future.successful(Redirect(routes.SignInController.view()).
+              flashing("error" -> Messages("invalid.reset.link")).
+              withSession(request.session - SessionKeys.HAS_SUDO_ACCESS))
           }
         )
-      case None => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.reset.link")))
+      case None => Future.successful(Redirect(routes.SignInController.view()).
+        flashing("error" -> Messages("invalid.reset.link")).
+        withSession(request.session - SessionKeys.HAS_SUDO_ACCESS))
     }
   }
 }

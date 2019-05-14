@@ -1,13 +1,13 @@
 package controllers
 
 import javax.inject.Inject
-
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.actions.SecuredRequest
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{ Credentials, PasswordHasherRegistry, PasswordInfo }
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
+import constants.SessionKeys
 import forms.ChangePasswordForm
 import org.webjars.play.WebJarsUtil
 import play.api.i18n.{ I18nSupport, Messages }
@@ -18,7 +18,6 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * The `Change Password` controller.
- *
  * @param components             The Play controller components.
  * @param silhouette             The Silhouette stack.
  * @param credentialsProvider    The credentials provider.
@@ -43,7 +42,6 @@ class ChangePasswordController @Inject() (
 
   /**
    * Views the `Change Password` page.
-   *
    * @return The result to display.
    */
   def view = silhouette.SecuredAction(WithProvider[DefaultEnv#A](CredentialsProvider.ID)) {
@@ -53,7 +51,6 @@ class ChangePasswordController @Inject() (
 
   /**
    * Changes the password.
-   *
    * @return The result to display.
    */
   def submit = silhouette.SecuredAction(WithProvider[DefaultEnv#A](CredentialsProvider.ID)).async {
@@ -65,11 +62,15 @@ class ChangePasswordController @Inject() (
           credentialsProvider.authenticate(credentials).flatMap { loginInfo =>
             val passwordInfo = passwordHasherRegistry.current.hash(data.newPassword)
             authInfoRepository.update[PasswordInfo](loginInfo, passwordInfo).map { _ =>
-              Redirect(routes.ChangePasswordController.view()).flashing("success" -> Messages("password.changed"))
+              Redirect(routes.ChangePasswordController.view()).
+                flashing("success" -> Messages("password.changed")).
+                withSession(request.session - SessionKeys.HAS_SUDO_ACCESS)
             }
           }.recover {
             case _: ProviderException =>
-              Redirect(routes.ChangePasswordController.view()).flashing("error" -> Messages("current.password.invalid"))
+              Redirect(routes.ChangePasswordController.view()).
+                flashing("error" -> Messages("current.password.invalid")).
+                withSession(request.session - SessionKeys.HAS_SUDO_ACCESS)
           }
         }
       )

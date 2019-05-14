@@ -13,7 +13,7 @@ change.password.title = Silhouette - Cambiar contraseña
 activate.account.title = Silhouette - Activar cuenta
 
 toggle.navigation = Alternar navegación
-welcome.signed.in = ¡Bienvenido, ya has iniciado sesión!
+welcome.signed.in = ¡Bienvenido, ya has iniciado la sesión!
 
 sign.up.account = Regístrese para una nueva cuenta
 sign.in.credentials = Inicie sesión con sus credenciales
@@ -48,6 +48,10 @@ activate.account = Activar cuenta
 current.password = Contraseña actual
 new.password = Nueva contraseña
 constraint.required = Obligatorio
+
+restricted.sudo.access = Página restringida
+restricted.secrets = ¡Secretos, en todas partes!
+reenter.password = Por favor, introduzca la contraseña para acceder a la página deseada
 
 remember.me = Recordar mi inicio de sesión en esta computadora
 or.use.social = O use su cuenta existente en uno de los siguientes servicios para iniciar sesión:

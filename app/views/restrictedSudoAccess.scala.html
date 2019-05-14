@@ -1,0 +1,17 @@
+@import play.api.i18n.Messages
+@import play.api.mvc.RequestHeader
+@import org.webjars.play.WebJarsUtil
+@import controllers.AssetsFinder
+
+@(user: models.User)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+
+@main(messages("restricted.forbid.cookie"), Some(user)) {
+
+<div class="user col-md-6 col-md-offset-3">
+    <div class="row">
+        <hr class="col-md-12" />
+        <h4 class="col-md-8">@messages("restricted.secrets")</h4>
+        <hr class="col-md-12" />
+    </div>
+</div>
+}
