@@ -60,7 +60,7 @@ class SignUpController @Inject() (
    *
    * @return The result to display.
    */
-  def view = silhouette.UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def view = silhouette.UnsecuredAction.async { implicit request =>
     Future.successful(Ok(views.html.signUp(SignUpForm.form, recaptchaWidget, widgetHelper)))
   }
 
@@ -69,7 +69,7 @@ class SignUpController @Inject() (
    *
    * @return The result to display.
    */
-  def submit = silhouette.UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def submit = silhouette.UnsecuredAction.async { implicit request =>
     SignUpForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.signUp(form, recaptchaWidget, widgetHelper))),
       data => {

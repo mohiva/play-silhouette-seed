@@ -53,7 +53,7 @@ class SignInController @Inject() (
    *
    * @return The result to display.
    */
-  def view = silhouette.UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def view = silhouette.UnsecuredAction.async { implicit request =>
     Future.successful(Ok(views.html.signIn(SignInForm.form, socialProviderRegistry)))
   }
 
@@ -62,7 +62,7 @@ class SignInController @Inject() (
    *
    * @return The result to display.
    */
-  def submit = silhouette.UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def submit = silhouette.UnsecuredAction.async { implicit request =>
     SignInForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.signIn(form, socialProviderRegistry))),
       data => {
