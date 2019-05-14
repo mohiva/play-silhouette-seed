@@ -64,13 +64,13 @@ class ChangePasswordController @Inject() (
             authInfoRepository.update[PasswordInfo](loginInfo, passwordInfo).map { _ =>
               Redirect(routes.ChangePasswordController.view()).
                 flashing("success" -> Messages("password.changed")).
-                withSession(request.session - SessionKeys.HAS_SUDO_ACCESS)
+                withSession(request.session - SessionKeys.HAS_SUDO_ACCESS - SessionKeys.REDIRECT_TO_URI)
             }
           }.recover {
             case _: ProviderException =>
               Redirect(routes.ChangePasswordController.view()).
                 flashing("error" -> Messages("current.password.invalid")).
-                withSession(request.session - SessionKeys.HAS_SUDO_ACCESS)
+                withSession(request.session - SessionKeys.HAS_SUDO_ACCESS - SessionKeys.REDIRECT_TO_URI)
           }
         }
       )

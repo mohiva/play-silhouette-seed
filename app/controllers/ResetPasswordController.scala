@@ -73,16 +73,16 @@ class ResetPasswordController @Inject() (
               val passwordInfo = passwordHasherRegistry.current.hash(data.password)
               authInfoRepository.update[PasswordInfo](user.loginInfo, passwordInfo).map { _ =>
                 Redirect(routes.SignInController.view()).flashing("success" -> Messages("password.reset")).
-                  withSession(request.session - SessionKeys.HAS_SUDO_ACCESS)
+                  withSession(request.session - SessionKeys.HAS_SUDO_ACCESS - SessionKeys.REDIRECT_TO_URI)
               }
             case _ => Future.successful(Redirect(routes.SignInController.view()).
               flashing("error" -> Messages("invalid.reset.link")).
-              withSession(request.session - SessionKeys.HAS_SUDO_ACCESS))
+              withSession(request.session - SessionKeys.HAS_SUDO_ACCESS - SessionKeys.REDIRECT_TO_URI))
           }
         )
       case None => Future.successful(Redirect(routes.SignInController.view()).
         flashing("error" -> Messages("invalid.reset.link")).
-        withSession(request.session - SessionKeys.HAS_SUDO_ACCESS))
+        withSession(request.session - SessionKeys.HAS_SUDO_ACCESS - SessionKeys.REDIRECT_TO_URI))
     }
   }
 }
