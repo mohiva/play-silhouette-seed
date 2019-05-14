@@ -47,6 +47,7 @@ change.password = Cambiar contraseña
 activate.account = Activar cuenta
 current.password = Contraseña actual
 new.password = Nueva contraseña
+constraint.required = Obligatorio
 
 remember.me = Recordar mi inicio de sesión en esta computadora
 or.use.social = O use su cuenta existente en uno de los siguientes servicios para iniciar sesión:

@@ -47,6 +47,7 @@ change.password = Change password
 activate.account = Activate Account
 current.password = Current password
 new.password = New password
+constraint.required = Required
 
 remember.me = Remember my login on this computer
 or.use.social = Or use your existing account on one of the following services to sign in:
