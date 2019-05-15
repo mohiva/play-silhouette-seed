@@ -51,7 +51,9 @@ constraint.required = Obligatorio
 
 restricted.sudo.access = Página restringida
 restricted.secrets = ¡Secretos, en todas partes!
-reenter.password = Por favor, introduzca la contraseña para acceder a la página deseada
+reenter.password = Introducir la contraseña nuevamente
+reenter.password.title = Introducir la contraseña nuevamente
+reenter.password.continue = Continuar
 
 remember.me = Recordar mi inicio de sesión en esta computadora
 or.use.social = O use su cuenta existente en uno de los siguientes servicios para iniciar sesión:

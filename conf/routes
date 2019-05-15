@@ -13,6 +13,9 @@ GET         /restrictedSudoAccess            controllers.SudoAccessController.re
 GET         /signUp                          controllers.SignUpController.view
 POST        /signUp                          controllers.SignUpController.submit
 
+GET         /reenterPassword                 controllers.ReenterPasswordController.view
+POST        /reenterPassword                 controllers.ReenterPasswordController.submit
+
 GET         /signIn                          controllers.SignInController.view
 POST        /signIn                          controllers.SignInController.submit
 

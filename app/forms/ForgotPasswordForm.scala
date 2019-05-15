@@ -7,7 +7,6 @@ import play.api.data._
  * The `Forgot Password` form.
  */
 object ForgotPasswordForm {
-
   /**
    * A play framework form.
    */

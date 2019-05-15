@@ -22,7 +22,7 @@
             @b3.text(signUpForm("firstName"), '_hiddenLabel -> messages("first.name"), 'placeholder -> messages("first.name"), 'class -> "form-control input-lg")
             @b3.text(signUpForm("lastName"), '_hiddenLabel -> messages("last.name"), 'placeholder -> messages("last.name"), 'class -> "form-control input-lg")
             @b3.text(signUpForm("email"), '_hiddenLabel -> messages("email"), 'placeholder -> messages("email"), 'class -> "form-control input-lg")
-            @_passwordStrengthPartial(signUpForm("password"), '_hiddenLabel -> messages("password"), 'placeholder -> messages("password"), 'class -> "form-control input-lg")(signUpForm("repeatPassword"), '_hiddenLabel -> messages("repeat.password"), 'placeholder -> messages("repeat.password"), 'class -> "form-control input-lg")
+            @_passwordStrengthPartial(signUpForm("password"), '_hiddenLabel -> messages("password"), 'placeholder -> messages("password"), 'class -> "form-control input-lg")(Option(signUpForm("repeatPassword")), '_hiddenLabel -> messages("repeat.password"), 'placeholder -> messages("repeat.password"), 'class -> "form-control input-lg")
             @_recaptchaFieldPartial(form=signUpForm, recaptchaWidget=recaptchaWidget, fieldName="signup.captcha")(widgetHelper, request.asInstanceOf[Request[AnyContent]], messages)
             <div class="form-group">
                 <div>

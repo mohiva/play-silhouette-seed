@@ -1,6 +1,5 @@
 package controllers
 
-import javax.inject.Inject
 import com.mohiva.play.silhouette.api.Authenticator.Implicits._
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
@@ -8,7 +7,8 @@ import com.mohiva.play.silhouette.api.util.{ Clock, Credentials }
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import constants.SessionKeys
-import forms.SignInForm
+import forms.{ ReenterPasswordForm, SignInForm }
+import javax.inject.Inject
 import models.services.UserService
 import net.ceedubs.ficus.Ficus._
 import org.webjars.play.WebJarsUtil
@@ -33,7 +33,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param webJarsUtil            The webjar util.
  * @param assets                 The Play assets finder.
  */
-class SignInController @Inject() (
+class ReenterPasswordController @Inject() (
   components: ControllerComponents,
   silhouette: Silhouette[DefaultEnv],
   userService: UserService,
@@ -49,52 +49,35 @@ class SignInController @Inject() (
 ) extends AbstractController(components) with I18nSupport {
 
   /**
-   * Views the `Sign In` page.
+   * Views the `Reenter password` page.
    * @return The result to display.
    */
-  def view = silhouette.UnsecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.signIn(SignInForm.form, socialProviderRegistry)))
+  def view = silhouette.SecuredAction.async { implicit request =>
+    Future.successful(Ok(views.html.reenterPassword(ReenterPasswordForm.form, request.identity)))
   }
 
   /**
    * Handles the submitted form.
    * @return The result to display.
    */
-  def submit = silhouette.UnsecuredAction.async { implicit request =>
-    SignInForm.form.bindFromRequest.fold(
-      form => Future.successful(BadRequest(views.html.signIn(form, socialProviderRegistry))),
+  def submit = silhouette.SecuredAction.async { implicit request =>
+    ReenterPasswordForm.form.bindFromRequest.fold(
+      form => Future.successful(BadRequest(views.html.reenterPassword(form, request.identity))),
       data => {
         val credentials = Credentials(data.email, data.password)
         credentialsProvider.authenticate(credentials).flatMap { loginInfo =>
-          val result = request.session.get(SessionKeys.REDIRECT_TO_URI).map { targetUri =>
+          val result = Future.successful(request.session.get(SessionKeys.REDIRECT_TO_URI).map { targetUri =>
             Redirect(targetUri)
           }.getOrElse {
             Redirect(routes.ApplicationController.index())
-          }.withSession(request.session + (SessionKeys.HAS_SUDO_ACCESS -> "true"))
+          }.withSession(request.session + (SessionKeys.HAS_SUDO_ACCESS -> "true")))
           userService.retrieve(loginInfo).flatMap {
-            case Some(user) if !user.activated =>
-              Future.successful(Ok(views.html.activateAccount(data.email)))
-            case Some(user) =>
-              val c = configuration.underlying
-              silhouette.env.authenticatorService.create(loginInfo).map {
-                case authenticator if data.rememberMe =>
-                  authenticator.copy(
-                    expirationDateTime = clock.now + c.as[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorExpiry"),
-                    idleTimeout = c.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorIdleTimeout"),
-                    cookieMaxAge = c.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.cookieMaxAge")
-                  )
-                case authenticator => authenticator
-              }.flatMap { authenticator =>
-                silhouette.env.eventBus.publish(LoginEvent(user, request))
-                silhouette.env.authenticatorService.init(authenticator).flatMap { v =>
-                  silhouette.env.authenticatorService.embed(v, result)
-                }
-              }
             case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
+            case _ => result
           }
         }.recover {
           case _: ProviderException =>
-            Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.credentials"))
+            Redirect(routes.ReenterPasswordController.view()).flashing("error" -> Messages("invalid.credentials"))
         }
       }
     )

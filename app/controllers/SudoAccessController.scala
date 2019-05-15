@@ -24,12 +24,11 @@ class SudoAccessController @Inject() (
    */
   val errorHandler = new SecuredErrorHandler {
     override def onNotAuthenticated(implicit request: RequestHeader) = {
-      Future.successful(Redirect(controllers.routes.SignInController.view()))
+      Future.successful(Redirect(controllers.routes.ReenterPasswordController.view()))
     }
 
     override def onNotAuthorized(implicit request: RequestHeader) = {
-      Future.successful(Redirect(controllers.routes.SignInController.view()).
-        flashing("error" -> Messages("reenter.password")).
+      Future.successful(Redirect(controllers.routes.ReenterPasswordController.view()).
         withSession(request.session + (SessionKeys.REDIRECT_TO_URI -> request.uri)))
     }
   }

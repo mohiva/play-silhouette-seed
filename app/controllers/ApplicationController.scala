@@ -2,7 +2,6 @@ package controllers
 
 import javax.inject.Inject
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
-import constants.SessionKeys
 import org.webjars.play.WebJarsUtil
 import play.api.i18n.{ I18nSupport, Lang }
 import play.api.mvc.{ AbstractController, ControllerComponents }
@@ -15,6 +14,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param silhouette  The Silhouette stack.
  * @param webJarsUtil The webjar util.
  * @param assets      The Play assets finder.
+ * @param ex          The Execution context.
  */
 class ApplicationController @Inject() (
   components: ControllerComponents,
@@ -39,8 +39,7 @@ class ApplicationController @Inject() (
    * @return The result to display.
    */
   def signOut = silhouette.SecuredAction.async { implicit request =>
-    val result = Redirect(routes.ApplicationController.index()).
-      withSession(request.session - SessionKeys.HAS_SUDO_ACCESS - SessionKeys.REDIRECT_TO_URI)
+    val result = Redirect(routes.ApplicationController.index()).withNewSession
     silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))
     silhouette.env.authenticatorService.discard(request.authenticator, result)
   }

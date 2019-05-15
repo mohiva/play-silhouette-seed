@@ -51,7 +51,9 @@ constraint.required = Required
 
 restricted.sudo.access = Restricted page
 restricted.secrets = Secrets, everywhere!
-reenter.password = Please enter password to access requested page
+reenter.password = Re-enter password
+reenter.password.title = Re-enter password
+reenter.password.continue = Continue
 
 remember.me = Remember my login on this computer
 or.use.social = Or use your existing account on one of the following services to sign in:
