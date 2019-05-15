@@ -1,27 +1,24 @@
 package controllers
 
-import com.mohiva.play.silhouette.api.Authenticator.Implicits._
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.util.{ Clock, Credentials }
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import constants.SessionKeys
-import forms.{ ReenterPasswordForm, SignInForm }
+import forms.ReenterPasswordForm
+import forms.ReenterPasswordForm.Data
 import javax.inject.Inject
 import models.services.UserService
-import net.ceedubs.ficus.Ficus._
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.i18n.{ I18nSupport, Messages }
 import play.api.mvc.{ AbstractController, ControllerComponents }
 import utils.auth.DefaultEnv
-
-import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
- * The `Sign In` controller.
+ * The `Reenter password` controller.
  *
  * @param components             The Play controller components.
  * @param silhouette             The Silhouette stack.
@@ -47,13 +44,13 @@ class ReenterPasswordController @Inject() (
   assets: AssetsFinder,
   ex: ExecutionContext
 ) extends AbstractController(components) with I18nSupport {
-
   /**
    * Views the `Reenter password` page.
    * @return The result to display.
    */
   def view = silhouette.SecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.reenterPassword(ReenterPasswordForm.form, request.identity)))
+    val data = Data(email = request.identity.email.getOrElse(""), password = "")
+    Future.successful(Ok(views.html.reenterPassword(ReenterPasswordForm.form.fill(data), request.identity)))
   }
 
   /**
@@ -77,7 +74,7 @@ class ReenterPasswordController @Inject() (
           }
         }.recover {
           case _: ProviderException =>
-            Redirect(routes.ReenterPasswordController.view()).flashing("error" -> Messages("invalid.credentials"))
+            Redirect(routes.ReenterPasswordController.view()).flashing("error" -> Messages("current.password.invalid"))
         }
       }
     )

@@ -1,6 +1,6 @@
 error.email = Se requiere un email válido
 error.required = Este campo es requerido
-invalid.credentials = Credenciales no válidas!
+invalid.credentials = Credenciales inválidas!
 access.denied = Acceso denegado!
 could.not.authenticate = No se pudo autenticar con el proveedor social! Inténtalo de nuevo!
 
