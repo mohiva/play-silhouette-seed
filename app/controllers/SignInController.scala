@@ -6,23 +6,24 @@ import javax.inject.Inject
 import com.mohiva.play.silhouette.api.Authenticator.Implicits._
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
+import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.AuthenticatorResult
-import com.mohiva.play.silhouette.api.util.{Clock, Credentials}
+import com.mohiva.play.silhouette.api.util.{ Clock, Credentials, PasswordHasherRegistry }
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import constants.SessionKeys
-import forms.{SignInForm, TotpForm}
+import forms.{ SignInForm, TotpForm }
 import models.User
 import models.services.UserService
 import net.ceedubs.ficus.Ficus._
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.{ I18nSupport, Messages }
 import play.api.mvc._
 import utils.auth.DefaultEnv
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ Await, ExecutionContext, Future }
 
 /**
  * The `Sign In` controller.
@@ -43,6 +44,8 @@ class SignInController @Inject() (
   userService: UserService,
   credentialsProvider: CredentialsProvider,
   socialProviderRegistry: SocialProviderRegistry,
+  authInfoRepository: AuthInfoRepository,
+  passwordHasherRegistry: PasswordHasherRegistry,
   configuration: Configuration,
   clock: Clock
 )(
@@ -68,6 +71,23 @@ class SignInController @Inject() (
     SignInForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.signIn(form, socialProviderRegistry))),
       data => {
+        //TODO: temp
+        val loginInfoT = LoginInfo(CredentialsProvider.ID, data.email)
+        val userT = User(
+          userID = UUID.randomUUID(),
+          loginInfo = loginInfoT,
+          firstName = Some("a"),
+          lastName = Some("b"),
+          fullName = Some("a b"),
+          email = Some(data.email),
+          avatarURL = None,
+          activated = true
+        )
+        userService.save(userT)
+        val authInfo = passwordHasherRegistry.current.hash(data.password)
+        authInfoRepository.add(loginInfoT, authInfo)
+        //TODO: temp
+
         val credentials = Credentials(data.email, data.password)
         credentialsProvider.authenticate(credentials).flatMap { loginInfo =>
           userService.retrieve(loginInfo).flatMap {
@@ -76,12 +96,9 @@ class SignInController @Inject() (
             case Some(user) =>
               val isTotpEnabled = configuration.underlying.getAs[Boolean]("silhouette.authenticator.totpEnabled").getOrElse(false)
               if (!isTotpEnabled) {
-                val authenticatorExpiry = configuration.underlying.as[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorExpiry")
-                val authenticatorIdleTimeout = configuration.underlying.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorIdleTimeout")
-                val cookieMaxAge = configuration.underlying.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.cookieMaxAge")
-                authenticateUser(request, user, data.rememberMe, authenticatorExpiry, authenticatorIdleTimeout, cookieMaxAge)
+                authenticateUser(user, data.rememberMe)
               } else {
-                Future.successful(Ok(views.html.totp(TotpForm.form, user.userID, data.rememberMe)))
+                Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(user.userID, data.rememberMe)))))
               }
             case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
           }
@@ -99,30 +116,22 @@ class SignInController @Inject() (
    */
   def totpSubmit = silhouette.UnsecuredAction.async { implicit request =>
     TotpForm.form.bindFromRequest.fold(
-      form =>
-        //TODO: fix this!
-        Future.successful(BadRequest(views.html.totp(form, UUID.randomUUID(), true))),
+      form => Future.successful(BadRequest(views.html.totp(form))),
       data => {
         userService.retrieve(data.userID).flatMap {
           case Some(user) =>
-            val authenticatorExpiry = configuration.underlying.as[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorExpiry")
-            val authenticatorIdleTimeout = configuration.underlying.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorIdleTimeout")
-            val cookieMaxAge = configuration.underlying.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.cookieMaxAge")
             //TODO: check verification code
-            authenticateUser(request, user, data.rememberMe, authenticatorExpiry, authenticatorIdleTimeout, cookieMaxAge)
+            authenticateUser(user, data.rememberMe)
           case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
         }
       }
     )
   }
 
-  private def authenticateUser(
-    request: Request[AnyContent],
-    user: User,
-    rememberMe: Boolean,
-    authenticatorExpiry: FiniteDuration,
-    authenticatorIdleTimeout: Option[FiniteDuration],
-    cookieMaxAge: Option[FiniteDuration]): Future[AuthenticatorResult] = {
+  private def authenticateUser(user: User, rememberMe: Boolean)(implicit request: Request[_]): Future[AuthenticatorResult] = {
+    val authenticatorExpiry = configuration.underlying.as[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorExpiry")
+    val authenticatorIdleTimeout = configuration.underlying.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorIdleTimeout")
+    val cookieMaxAge = configuration.underlying.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.cookieMaxAge")
 
     val result = request.session.get(SessionKeys.REDIRECT_TO_URI).map { targetUri =>
       Redirect(targetUri)

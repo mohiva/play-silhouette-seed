@@ -7,6 +7,7 @@ could.not.authenticate = Could not authenticate with social provider! Please try
 home.title = Silhouette - Home
 sign.up.title = Silhouette - Sign Up
 sign.in.title = Silhouette - Sign In
+totp.title = Silhouette - TOTP
 forgot.password.title = Silhouette - Forgot Password
 reset.password.title = Silhouette - Reset Password
 change.password.title = Silhouette - Change Password
@@ -17,6 +18,7 @@ welcome.signed.in = Welcome, you are now signed in!
 
 sign.up.account = Sign up for a new account
 sign.in.credentials = Sign in with your credentials
+sign.in.totp = Enter TOTP verification code
 
 error = Error!
 info = Info!
@@ -33,6 +35,7 @@ change = Change
 reset = Reset
 sign.up = Sign up
 sign.in = Sign in
+verify = Verify
 sign.out = Sign out
 sign.in.now = Sign in now
 sign.up.now = Sign up now

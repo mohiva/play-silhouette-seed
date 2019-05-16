@@ -29,5 +29,5 @@ object TotpForm {
   case class Data(
     userID: UUID,
     rememberMe: Boolean,
-    verificationCode: Option[String])
+    verificationCode: Option[String] = None)
 }

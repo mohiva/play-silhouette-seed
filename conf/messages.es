@@ -7,6 +7,7 @@ could.not.authenticate = No se pudo autenticar con el proveedor social! Inténta
 home.title = Silhouette - Home
 sign.up.title = Silhouette - Regístrate
 sign.in.title = Silhouette - Iniciar sesión
+totp.title = Silhouette - TOTP
 forgot.password.title = Silhouette - Olvidé mi contraseña
 reset.password.title = Silhouette - Restablecer contraseña
 change.password.title = Silhouette - Cambiar contraseña
@@ -17,6 +18,7 @@ welcome.signed.in = ¡Bienvenido, ya has iniciado la sesión!
 
 sign.up.account = Regístrese para una nueva cuenta
 sign.in.credentials = Inicie sesión con sus credenciales
+sign.in.totp = Enter TOTP verification code
 
 error = error!
 info = Info!
@@ -33,6 +35,7 @@ change = cambio
 reset = reiniciar
 sign.up = Registrarse
 sign.in = Iniciar sesión
+verify = Verify
 sign.out = Cerrar sesión
 sign.in.now = Iniciar sesión ahora
 sign.up.error.passwords.not.same = Las contraseñas no coinciden.
