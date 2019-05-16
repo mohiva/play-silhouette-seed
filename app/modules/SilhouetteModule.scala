@@ -18,6 +18,7 @@ import com.mohiva.play.silhouette.impl.providers.oauth2._
 import com.mohiva.play.silhouette.impl.providers.openid.YahooProvider
 import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDService
 import com.mohiva.play.silhouette.impl.providers.state.{ CsrfStateItemHandler, CsrfStateSettings }
+import com.mohiva.play.silhouette.impl.providers.totp.GoogleTOTPProvider
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
 import com.mohiva.play.silhouette.password.{ BCryptPasswordHasher, BCryptSha256PasswordHasher }
@@ -81,6 +82,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[DelegableAuthInfoDAO[OAuth1Info]].toInstance(new InMemoryAuthInfoDAO[OAuth1Info])
     bind[DelegableAuthInfoDAO[OAuth2Info]].toInstance(new InMemoryAuthInfoDAO[OAuth2Info])
     bind[DelegableAuthInfoDAO[OpenIDInfo]].toInstance(new InMemoryAuthInfoDAO[OpenIDInfo])
+    bind[DelegableAuthInfoDAO[TOTPInfo]].toInstance(new InMemoryAuthInfoDAO[TOTPInfo])
   }
 
   /**
@@ -236,9 +238,10 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
-    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoRepository = {
+    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo],
+    totpInfoDAO: DelegableAuthInfoDAO[TOTPInfo]): AuthInfoRepository = {
 
-    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
+    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO, totpInfoDAO)
   }
 
   /**
@@ -352,6 +355,17 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     passwordHasherRegistry: PasswordHasherRegistry): CredentialsProvider = {
 
     new CredentialsProvider(authInfoRepository, passwordHasherRegistry)
+  }
+
+  /**
+   * Provides the TOTP provider.
+   *
+   * @param authInfoRepository The auth info repository implementation.
+   * @return The credentials provider.
+   */
+  @Provides
+  def provideTOTPProvider(authInfoRepository: AuthInfoRepository): TOTPProvider = {
+    new GoogleTOTPProvider(authInfoRepository)
   }
 
   /**

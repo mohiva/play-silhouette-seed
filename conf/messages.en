@@ -1,6 +1,7 @@
 error.email = Valid email required
 error.required = This field is required
 invalid.credentials = Invalid credentials!
+invalid.verificationCode = Invalid verification code!
 access.denied = Access denied!
 could.not.authenticate = Could not authenticate with social provider! Please try again!
 

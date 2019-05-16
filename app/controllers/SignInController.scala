@@ -2,28 +2,28 @@ package controllers
 
 import java.util.UUID
 
-import javax.inject.Inject
 import com.mohiva.play.silhouette.api.Authenticator.Implicits._
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.AuthenticatorResult
-import com.mohiva.play.silhouette.api.util.{ Clock, Credentials, PasswordHasherRegistry }
+import com.mohiva.play.silhouette.api.util.{Clock, Credentials, PasswordHasherRegistry}
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import constants.SessionKeys
-import forms.{ SignInForm, TotpForm }
+import forms.{SignInForm, TotpForm}
+import javax.inject.Inject
 import models.User
 import models.services.UserService
 import net.ceedubs.ficus.Ficus._
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
-import play.api.i18n.{ I18nSupport, Messages }
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import utils.auth.DefaultEnv
 
 import scala.concurrent.duration._
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * The `Sign In` controller.
@@ -32,6 +32,7 @@ import scala.concurrent.{ Await, ExecutionContext, Future }
  * @param silhouette             The Silhouette stack.
  * @param userService            The user service implementation.
  * @param credentialsProvider    The credentials provider.
+ * @param totpProvider           The totp provider.
  * @param socialProviderRegistry The social provider registry.
  * @param configuration          The Play configuration.
  * @param clock                  The clock instance.
@@ -43,6 +44,7 @@ class SignInController @Inject() (
   silhouette: Silhouette[DefaultEnv],
   userService: UserService,
   credentialsProvider: CredentialsProvider,
+  totpProvider: TOTPProvider,
   socialProviderRegistry: SocialProviderRegistry,
   authInfoRepository: AuthInfoRepository,
   passwordHasherRegistry: PasswordHasherRegistry,
@@ -98,7 +100,7 @@ class SignInController @Inject() (
               if (!isTotpEnabled) {
                 authenticateUser(user, data.rememberMe)
               } else {
-                Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(user.userID, data.rememberMe)))))
+                Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(user.userID.toString, data.rememberMe)))))
               }
             case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
           }
@@ -111,17 +113,23 @@ class SignInController @Inject() (
   }
 
   /**
-   * Handles the submitted form with credentials + TOTP verification key.
+   * Handles the submitted form with TOTP verification key.
    * @return The result to display.
    */
   def totpSubmit = silhouette.UnsecuredAction.async { implicit request =>
     TotpForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.totp(form))),
       data => {
-        userService.retrieve(data.userID).flatMap {
+        userService.retrieve(UUID.fromString(data.userID)).flatMap {
           case Some(user) =>
-            //TODO: check verification code
-            authenticateUser(user, data.rememberMe)
+            totpProvider.authenticate().flatMap { _ =>
+              println("OK!")
+              authenticateUser(user, data.rememberMe)
+            }.recover {
+              case e: Throwable =>
+                e.printStackTrace()
+                Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.verificationCode"))
+            }
           case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
         }
       }
