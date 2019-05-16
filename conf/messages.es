@@ -26,6 +26,7 @@ first.name = Nombre
 last.name = Apellido
 full.name = Nombre completo
 email = Email
+verificationCode = Verification Code
 password = Contraseña
 send = Enviar
 change = cambio

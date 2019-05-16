@@ -18,6 +18,7 @@ POST        /reenterPassword                 controllers.ReenterPasswordControll
 
 GET         /signIn                          controllers.SignInController.view
 POST        /signIn                          controllers.SignInController.submit
+POST        /totpSubmit                      controllers.SignInController.totpSubmit
 
 GET         /password/forgot                 controllers.ForgotPasswordController.view
 POST        /password/forgot                 controllers.ForgotPasswordController.submit
