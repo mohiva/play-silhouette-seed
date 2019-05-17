@@ -12,7 +12,7 @@
 @main(messages("sign.in.title")) {
     <fieldset class="col-md-6 col-md-offset-3">
         <legend>@messages("sign.in.totp")</legend>
-        @helper.form(action = controllers.routes.SignInController.totpSubmit()) {
+        @helper.form(action = controllers.routes.TotpController.submit()) {
             @helper.CSRF.formField
             @b3.text(totpForm("verificationCode"), '_hiddenLabel -> messages("verificationCode"), 'placeholder -> messages("verificationCode"), 'class -> "form-control input-lg")
             @b3.hidden(totpForm("userID"))

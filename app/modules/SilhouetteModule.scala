@@ -18,7 +18,7 @@ import com.mohiva.play.silhouette.impl.providers.oauth2._
 import com.mohiva.play.silhouette.impl.providers.openid.YahooProvider
 import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDService
 import com.mohiva.play.silhouette.impl.providers.state.{ CsrfStateItemHandler, CsrfStateSettings }
-import com.mohiva.play.silhouette.impl.providers.totp.GoogleTOTPProvider
+import com.mohiva.play.silhouette.impl.providers.totp.GoogleTotpProvider
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
 import com.mohiva.play.silhouette.password.{ BCryptPasswordHasher, BCryptSha256PasswordHasher }
@@ -82,7 +82,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[DelegableAuthInfoDAO[OAuth1Info]].toInstance(new InMemoryAuthInfoDAO[OAuth1Info])
     bind[DelegableAuthInfoDAO[OAuth2Info]].toInstance(new InMemoryAuthInfoDAO[OAuth2Info])
     bind[DelegableAuthInfoDAO[OpenIDInfo]].toInstance(new InMemoryAuthInfoDAO[OpenIDInfo])
-    bind[DelegableAuthInfoDAO[TOTPInfo]].toInstance(new InMemoryAuthInfoDAO[TOTPInfo])
+    bind[DelegableAuthInfoDAO[TotpInfo]].toInstance(new InMemoryAuthInfoDAO[TotpInfo])
   }
 
   /**
@@ -239,7 +239,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
     openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo],
-    totpInfoDAO: DelegableAuthInfoDAO[TOTPInfo]): AuthInfoRepository = {
+    totpInfoDAO: DelegableAuthInfoDAO[TotpInfo]): AuthInfoRepository = {
 
     new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO, totpInfoDAO)
   }
@@ -364,8 +364,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * @return The credentials provider.
    */
   @Provides
-  def provideTOTPProvider(): TOTPProvider = {
-    new GoogleTOTPProvider()
+  def provideTOTPProvider(): TotpProvider = {
+    new GoogleTotpProvider()
   }
 
   /**
