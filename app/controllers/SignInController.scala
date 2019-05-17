@@ -1,5 +1,7 @@
 package controllers
 
+import java.util.UUID
+
 import javax.inject.Inject
 import com.mohiva.play.silhouette.api.Authenticator.Implicits._
 import com.mohiva.play.silhouette.api._
@@ -10,6 +12,7 @@ import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import constants.SessionKeys
 import forms.SignInForm
+import models.User
 import models.services.UserService
 import net.ceedubs.ficus.Ficus._
 import org.webjars.play.WebJarsUtil
@@ -90,7 +93,15 @@ class SignInController @Inject() (
               }.flatMap { authenticator =>
                 silhouette.env.eventBus.publish(LoginEvent(user, request))
                 silhouette.env.authenticatorService.init(authenticator).flatMap { v =>
-                  silhouette.env.authenticatorService.embed(v, result)
+                  // Check if TOTP enabled for this user
+                  val totpLoginInfo = LoginInfo(TotpProvider.ID, user.email.get)
+                  //TODO: doesn't work
+                  authInfoRepository.find(totpLoginInfo).flatMap {
+                    case Some(_) =>
+                      Future(Redirect(routes.TotpController.view()))
+                    case None =>
+                      silhouette.env.authenticatorService.embed(v, result)
+                  }
                 }
               }
             case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))

@@ -20,7 +20,9 @@ GET         /signIn                          controllers.SignInController.view
 POST        /signIn                          controllers.SignInController.submit
 
 GET         /totp                            controllers.TotpController.view
+GET         /enableTotp                      controllers.TotpController.enableTotpView
 POST        /totpSubmit                      controllers.TotpController.submit
+POST        /enableTotpSubmit                controllers.TotpController.enableTotpSubmit
 
 GET         /password/forgot                 controllers.ForgotPasswordController.view
 POST        /password/forgot                 controllers.ForgotPasswordController.submit

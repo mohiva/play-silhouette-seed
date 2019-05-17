@@ -18,6 +18,13 @@ activate.account.title = Silhouette - Activate Account
 toggle.navigation = Toggle navigation
 welcome.signed.in = Welcome, you are now signed in!
 
+totp.enable = Enable TOTP
+totp.enabling.title = 2 factor auth enabling
+totp.not.enabled.title = 2 factor auth is not enabled
+totp.shared.key.title = Shared key:
+totp.recovery.tokens.title = Recovery tokens:
+totp.enabling.info = 2 factor auth enabled successfully!
+
 sign.up.account = Sign up for a new account
 sign.in.credentials = Sign in with your credentials
 sign.in.totp = Enter TOTP verification code
