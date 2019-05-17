@@ -364,8 +364,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * @return The credentials provider.
    */
   @Provides
-  def provideTOTPProvider(authInfoRepository: AuthInfoRepository): TOTPProvider = {
-    new GoogleTOTPProvider(authInfoRepository)
+  def provideTOTPProvider(): TOTPProvider = {
+    new GoogleTOTPProvider()
   }
 
   /**

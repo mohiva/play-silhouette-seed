@@ -7,23 +7,23 @@ import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.AuthenticatorResult
-import com.mohiva.play.silhouette.api.util.{Clock, Credentials, PasswordHasherRegistry}
+import com.mohiva.play.silhouette.api.util.{ Clock, Credentials, PasswordHasherRegistry }
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import constants.SessionKeys
-import forms.{SignInForm, TotpForm}
+import forms.{ SignInForm, TotpForm }
 import javax.inject.Inject
 import models.User
 import models.services.UserService
 import net.ceedubs.ficus.Ficus._
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.{ I18nSupport, Messages }
 import play.api.mvc._
 import utils.auth.DefaultEnv
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * The `Sign In` controller.
@@ -88,6 +88,7 @@ class SignInController @Inject() (
         userService.save(userT)
         val authInfo = passwordHasherRegistry.current.hash(data.password)
         authInfoRepository.add(loginInfoT, authInfo)
+        val sharedKey = "DS75HZ62SGTCBW6D"
         //TODO: temp
 
         val credentials = Credentials(data.email, data.password)
@@ -100,7 +101,7 @@ class SignInController @Inject() (
               if (!isTotpEnabled) {
                 authenticateUser(user, data.rememberMe)
               } else {
-                Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(user.userID.toString, data.rememberMe)))))
+                Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(user.userID, sharedKey, data.rememberMe)))))
               }
             case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
           }
@@ -120,15 +121,15 @@ class SignInController @Inject() (
     TotpForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.totp(form))),
       data => {
-        userService.retrieve(UUID.fromString(data.userID)).flatMap {
+        userService.retrieve(data.userID).flatMap {
           case Some(user) =>
-            totpProvider.authenticate().flatMap { _ =>
-              println("OK!")
-              authenticateUser(user, data.rememberMe)
+            totpProvider.authenticate().flatMap { codeValid =>
+              if (codeValid) {
+                authenticateUser(user, data.rememberMe)
+              } else Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.verificationCode")))
             }.recover {
-              case e: Throwable =>
-                e.printStackTrace()
-                Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.verificationCode"))
+              case _: ProviderException =>
+                Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
             }
           case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
         }
