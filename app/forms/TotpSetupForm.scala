@@ -6,7 +6,7 @@ import play.api.data.Forms._
 /**
  * The form which handles the submission of the form with data for TOTP-authentication enabling
  */
-object TotpInitForm {
+object TotpSetupForm {
   /**
    * A play framework form.
    */

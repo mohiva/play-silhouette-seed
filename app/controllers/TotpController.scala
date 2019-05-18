@@ -8,7 +8,7 @@ import com.mohiva.play.silhouette.api.util.Clock
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import constants.SessionKeys
-import forms.{ TotpForm, TotpInitForm }
+import forms.{ TotpForm, TotpSetupForm }
 import javax.inject.Inject
 import models.User
 import models.services.UserService
@@ -63,7 +63,7 @@ class TotpController @Inject() (
   def enableTotp = silhouette.SecuredAction.async { implicit request =>
     val user = request.identity
     val credentials = totpProvider.createCredentials(user.email.get)
-    val formData = TotpInitForm.form.fill(TotpInitForm.Data(credentials.sharedKey))
+    val formData = TotpSetupForm.form.fill(TotpSetupForm.Data(credentials.sharedKey))
     Future.successful(Ok(views.html.home(user, Some((formData, credentials)))))
   }
 
@@ -83,7 +83,7 @@ class TotpController @Inject() (
    */
   def enableTotpSubmit = silhouette.SecuredAction.async { implicit request =>
     val user = request.identity
-    TotpInitForm.form.bindFromRequest.fold(
+    TotpSetupForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.home(user))),
       data => {
         totpProvider.authenticate().flatMap { codeValid =>

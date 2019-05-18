@@ -3,7 +3,7 @@
 @import org.webjars.play.WebJarsUtil
 @import controllers.AssetsFinder
 @import play.api.data.Form
-@import forms.TotpInitForm.Data
+@import forms.TotpSetupForm.Data
 @import com.mohiva.play.silhouette.impl.providers.TotpCredentials
 
 @(user: models.User, totpDataOpt: Option[(Form[Data], TotpCredentials)] = None)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
