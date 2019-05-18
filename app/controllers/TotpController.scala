@@ -3,9 +3,8 @@ package controllers
 import com.mohiva.play.silhouette.api.Authenticator.Implicits._
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
-import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.AuthenticatorResult
-import com.mohiva.play.silhouette.api.util.{ Clock, PasswordHasherRegistry }
+import com.mohiva.play.silhouette.api.util.Clock
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import constants.SessionKeys
@@ -40,7 +39,6 @@ class TotpController @Inject() (
   silhouette: Silhouette[DefaultEnv],
   userService: UserService,
   totpProvider: TotpProvider,
-  authInfoRepository: AuthInfoRepository,
   configuration: Configuration,
   clock: Clock
 )(
@@ -59,14 +57,24 @@ class TotpController @Inject() (
   }
 
   /**
-   * Views the `Home` page with TOTP enabled.
+   * Enable TOTP.
    * @return The result to display.
    */
-  def enableTotpView = silhouette.SecuredAction.async { implicit request =>
+  def enableTotp = silhouette.SecuredAction.async { implicit request =>
     val user = request.identity
     val credentials = totpProvider.createCredentials(user.email.get)
     val formData = TotpInitForm.form.fill(TotpInitForm.Data(credentials.sharedKey))
-    Future.successful(Ok(views.html.home(user, Some(formData), Some(credentials))))
+    Future.successful(Ok(views.html.home(user, Some((formData, credentials)))))
+  }
+
+  /**
+   * Disable TOTP.
+   * @return The result to display.
+   */
+  def disableTotp = silhouette.SecuredAction.async { implicit request =>
+    val user = request.identity
+    userService.save(user.copy(sharedKey = None))
+    Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.disbling.info")))
   }
 
   /**
@@ -104,7 +112,7 @@ class TotpController @Inject() (
             totpProvider.authenticate().flatMap { codeValid =>
               if (codeValid) {
                 authenticateUser(user, data.rememberMe)
-              } else Future.successful(Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.verificationCode")))
+              } else Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.verificationCode")))
             }.recover {
               case _: ProviderException =>
                 Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))

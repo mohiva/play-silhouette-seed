@@ -6,7 +6,7 @@
 @import forms.TotpInitForm.Data
 @import com.mohiva.play.silhouette.impl.providers.TotpCredentials
 
-@(user: models.User, totpFormOpt: Option[Form[Data]] = None, credentialsOpt: Option[TotpCredentials] = None)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+@(user: models.User, totpDataOpt: Option[(Form[Data], TotpCredentials)] = None)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
 
 @implicitFieldConstructor = @{ b3.vertical.fieldConstructor() }
 
@@ -37,20 +37,24 @@
             </div>
         </div>
         <div class="row data">
-            @credentialsOpt match {
-                case Some(credentials) => {
-                    <h2>@messages("totp.enabling.title")</h2>
-                    <h2>@messages("totp.shared.key.title")</h2>
-                    <img src="@credentials.qrUrl"/>
-                    <h2>@messages("totp.recovery.tokens.title")</h2>
-                    <ul>
+            @if(user.sharedKey.nonEmpty) {
+                <h2>@messages("totp.enabled.title")</h2>
+                <a href="@controllers.routes.TotpController.disableTotp">
+                    <input type="button" class="btn btn-primary" value='@messages("totp.disable")'/>
+                </a>
+            } else {
+                @totpDataOpt match {
+                    case Some((totpForm, credentials)) => {
+                        <h2>@messages("totp.enabling.title")</h2>
+                        <h2>@messages("totp.shared.key.title")</h2>
+                        <img src="@credentials.qrUrl"/>
+                        <h2>@messages("totp.recovery.tokens.title")</h2>
+                        <ul>
                         @for(token <- credentials.scratchCodes) {
-                        <li>@{token}</li>
+                            <li>@{token}</li>
                         }
-                    </ul>
-                    @totpFormOpt match {
-                        case Some(totpForm) => {
-                            @helper.form(action = controllers.routes.TotpController.enableTotpSubmit()) {
+                        </ul>
+                        @helper.form(action = controllers.routes.TotpController.enableTotpSubmit()) {
                             @helper.CSRF.formField
                             @b3.text(totpForm("verificationCode"), '_hiddenLabel -> messages("verificationCode"), 'placeholder -> messages("verificationCode"), 'class -> "form-control input-lg")
                             @b3.hidden(totpForm("sharedKey"))
@@ -59,17 +63,14 @@
                                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@messages("verify")</button>
                                 </div>
                             </div>
-                            }
-                        }
-                        case None => {
                         }
                     }
-                }
-                case None => {
-                    <h2>@messages("totp.not.enabled.title")</h2>
-                    <a href="@controllers.routes.TotpController.enableTotpView">
-                        <input type="button" class="btn btn-primary" value='@messages("totp.enable")'/>
-                    </a>
+                    case None => {
+                        <h2>@messages("totp.disabled.title")</h2>
+                        <a href="@controllers.routes.TotpController.enableTotp">
+                            <input type="button" class="btn btn-primary" value='@messages("totp.enable")'/>
+                        </a>
+                    }
                 }
             }
         </div>

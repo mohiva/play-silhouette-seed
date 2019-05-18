@@ -20,7 +20,8 @@ GET         /signIn                          controllers.SignInController.view
 POST        /signIn                          controllers.SignInController.submit
 
 GET         /totp                            controllers.TotpController.view
-GET         /enableTotp                      controllers.TotpController.enableTotpView
+GET         /enableTotp                      controllers.TotpController.enableTotp
+GET         /disableTotp                     controllers.TotpController.disableTotp
 POST        /totpSubmit                      controllers.TotpController.submit
 POST        /enableTotpSubmit                controllers.TotpController.enableTotpSubmit
 
