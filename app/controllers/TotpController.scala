@@ -29,9 +29,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param components             The Play controller components.
  * @param silhouette             The Silhouette stack.
  * @param userService            The user service implementation.
- * @param credentialsProvider    The credentials provider.
  * @param totpProvider           The totp provider.
- * @param socialProviderRegistry The social provider registry.
  * @param configuration          The Play configuration.
  * @param clock                  The clock instance.
  * @param webJarsUtil            The webjar util.
@@ -82,8 +80,7 @@ class TotpController @Inject() (
       data => {
         totpProvider.authenticate().flatMap { codeValid =>
           if (codeValid) {
-            //TODO: doesn't work
-            authInfoRepository.add(LoginInfo(TotpProvider.ID, user.email.get), TotpInfo(data.sharedKey))
+            userService.save(user.copy(sharedKey = Some(data.sharedKey)))
             Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.enabling.info")))
           } else Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verificationCode")))
         }.recover {
