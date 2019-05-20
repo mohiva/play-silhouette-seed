@@ -18,15 +18,15 @@ activate.account.title = Silhouette - Activar cuenta
 toggle.navigation = Alternar navegación
 welcome.signed.in = ¡Bienvenido, ya has iniciado la sesión!
 
-totp.enable = Enable TOTP
-totp.disable = Disable TOTP
-totp.enabling.title = 2 factor auth enabling
-totp.disabled.title = 2 factor auth is not enabled
-totp.enabled.title = 2 factor auth is enabled
-totp.shared.key.title = Shared key:
-totp.recovery.tokens.title = Recovery tokens:
-totp.enabling.info = 2 factor auth enabled successfully!
-totp.disbling.info = 2 factor auth disabled successfully!
+totp.enable = Habilitar TOTP
+totp.disable = Deshabilitar TOTP
+totp.enabling.title = Autenticación de doble factor habilitada
+totp.disabled.title = Autenticación de doble factor deshabilitada
+totp.enabled.title = Autenticación de doble factor habilitada
+totp.shared.key.title = Llave compartida:
+totp.recovery.tokens.title = Codigos de recuperación:
+totp.enabling.info = ¡Autenticación de doble factor habilitada con éxito!
+totp.disabling.info = ¡Autenticación de doble factor deshabilitada con éxito!
 
 sign.up.account = Regístrese para una nueva cuenta
 sign.in.credentials = Inicie sesión con sus credenciales

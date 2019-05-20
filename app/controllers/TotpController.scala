@@ -1,31 +1,23 @@
 package controllers
 
-import com.mohiva.play.silhouette.api.Authenticator.Implicits._
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
-import com.mohiva.play.silhouette.api.services.AuthenticatorResult
 import com.mohiva.play.silhouette.api.util.Clock
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
-import constants.SessionKeys
 import forms.{ TotpForm, TotpSetupForm }
 import javax.inject.Inject
-import models.User
 import models.services.UserService
-import net.ceedubs.ficus.Ficus._
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.i18n.{ I18nSupport, Messages }
-import play.api.mvc._
 import utils.auth.DefaultEnv
 
-import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * The `TOTP` controller.
  *
- * @param components             The Play controller components.
  * @param silhouette             The Silhouette stack.
  * @param userService            The user service implementation.
  * @param totpProvider           The totp provider.
@@ -35,7 +27,6 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param assets                 The Play assets finder.
  */
 class TotpController @Inject() (
-  components: ControllerComponents,
   silhouette: Silhouette[DefaultEnv],
   userService: UserService,
   totpProvider: TotpProvider,
@@ -46,7 +37,7 @@ class TotpController @Inject() (
   webJarsUtil: WebJarsUtil,
   assets: AssetsFinder,
   ex: ExecutionContext
-) extends AbstractController(components) with I18nSupport {
+) extends AbstractAuthController(silhouette, configuration, clock) with I18nSupport {
 
   /**
    * Views the `TOTP` page.
@@ -74,7 +65,7 @@ class TotpController @Inject() (
   def disableTotp = silhouette.SecuredAction.async { implicit request =>
     val user = request.identity
     userService.save(user.copy(sharedKey = None))
-    Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.disbling.info")))
+    Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.disabling.info")))
   }
 
   /**
@@ -86,11 +77,14 @@ class TotpController @Inject() (
     TotpSetupForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.home(user))),
       data => {
-        totpProvider.authenticate().flatMap { codeValid =>
-          if (codeValid) {
-            userService.save(user.copy(sharedKey = Some(data.sharedKey)))
-            Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.enabling.info")))
-          } else Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verificationCode")))
+        totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap { loginInfoOpt =>
+          loginInfoOpt match {
+            case Some(loginInfo) => {
+              userService.save(user.copy(sharedKey = Some(loginInfo.providerKey)))
+              Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.enabling.info")))
+            }
+            case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verificationCode")))
+          }
         }.recover {
           case _: ProviderException =>
             Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
@@ -109,10 +103,11 @@ class TotpController @Inject() (
       data => {
         userService.retrieve(data.userID).flatMap {
           case Some(user) =>
-            totpProvider.authenticate().flatMap { codeValid =>
-              if (codeValid) {
-                authenticateUser(user, data.rememberMe)
-              } else Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.verificationCode")))
+            totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap { loginInfoOpt =>
+              loginInfoOpt match {
+                case Some(_) => authenticateUser(user, data.rememberMe)
+                case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.verificationCode")))
+              }
             }.recover {
               case _: ProviderException =>
                 Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
@@ -121,32 +116,5 @@ class TotpController @Inject() (
         }
       }
     )
-  }
-
-  private def authenticateUser(user: User, rememberMe: Boolean)(implicit request: Request[_]): Future[AuthenticatorResult] = {
-    val authenticatorExpiry = configuration.underlying.as[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorExpiry")
-    val authenticatorIdleTimeout = configuration.underlying.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorIdleTimeout")
-    val cookieMaxAge = configuration.underlying.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.cookieMaxAge")
-
-    val result = request.session.get(SessionKeys.REDIRECT_TO_URI).map { targetUri =>
-      Redirect(targetUri)
-    }.getOrElse {
-      Redirect(routes.ApplicationController.index())
-    }.withSession(request.session + (SessionKeys.HAS_SUDO_ACCESS -> "true"))
-
-    silhouette.env.authenticatorService.create(user.loginInfo).map {
-      case authenticator if rememberMe =>
-        authenticator.copy(
-          expirationDateTime = clock.now + authenticatorExpiry,
-          idleTimeout = authenticatorIdleTimeout,
-          cookieMaxAge = cookieMaxAge
-        )
-      case authenticator => authenticator
-    }.flatMap { authenticator =>
-      silhouette.env.eventBus.publish(LoginEvent(user, request))
-      silhouette.env.authenticatorService.init(authenticator).flatMap { v =>
-        silhouette.env.authenticatorService.embed(v, result)
-      }
-    }
   }
 }

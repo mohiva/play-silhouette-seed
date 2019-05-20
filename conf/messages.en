@@ -26,7 +26,7 @@ totp.enabled.title = 2 factor auth is enabled
 totp.shared.key.title = Shared key:
 totp.recovery.tokens.title = Recovery tokens:
 totp.enabling.info = 2 factor auth enabled successfully!
-totp.disbling.info = 2 factor auth disabled successfully!
+totp.disabling.info = 2 factor auth disabled successfully!
 
 sign.up.account = Sign up for a new account
 sign.in.credentials = Sign in with your credentials

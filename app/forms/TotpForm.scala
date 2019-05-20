@@ -17,13 +17,14 @@ object TotpForm {
       "userID" -> uuid,
       "sharedKey" -> nonEmptyText,
       "rememberMe" -> boolean,
-      "verificationCode" -> optional(nonEmptyText(minLength = 6, maxLength = 6))
+      "verificationCode" -> nonEmptyText(minLength = 6, maxLength = 6)
     )(Data.apply)(Data.unapply)
   )
 
   /**
    * The form data.
    * @param userID The unique identifier of the user.
+   * @param sharedKey the TOTP shared key
    * @param rememberMe Indicates if the user should stay logged in on the next visit.
    * @param verificationCode Verification code for TOTP-authentication
    */
@@ -31,5 +32,5 @@ object TotpForm {
     userID: UUID,
     sharedKey: String,
     rememberMe: Boolean,
-    verificationCode: Option[String] = None)
+    verificationCode: String = "")
 }

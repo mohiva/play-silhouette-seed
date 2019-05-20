@@ -82,7 +82,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[DelegableAuthInfoDAO[OAuth1Info]].toInstance(new InMemoryAuthInfoDAO[OAuth1Info])
     bind[DelegableAuthInfoDAO[OAuth2Info]].toInstance(new InMemoryAuthInfoDAO[OAuth2Info])
     bind[DelegableAuthInfoDAO[OpenIDInfo]].toInstance(new InMemoryAuthInfoDAO[OpenIDInfo])
-    bind[DelegableAuthInfoDAO[TotpInfo]].toInstance(new InMemoryAuthInfoDAO[TotpInfo])
   }
 
   /**
@@ -238,10 +237,9 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
-    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo],
-    totpInfoDAO: DelegableAuthInfoDAO[TotpInfo]): AuthInfoRepository = {
+    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoRepository = {
 
-    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO, totpInfoDAO)
+    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
   }
 
   /**
@@ -360,11 +358,10 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   /**
    * Provides the TOTP provider.
    *
-   * @param authInfoRepository The auth info repository implementation.
    * @return The credentials provider.
    */
   @Provides
-  def provideTOTPProvider(): TotpProvider = {
+  def provideTotpProvider(): TotpProvider = {
     new GoogleTotpProvider()
   }
 
