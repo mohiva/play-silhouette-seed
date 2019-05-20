@@ -17,7 +17,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
-  * Abstract base class with auxiliary methods to authenticate an user.
+  * `AbstractAuthController` base with support methods to authenticate an user.
   *
   * @param silhouette
   * @param configuration
