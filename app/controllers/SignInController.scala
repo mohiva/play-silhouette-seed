@@ -18,21 +18,21 @@ import utils.auth.DefaultEnv
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
-  * The `Sign In` controller.
-  *
-  * @param components
-  * @param silhouette
-  * @param userService
-  * @param credentialsProvider
-  * @param socialProviderRegistry
-  * @param authInfoRepository
-  * @param passwordHasherRegistry
-  * @param configuration
-  * @param clock
-  * @param webJarsUtil
-  * @param assets
-  * @param ex
-  */
+ * The `Sign In` controller.
+ *
+ * @param components
+ * @param silhouette
+ * @param userService
+ * @param credentialsProvider
+ * @param socialProviderRegistry
+ * @param authInfoRepository
+ * @param passwordHasherRegistry
+ * @param configuration
+ * @param clock
+ * @param webJarsUtil
+ * @param assets
+ * @param ex
+ */
 class SignInController @Inject() (
   components: ControllerComponents,
   silhouette: Silhouette[DefaultEnv],

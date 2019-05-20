@@ -17,15 +17,15 @@ import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
-  * `AbstractAuthController` base with support methods to authenticate an user.
-  *
-  * @param silhouette
-  * @param configuration
-  * @param clock
-  * @param webJarsUtil
-  * @param assets
-  * @param ex
-  */
+ * `AbstractAuthController` base with support methods to authenticate an user.
+ *
+ * @param silhouette
+ * @param configuration
+ * @param clock
+ * @param webJarsUtil
+ * @param assets
+ * @param ex
+ */
 abstract class AbstractAuthController(
   silhouette: Silhouette[DefaultEnv],
   configuration: Configuration,
