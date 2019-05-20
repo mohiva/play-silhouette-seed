@@ -77,14 +77,12 @@ class TotpController @Inject() (
     TotpSetupForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.home(user))),
       data => {
-        totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap { loginInfoOpt =>
-          loginInfoOpt match {
-            case Some(loginInfo) => {
-              userService.save(user.copy(sharedKey = Some(loginInfo.providerKey)))
-              Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.enabling.info")))
-            }
-            case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verificationCode")))
+        totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
+          case Some(loginInfo) => {
+            userService.save(user.copy(sharedKey = Some(loginInfo.providerKey)))
+            Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.enabling.info")))
           }
+          case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verificationCode")))
         }.recover {
           case _: ProviderException =>
             Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
@@ -103,11 +101,9 @@ class TotpController @Inject() (
       data => {
         userService.retrieve(data.userID).flatMap {
           case Some(user) =>
-            totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap { loginInfoOpt =>
-              loginInfoOpt match {
-                case Some(_) => authenticateUser(user, data.rememberMe)
-                case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.verificationCode")))
-              }
+            totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
+              case Some(_) => authenticateUser(user, data.rememberMe)
+              case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.verificationCode")))
             }.recover {
               case _: ProviderException =>
                 Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
