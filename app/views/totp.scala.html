@@ -1,0 +1,28 @@
+@import play.api.data.Form
+@import play.api.i18n.Messages
+@import play.api.mvc.RequestHeader
+@import org.webjars.play.WebJarsUtil
+@import controllers.AssetsFinder
+@import forms.TotpForm.Data
+
+@(totpForm: Form[Data])(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+
+@implicitFieldConstructor = @{ b3.vertical.fieldConstructor() }
+
+@main(messages("sign.in.title")) {
+    <fieldset class="col-md-6 col-md-offset-3">
+        <legend>@messages("sign.in.totp")</legend>
+        @helper.form(action = controllers.routes.TotpController.submit()) {
+            @helper.CSRF.formField
+            @b3.text(totpForm("verificationCode"), '_hiddenLabel -> messages("verificationCode"), 'placeholder -> messages("verificationCode"), 'class -> "form-control input-lg")
+            @b3.hidden(totpForm("userID"))
+            @b3.hidden(totpForm("sharedKey"))
+            @b3.hidden(totpForm("rememberMe"))
+            <div class="form-group">
+                <div>
+                    <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@messages("verify")</button>
+                </div>
+            </div>
+        }
+    </fieldset>
+}

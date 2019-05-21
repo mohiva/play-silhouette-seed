@@ -18,6 +18,7 @@ import com.mohiva.play.silhouette.impl.providers.oauth2._
 import com.mohiva.play.silhouette.impl.providers.openid.YahooProvider
 import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDService
 import com.mohiva.play.silhouette.impl.providers.state.{ CsrfStateItemHandler, CsrfStateSettings }
+import com.mohiva.play.silhouette.impl.providers.totp.GoogleTotpProvider
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
 import com.mohiva.play.silhouette.password.{ BCryptPasswordHasher, BCryptSha256PasswordHasher }
@@ -352,6 +353,16 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     passwordHasherRegistry: PasswordHasherRegistry): CredentialsProvider = {
 
     new CredentialsProvider(authInfoRepository, passwordHasherRegistry)
+  }
+
+  /**
+   * Provides the TOTP provider.
+   *
+   * @return The credentials provider.
+   */
+  @Provides
+  def provideTotpProvider(): TotpProvider = {
+    new GoogleTotpProvider()
   }
 
   /**

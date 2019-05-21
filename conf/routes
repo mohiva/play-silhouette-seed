@@ -19,6 +19,12 @@ POST        /reenterPassword                 controllers.ReenterPasswordControll
 GET         /signIn                          controllers.SignInController.view
 POST        /signIn                          controllers.SignInController.submit
 
+GET         /totp                            controllers.TotpController.view
+GET         /enableTotp                      controllers.TotpController.enableTotp
+GET         /disableTotp                     controllers.TotpController.disableTotp
+POST        /totpSubmit                      controllers.TotpController.submit
+POST        /enableTotpSubmit                controllers.TotpController.enableTotpSubmit
+
 GET         /password/forgot                 controllers.ForgotPasswordController.view
 POST        /password/forgot                 controllers.ForgotPasswordController.submit
 GET         /password/reset/:token           controllers.ResetPasswordController.view(token: java.util.UUID)

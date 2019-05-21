@@ -1,12 +1,15 @@
 error.email = Valid email required
 error.required = This field is required
 invalid.credentials = Invalid credentials!
+invalid.verificationCode = Invalid verification code!
+invalid.unexpected.totp = Unexpected TOTP exception!
 access.denied = Access denied!
 could.not.authenticate = Could not authenticate with social provider! Please try again!
 
 home.title = Silhouette - Home
 sign.up.title = Silhouette - Sign Up
 sign.in.title = Silhouette - Sign In
+totp.title = Silhouette - TOTP
 forgot.password.title = Silhouette - Forgot Password
 reset.password.title = Silhouette - Reset Password
 change.password.title = Silhouette - Change Password
@@ -15,8 +18,19 @@ activate.account.title = Silhouette - Activate Account
 toggle.navigation = Toggle navigation
 welcome.signed.in = Welcome, you are now signed in!
 
+totp.enable = Enable TOTP
+totp.disable = Disable TOTP
+totp.enabling.title = 2 factor auth enabling
+totp.disabled.title = 2 factor auth is not enabled
+totp.enabled.title = 2 factor auth is enabled
+totp.shared.key.title = Shared key:
+totp.recovery.tokens.title = Recovery tokens:
+totp.enabling.info = 2 factor auth enabled successfully!
+totp.disabling.info = 2 factor auth disabled successfully!
+
 sign.up.account = Sign up for a new account
 sign.in.credentials = Sign in with your credentials
+sign.in.totp = Enter TOTP verification code
 
 error = Error!
 info = Info!
@@ -26,12 +40,14 @@ first.name = First name
 last.name = Last name
 full.name = Full name
 email = Email
+verificationCode = Verification Code
 password = Password
 send = Send
 change = Change
 reset = Reset
 sign.up = Sign up
 sign.in = Sign in
+verify = Verify
 sign.out = Sign out
 sign.in.now = Sign in now
 sign.up.now = Sign up now

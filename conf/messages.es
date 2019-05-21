@@ -1,12 +1,15 @@
 error.email = Se requiere un email válido
 error.required = Este campo es requerido
 invalid.credentials = Credenciales inválidas!
+invalid.verificationCode = Invalid verification code!
+invalid.unexpected.totp = Unexpected TOTP exception!
 access.denied = Acceso denegado!
 could.not.authenticate = No se pudo autenticar con el proveedor social! Inténtalo de nuevo!
 
 home.title = Silhouette - Home
 sign.up.title = Silhouette - Regístrate
 sign.in.title = Silhouette - Iniciar sesión
+totp.title = Silhouette - TOTP
 forgot.password.title = Silhouette - Olvidé mi contraseña
 reset.password.title = Silhouette - Restablecer contraseña
 change.password.title = Silhouette - Cambiar contraseña
@@ -15,8 +18,19 @@ activate.account.title = Silhouette - Activar cuenta
 toggle.navigation = Alternar navegación
 welcome.signed.in = ¡Bienvenido, ya has iniciado la sesión!
 
+totp.enable = Habilitar TOTP
+totp.disable = Deshabilitar TOTP
+totp.enabling.title = Autenticación de doble factor habilitada
+totp.disabled.title = Autenticación de doble factor deshabilitada
+totp.enabled.title = Autenticación de doble factor habilitada
+totp.shared.key.title = Llave compartida:
+totp.recovery.tokens.title = Codigos de recuperación:
+totp.enabling.info = ¡Autenticación de doble factor habilitada con éxito!
+totp.disabling.info = ¡Autenticación de doble factor deshabilitada con éxito!
+
 sign.up.account = Regístrese para una nueva cuenta
 sign.in.credentials = Inicie sesión con sus credenciales
+sign.in.totp = Enter TOTP verification code
 
 error = error!
 info = Info!
@@ -26,12 +40,14 @@ first.name = Nombre
 last.name = Apellido
 full.name = Nombre completo
 email = Email
+verificationCode = Verification Code
 password = Contraseña
 send = Enviar
 change = cambio
 reset = reiniciar
 sign.up = Registrarse
 sign.in = Iniciar sesión
+verify = Verify
 sign.out = Cerrar sesión
 sign.in.now = Iniciar sesión ahora
 sign.up.error.passwords.not.same = Las contraseñas no coinciden.
