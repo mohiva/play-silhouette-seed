@@ -5,8 +5,10 @@
 @import play.api.data.Form
 @import forms.TotpSetupForm.Data
 @import com.mohiva.play.silhouette.impl.providers.TotpCredentials
+@import com.mohiva.play.silhouette.impl.providers.TotpInfo
 
-@(user: models.User, totpDataOpt: Option[(Form[Data], TotpCredentials)] = None)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+@(user: models.User, totpInfoOpt: Option[TotpInfo], totpDataOpt: Option[(Form[Data], TotpCredentials)] = None)(implicit request: RequestHeader,
+        messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
 
 @implicitFieldConstructor = @{ b3.vertical.fieldConstructor() }
 
@@ -37,7 +39,7 @@
             </div>
         </div>
         <div class="row data">
-            @if(user.sharedKey.nonEmpty) {
+            @if(totpInfoOpt.nonEmpty) {
                 <h2>@messages("totp.enabled.title")</h2>
                 <a href="@controllers.routes.TotpController.disableTotp">
                     <input type="button" class="btn btn-primary" value='@messages("totp.disable")'/>
@@ -50,14 +52,15 @@
                         <img src="@credentials.qrUrl"/>
                         <h2>@messages("totp.recovery.tokens.title")</h2>
                         <ul>
-                        @for(token <- credentials.scratchCodes) {
+                        @for(token <- credentials.totpInfo.scratchCodes) {
                             <li>@{token}</li>
                         }
                         </ul>
                         @helper.form(action = controllers.routes.TotpController.enableTotpSubmit()) {
                             @helper.CSRF.formField
-                            @b3.text(totpForm("verificationCode"), '_hiddenLabel -> messages("verificationCode"), 'placeholder -> messages("verificationCode"), 'class -> "form-control input-lg")
+                            @b3.text(totpForm("verificationCode"), '_hiddenLabel -> messages("verificationCode"), 'placeholder -> messages("verificationCode"), 'autocomplete -> "off", 'class -> "form-control input-lg")
                             @b3.hidden(totpForm("sharedKey"))
+                            @b3.hidden(totpForm("scratchCodes"))
                             <div class="form-group">
                                 <div>
                                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@messages("verify")</button>

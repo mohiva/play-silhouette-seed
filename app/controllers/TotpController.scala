@@ -2,6 +2,7 @@ package controllers
 
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
+import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.Clock
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
@@ -18,13 +19,15 @@ import scala.concurrent.{ ExecutionContext, Future }
 /**
  * The `TOTP` controller.
  *
- * @param silhouette             The Silhouette stack.
- * @param userService            The user service implementation.
- * @param totpProvider           The totp provider.
- * @param configuration          The Play configuration.
- * @param clock                  The clock instance.
- * @param webJarsUtil            The webjar util.
- * @param assets                 The Play assets finder.
+ * @param silhouette The Silhouette stack.
+ * @param userService The user service implementation.
+ * @param totpProvider The totp provider.
+ * @param configuration The Play configuration.
+ * @param clock The clock instance.
+ * @param webJarsUtil The webjar util.
+ * @param assets The Play assets finder.
+ * @param ex The execution context.
+ * @param authInfoRepository The auth info repository.
  */
 class TotpController @Inject() (
   silhouette: Silhouette[DefaultEnv],
@@ -36,7 +39,8 @@ class TotpController @Inject() (
   implicit
   webJarsUtil: WebJarsUtil,
   assets: AssetsFinder,
-  ex: ExecutionContext
+  ex: ExecutionContext,
+  authInfoRepository: AuthInfoRepository
 ) extends AbstractAuthController(silhouette, configuration, clock) with I18nSupport {
 
   /**
@@ -54,8 +58,11 @@ class TotpController @Inject() (
   def enableTotp = silhouette.SecuredAction.async { implicit request =>
     val user = request.identity
     val credentials = totpProvider.createCredentials(user.email.get)
-    val formData = TotpSetupForm.form.fill(TotpSetupForm.Data(credentials.sharedKey))
-    Future.successful(Ok(views.html.home(user, Some((formData, credentials)))))
+    val totpInfo = credentials.totpInfo
+    val formData = TotpSetupForm.form.fill(TotpSetupForm.Data(totpInfo.sharedKey, totpInfo.scratchCodes))
+    authInfoRepository.find[TotpInfo](request.identity.loginInfo).map { totpInfoOpt =>
+      Ok(views.html.home(user, totpInfoOpt, Some((formData, credentials))))
+    }
   }
 
   /**
@@ -64,7 +71,7 @@ class TotpController @Inject() (
    */
   def disableTotp = silhouette.SecuredAction.async { implicit request =>
     val user = request.identity
-    userService.save(user.copy(sharedKey = None))
+    authInfoRepository.remove[TotpInfo](user.loginInfo)
     Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.disabling.info")))
   }
 
@@ -75,11 +82,13 @@ class TotpController @Inject() (
   def enableTotpSubmit = silhouette.SecuredAction.async { implicit request =>
     val user = request.identity
     TotpSetupForm.form.bindFromRequest.fold(
-      form => Future.successful(BadRequest(views.html.home(user))),
+      form => authInfoRepository.find[TotpInfo](request.identity.loginInfo).map { totpInfoOpt =>
+        BadRequest(views.html.home(user, totpInfoOpt))
+      },
       data => {
         totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
-          case Some(loginInfo) => {
-            userService.save(user.copy(sharedKey = Some(loginInfo.providerKey)))
+          case Some(loginInfo: LoginInfo) => {
+            authInfoRepository.add[TotpInfo](user.loginInfo, TotpInfo(data.sharedKey, data.scratchCodes))
             Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.enabling.info")))
           }
           case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verificationCode")))

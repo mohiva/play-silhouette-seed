@@ -13,16 +13,19 @@ object TotpSetupForm {
   val form = Form(
     mapping(
       "sharedKey" -> nonEmptyText,
+      "scratchCodes" -> seq(nonEmptyText),
       "verificationCode" -> nonEmptyText(minLength = 6, maxLength = 6)
     )(Data.apply)(Data.unapply)
   )
 
   /**
    * The form data.
-   * @param sharedKey User shared key for TOTP-authentication
+   * @param sharedKey Shared user key for TOTP authentication.
+   * @param scratchCodes Scratch or recovery codes used for one time TOTP authentication.
    * @param verificationCode Verification code for TOTP-authentication
    */
   case class Data(
     sharedKey: String,
+    scratchCodes: Seq[String],
     verificationCode: String = "")
 }
