@@ -89,7 +89,7 @@ class TotpController @Inject() (
         totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
           case Some(loginInfo: LoginInfo) => {
             authInfoRepository.add[TotpInfo](user.loginInfo, TotpInfo(data.sharedKey, data.scratchCodes, None))
-            Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.enabling.info")))
+            Future(Redirect(routes.ApplicationController.index()).flashing("success" -> Messages("totp.enabling.info")))
           }
           case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verification.code")))
         }.recover {

@@ -1,5 +1,7 @@
 package controllers
 
+import java.util.UUID
+
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
@@ -44,11 +46,15 @@ class TotpRecoveryController @Inject() (
 ) extends AbstractAuthController(silhouette, configuration, clock) with I18nSupport {
 
   /**
-   * Views the `TOTP` recovery page.
+   * Views the TOTP recovery page.
+   *
+   * @param userID the user ID.
+   * @param sharedKey the shared key associated to the user.
+   * @param rememberMe the remember me flag.
    * @return The result to display.
    */
-  def view = silhouette.UnsecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.totpRecovery(TotpRecoveryForm.form)))
+  def view(userID: UUID, sharedKey: String, rememberMe: Boolean) = silhouette.UnsecuredAction.async { implicit request =>
+    Future.successful(Ok(views.html.totpRecovery(TotpRecoveryForm.form.fill(TotpRecoveryForm.Data(userID, sharedKey, rememberMe)))))
   }
 
   /**
@@ -59,18 +65,19 @@ class TotpRecoveryController @Inject() (
     TotpRecoveryForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.totpRecovery(form))),
       data => {
+        val totpRecoveryControllerRoute = routes.TotpRecoveryController.view(data.userID, data.sharedKey, data.rememberMe)
         userService.retrieve(data.userID).flatMap {
           case Some(user) => {
             authInfoRepository.find[TotpInfo](user.loginInfo).flatMap {
               case Some(totpInfo) =>
                 totpProvider.authenticate(totpInfo, data.recoveryCode).flatMap {
                   case Some(_) => authenticateUser(user, data.rememberMe)
-                  case _ => Future.successful(Redirect(routes.TotpRecoveryController.view()).flashing("error" -> Messages("invalid.recovery.code")))
+                  case _ => Future.successful(Redirect(totpRecoveryControllerRoute).flashing("error" -> Messages("invalid.recovery.code")))
                 }.recover {
                   case _: ProviderException =>
-                    Redirect(routes.TotpRecoveryController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
+                    Redirect(totpRecoveryControllerRoute).flashing("error" -> Messages("invalid.unexpected.totp"))
                 }
-              case _ => Future.successful(Redirect(routes.TotpRecoveryController.view()).flashing("error" -> Messages("invalid.unexpected.totp")))
+              case _ => Future.successful(Redirect(totpRecoveryControllerRoute).flashing("error" -> Messages("invalid.unexpected.totp")))
             }
           }
           case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
