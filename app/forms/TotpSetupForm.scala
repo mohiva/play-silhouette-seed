@@ -13,7 +13,7 @@ object TotpSetupForm {
   val form = Form(
     mapping(
       "sharedKey" -> nonEmptyText,
-      "scratchCodes" -> seq(nonEmptyText),
+      "scratchCodes" -> set(nonEmptyText),
       "verificationCode" -> nonEmptyText(minLength = 6, maxLength = 6)
     )(Data.apply)(Data.unapply)
   )
@@ -26,6 +26,6 @@ object TotpSetupForm {
    */
   case class Data(
     sharedKey: String,
-    scratchCodes: Seq[String],
+    scratchCodes: Set[String],
     verificationCode: String = "")
 }
