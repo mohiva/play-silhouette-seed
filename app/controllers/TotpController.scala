@@ -91,7 +91,7 @@ class TotpController @Inject() (
             authInfoRepository.add[TotpInfo](user.loginInfo, TotpInfo(data.sharedKey, data.scratchCodes, None))
             Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.enabling.info")))
           }
-          case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verificationCode")))
+          case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verification.code")))
         }.recover {
           case _: ProviderException =>
             Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
@@ -112,7 +112,7 @@ class TotpController @Inject() (
           case Some(user) =>
             totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
               case Some(_) => authenticateUser(user, data.rememberMe)
-              case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.verificationCode")))
+              case _ => Future.successful(Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.verification.code")))
             }.recover {
               case _: ProviderException =>
                 Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))

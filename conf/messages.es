@@ -1,10 +1,11 @@
 error.email = Se requiere un email válido
 error.required = Este campo es requerido
 invalid.credentials = Credenciales inválidas!
-invalid.verificationCode = Invalid verification code!
-invalid.unexpected.totp = Unexpected TOTP exception!
+invalid.verification.code = ¡Código de doble factor invalido!
+invalid.recovery.code = ¡Código de recuperación invalido!
+invalid.unexpected.totp = ¡Error de doble factor desconocido!
 access.denied = Acceso denegado!
-could.not.authenticate = No se pudo autenticar con el proveedor social! Inténtalo de nuevo!
+could.not.authenticate = ¡No se pudo autenticar con el proveedor social! Inténtalo de nuevo!
 
 home.title = Silhouette - Home
 sign.up.title = Silhouette - Regístrate
@@ -18,19 +19,23 @@ activate.account.title = Silhouette - Activar cuenta
 toggle.navigation = Alternar navegación
 welcome.signed.in = ¡Bienvenido, ya has iniciado la sesión!
 
-totp.enable = Habilitar TOTP
-totp.disable = Deshabilitar TOTP
+totp.enable = Activar autenticación doble factor
+totp.disable = Desactivar autenticación doble factor
 totp.enabling.title = Autenticación de doble factor activada
 totp.disabled.title = Autenticación de doble factor desactivada
 totp.enabled.title = Autenticación de doble factor activada
 totp.shared.key.title = Llave compartida:
-totp.recovery.tokens.title = Codigos de recuperación:
+totp.recovery.tokens.title = Códigos de recuperación:
 totp.enabling.info = ¡Autenticación de doble factor activada con éxito!
 totp.disabling.info = ¡Autenticación de doble factor desactivada con éxito!
 
 sign.up.account = Regístrese para una nueva cuenta
 sign.in.credentials = Inicie sesión con sus credenciales
 sign.in.totp = Autenticación de doble factor
+recovery.code = Recovery code
+sign.in.totp.recovery = Autenticación de doble factor con código de recuperación
+lost.your.recovery.codes = ¿Perdió sus código de recuperación?
+contact.support = Contactar soporte técnico
 
 error = error!
 info = Info!
@@ -40,7 +45,7 @@ first.name = Nombre
 last.name = Apellido
 full.name = Nombre completo
 email = Email
-verificationCode = Verification Code
+verificationCode = Código de dos factores
 password = Contraseña
 send = Enviar
 change = cambio
