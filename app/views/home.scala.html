@@ -2,7 +2,7 @@
 @import play.api.mvc.RequestHeader
 @import org.webjars.play.WebJarsUtil
 @import controllers.AssetsFinder
-@import play.api.data.Form
+@import play.api.data._
 @import forms.TotpSetupForm.Data
 @import com.mohiva.play.silhouette.impl.providers.TotpCredentials
 @import com.mohiva.play.silhouette.impl.providers.TotpInfo
@@ -60,7 +60,9 @@
                             @helper.CSRF.formField
                             @b3.text(totpForm("verificationCode"), '_hiddenLabel -> messages("verificationCode"), 'placeholder -> messages("verificationCode"), 'autocomplete -> "off", 'class -> "form-control input-lg")
                             @b3.hidden(totpForm("sharedKey"))
-                            @b3.hidden(totpForm("scratchCodes"))
+                            @helper.repeatWithIndex(totpForm("scratchCodes"), min = 1) { (scratchCodeField, index) =>
+                                @b3.hidden(scratchCodeField, '_label -> ("scratchCode #" + index))
+                            }
                             <div class="form-group">
                                 <div>
                                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@messages("verify")</button>
