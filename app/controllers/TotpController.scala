@@ -59,7 +59,7 @@ class TotpController @Inject() (
     val user = request.identity
     val credentials = totpProvider.createCredentials(user.email.get)
     val totpInfo = credentials.totpInfo
-    val formData = TotpSetupForm.form.fill(TotpSetupForm.Data(totpInfo.sharedKey, totpInfo.scratchCodes))
+    val formData = TotpSetupForm.form.fill(TotpSetupForm.Data(totpInfo.sharedKey, totpInfo.scratchCodes, totpInfo.scratchCodesPlain))
     authInfoRepository.find[TotpInfo](request.identity.loginInfo).map { totpInfoOpt =>
       Ok(views.html.home(user, totpInfoOpt, Some((formData, credentials))))
     }
@@ -88,7 +88,7 @@ class TotpController @Inject() (
       data => {
         totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
           case Some(loginInfo: LoginInfo) => {
-            authInfoRepository.add[TotpInfo](user.loginInfo, TotpInfo(data.sharedKey, data.scratchCodes))
+            authInfoRepository.add[TotpInfo](user.loginInfo, TotpInfo(data.sharedKey, data.scratchCodes, None))
             Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.enabling.info")))
           }
           case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verificationCode")))

@@ -1,5 +1,6 @@
 package forms
 
+import com.mohiva.play.silhouette.api.util.PasswordInfo
 import play.api.data.Form
 import play.api.data.Forms._
 
@@ -13,7 +14,12 @@ object TotpSetupForm {
   val form = Form(
     mapping(
       "sharedKey" -> nonEmptyText,
-      "scratchCodes" -> set(nonEmptyText),
+      "scratchCodes" -> seq(mapping(
+        "hasher" -> nonEmptyText,
+        "password" -> nonEmptyText,
+        "salt" -> optional(nonEmptyText)
+      )(PasswordInfo.apply)(PasswordInfo.unapply)),
+      "scratchCodesPlain" -> optional(seq(nonEmptyText)),
       "verificationCode" -> nonEmptyText(minLength = 6, maxLength = 6)
     )(Data.apply)(Data.unapply)
   )
@@ -26,6 +32,7 @@ object TotpSetupForm {
    */
   case class Data(
     sharedKey: String,
-    scratchCodes: Set[String],
+    scratchCodes: Seq[PasswordInfo],
+    scratchCodesPlain: Option[Seq[String]],
     verificationCode: String = "")
 }

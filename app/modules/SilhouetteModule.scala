@@ -364,8 +364,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * @return The credentials provider.
    */
   @Provides
-  def provideTotpProvider(): TotpProvider = {
-    new GoogleTotpProvider()
+  def provideTotpProvider(passwordHasherRegistry: PasswordHasherRegistry): TotpProvider = {
+    new GoogleTotpProvider(passwordHasherRegistry)
   }
 
   /**

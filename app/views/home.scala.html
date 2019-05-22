@@ -52,8 +52,8 @@
                         <img src="@credentials.qrUrl"/>
                         <h2>@messages("totp.recovery.tokens.title")</h2>
                         <ul>
-                        @for(token <- credentials.totpInfo.scratchCodes) {
-                            <li>@{token}</li>
+                        @for(scratchCodePlain <- credentials.totpInfo.scratchCodesPlain) {
+                            <li>@{scratchCodePlain}</li>
                         }
                         </ul>
                         @helper.form(action = controllers.routes.TotpController.enableTotpSubmit()) {
