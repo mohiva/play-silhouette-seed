@@ -70,6 +70,8 @@ restricted.secrets = ¡Secretos, en todas partes!
 reenter.password = Introducir la contraseña nuevamente
 reenter.password.title = Introducir la contraseña nuevamente
 reenter.password.continue = Continuar
+dont.have.your.phone = ¿No tiene su teléfono?
+use.recovery.code = Introduzca un código de recuperación de dos factores
 
 remember.me = Recordar mi inicio de sesión en esta computadora
 or.use.social = O use su cuenta existente en uno de los siguientes servicios para iniciar sesión:

@@ -70,6 +70,8 @@ restricted.secrets = Secrets, everywhere!
 reenter.password = Re-enter password
 reenter.password.title = Re-enter password
 reenter.password.continue = Continue
+dont.have.your.phone = Don't have your phone?
+use.recovery.code = Enter a two-factor recovery code
 
 remember.me = Remember my login on this computer
 or.use.social = Or use your existing account on one of the following services to sign in:
