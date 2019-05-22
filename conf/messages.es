@@ -20,17 +20,17 @@ welcome.signed.in = ¡Bienvenido, ya has iniciado la sesión!
 
 totp.enable = Habilitar TOTP
 totp.disable = Deshabilitar TOTP
-totp.enabling.title = Autenticación de doble factor habilitada
-totp.disabled.title = Autenticación de doble factor deshabilitada
-totp.enabled.title = Autenticación de doble factor habilitada
+totp.enabling.title = Autenticación de doble factor activada
+totp.disabled.title = Autenticación de doble factor desactivada
+totp.enabled.title = Autenticación de doble factor activada
 totp.shared.key.title = Llave compartida:
 totp.recovery.tokens.title = Codigos de recuperación:
-totp.enabling.info = ¡Autenticación de doble factor habilitada con éxito!
-totp.disabling.info = ¡Autenticación de doble factor deshabilitada con éxito!
+totp.enabling.info = ¡Autenticación de doble factor activada con éxito!
+totp.disabling.info = ¡Autenticación de doble factor desactivada con éxito!
 
 sign.up.account = Regístrese para una nueva cuenta
 sign.in.credentials = Inicie sesión con sus credenciales
-sign.in.totp = Enter TOTP verification code
+sign.in.totp = Autenticación de doble factor
 
 error = error!
 info = Info!
@@ -47,7 +47,7 @@ change = cambio
 reset = reiniciar
 sign.up = Registrarse
 sign.in = Iniciar sesión
-verify = Verify
+verify = Verificar
 sign.out = Cerrar sesión
 sign.in.now = Iniciar sesión ahora
 sign.up.error.passwords.not.same = Las contraseñas no coinciden.
@@ -72,6 +72,7 @@ reenter.password.title = Introducir la contraseña nuevamente
 reenter.password.continue = Continuar
 dont.have.your.phone = ¿No tiene su teléfono?
 use.recovery.code = Introduzca un código de recuperación de dos factores
+open.the.app.for.2fa = Abra la aplicación de autenticación de dos factores en su dispositivo para ver su código de autenticación y verificar su identidad.
 
 remember.me = Recordar mi inicio de sesión en esta computadora
 or.use.social = O use su cuenta existente en uno de los siguientes servicios para iniciar sesión:

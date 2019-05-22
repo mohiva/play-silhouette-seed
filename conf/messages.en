@@ -30,7 +30,7 @@ totp.disabling.info = 2 factor auth disabled successfully!
 
 sign.up.account = Sign up for a new account
 sign.in.credentials = Sign in with your credentials
-sign.in.totp = Enter TOTP verification code
+sign.in.totp = Two-factor authentication
 
 error = Error!
 info = Info!
@@ -72,6 +72,7 @@ reenter.password.title = Re-enter password
 reenter.password.continue = Continue
 dont.have.your.phone = Don't have your phone?
 use.recovery.code = Enter a two-factor recovery code
+open.the.app.for.2fa = Open the two-factor authentication app on your device to view your authentication code and verify your identity.
 
 remember.me = Remember my login on this computer
 or.use.social = Or use your existing account on one of the following services to sign in:
