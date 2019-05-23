@@ -71,7 +71,10 @@ class TotpRecoveryController @Inject() (
             authInfoRepository.find[TotpInfo](user.loginInfo).flatMap {
               case Some(totpInfo) =>
                 totpProvider.authenticate(totpInfo, data.recoveryCode).flatMap {
-                  case Some(_) => authenticateUser(user, data.rememberMe)
+                  case Some(updated) => {
+                    authInfoRepository.update[TotpInfo](user.loginInfo, updated)
+                    authenticateUser(user, data.rememberMe)
+                  }
                   case _ => Future.successful(Redirect(totpRecoveryControllerRoute).flashing("error" -> Messages("invalid.recovery.code")))
                 }.recover {
                   case _: ProviderException =>
