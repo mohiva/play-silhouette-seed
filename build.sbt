@@ -32,7 +32,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
   "com.typesafe.slick" %% "slick" % "3.2.1",
   "com.typesafe.slick" %% "slick-codegen" % "3.2.1",
-  "org.postgresql" % "postgresql" % "9.4.1212",
+  "mysql" % "mysql-connector-java" % "8.0.16",
   "com.mohiva" %% "play-silhouette-testkit" % "6.0.1-SNAPSHOT" % "test",
   specs2 % Test,
   ehcache,

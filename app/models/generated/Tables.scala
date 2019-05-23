@@ -3,7 +3,7 @@ package models.generated
 // AUTO-GENERATED Slick data model
 /** Stand-alone Slick data model for immediate use */
 object Tables extends {
-  val profile = slick.jdbc.PostgresProfile
+  val profile = slick.jdbc.MySQLProfile
 } with Tables
 
 /** Slick data model trait for extension, choice of backend or usage in the cake pattern. (Make sure to initialize this late.) */
