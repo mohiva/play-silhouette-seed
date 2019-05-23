@@ -4,6 +4,8 @@
 @import org.webjars.play.WebJarsUtil
 @import controllers.AssetsFinder
 @import forms.TotpForm.Data
+@import forms.TotpRecoveryForm
+@import java.util.UUID
 
 @(totpForm: Form[Data])(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
 
@@ -14,7 +16,7 @@
         <legend>@messages("sign.in.totp")</legend>
         @helper.form(action = controllers.routes.TotpController.submit()) {
             @helper.CSRF.formField
-            @b3.text(totpForm("verificationCode"), '_hiddenLabel -> messages("verificationCode"), 'placeholder -> messages("verificationCode"), 'class -> "form-control input-lg")
+            @b3.text(totpForm("verificationCode"), '_hiddenLabel -> messages("verificationCode"), 'placeholder -> messages("verificationCode"), 'autocomplete -> "off", 'class -> "form-control input-lg")
             @b3.hidden(totpForm("userID"))
             @b3.hidden(totpForm("sharedKey"))
             @b3.hidden(totpForm("rememberMe"))
@@ -24,5 +26,10 @@
                 </div>
             </div>
         }
+
+        @messages("open.the.app.for.2fa")
+        <div>
+            <p class="enter-recovery-code">@messages("dont.have.your.phone") <a href="@controllers.routes.TotpRecoveryController.view(UUID.fromString(totpForm("userID").value.get), totpForm("sharedKey").value.get, totpForm("rememberMe").value.get.toBoolean)">@messages("use.recovery.code")</a></p>
+        </div>
     </fieldset>
 }

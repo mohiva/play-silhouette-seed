@@ -1,7 +1,8 @@
 error.email = Valid email required
 error.required = This field is required
 invalid.credentials = Invalid credentials!
-invalid.verificationCode = Invalid verification code!
+invalid.verification.code = Invalid verification code!
+invalid.recovery.code = Invalid recovery code!
 invalid.unexpected.totp = Unexpected TOTP exception!
 access.denied = Access denied!
 could.not.authenticate = Could not authenticate with social provider! Please try again!
@@ -18,8 +19,8 @@ activate.account.title = Silhouette - Activate Account
 toggle.navigation = Toggle navigation
 welcome.signed.in = Welcome, you are now signed in!
 
-totp.enable = Enable TOTP
-totp.disable = Disable TOTP
+totp.enable = Enable two-factor authentication
+totp.disable = Disable two-factor authentication
 totp.enabling.title = 2 factor auth enabling
 totp.disabled.title = 2 factor auth is not enabled
 totp.enabled.title = 2 factor auth is enabled
@@ -30,7 +31,11 @@ totp.disabling.info = 2 factor auth disabled successfully!
 
 sign.up.account = Sign up for a new account
 sign.in.credentials = Sign in with your credentials
-sign.in.totp = Enter TOTP verification code
+sign.in.totp = Two-factor authentication
+recovery.code = Recovery code
+sign.in.totp.recovery = Two-factor authentication using recovery code
+lost.your.recovery.codes = Lost your recovery codes?
+contact.support = Contact support
 
 error = Error!
 info = Info!
@@ -70,6 +75,9 @@ restricted.secrets = Secrets, everywhere!
 reenter.password = Re-enter password
 reenter.password.title = Re-enter password
 reenter.password.continue = Continue
+dont.have.your.phone = Don't have your phone?
+use.recovery.code = Enter a two-factor recovery code
+open.the.app.for.2fa = Open the two-factor authentication app on your device to view your authentication code and verify your identity.
 
 remember.me = Remember my login on this computer
 or.use.social = Or use your existing account on one of the following services to sign in:

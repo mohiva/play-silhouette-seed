@@ -72,10 +72,10 @@ class SignInController @Inject() (
             case Some(user) if !user.activated =>
               Future.successful(Ok(views.html.activateAccount(data.email)))
             case Some(user) =>
-              if (user.sharedKey.isEmpty) {
-                authenticateUser(user, data.rememberMe)
-              } else {
-                Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(user.userID, user.sharedKey.get, data.rememberMe)))))
+              authInfoRepository.find[TotpInfo](user.loginInfo).flatMap {
+                case Some(totpInfo) => Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(
+                  user.userID, totpInfo.sharedKey, data.rememberMe)))))
+                case _ => authenticateUser(user, data.rememberMe)
               }
             case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
           }
