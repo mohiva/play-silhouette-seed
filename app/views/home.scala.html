@@ -52,7 +52,7 @@
                         <img src="@credentials.qrUrl"/>
                         <h2>@messages("totp.recovery.tokens.title")</h2>
                         <ul>
-                        @for(scratchCodePlain <- credentials.totpInfo.scratchCodesPlain.get) {
+                        @for(scratchCodePlain <- credentials.scratchCodesPlain) {
                             <li>@{scratchCodePlain}</li>
                         }
                         </ul>

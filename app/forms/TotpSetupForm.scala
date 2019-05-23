@@ -21,7 +21,7 @@ object TotpSetupForm {
           "salt" -> optional(nonEmptyText)
         )(PasswordInfo.apply)(PasswordInfo.unapply)
       ),
-      "scratchCodesPlain" -> optional(seq(nonEmptyText)),
+      "scratchCodesPlain" -> seq(nonEmptyText),
       "verificationCode" -> nonEmptyText(minLength = 6, maxLength = 6)
     )(Data.apply)(Data.unapply)
   )
@@ -35,6 +35,6 @@ object TotpSetupForm {
   case class Data(
     sharedKey: String,
     scratchCodes: Seq[PasswordInfo],
-    scratchCodesPlain: Option[Seq[String]],
+    scratchCodesPlain: Seq[String],
     verificationCode: String = "")
 }
