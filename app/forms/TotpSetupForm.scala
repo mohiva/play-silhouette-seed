@@ -14,11 +14,13 @@ object TotpSetupForm {
   val form = Form(
     mapping(
       "sharedKey" -> nonEmptyText,
-      "scratchCodes" -> seq(mapping(
-        "hasher" -> nonEmptyText,
-        "password" -> nonEmptyText,
-        "salt" -> optional(nonEmptyText)
-      )(PasswordInfo.apply)(PasswordInfo.unapply)),
+      "scratchCodes" -> seq(
+        mapping(
+          "hasher" -> nonEmptyText,
+          "password" -> nonEmptyText,
+          "salt" -> optional(nonEmptyText)
+        )(PasswordInfo.apply)(PasswordInfo.unapply)
+      ),
       "scratchCodesPlain" -> optional(seq(nonEmptyText)),
       "verificationCode" -> nonEmptyText(minLength = 6, maxLength = 6)
     )(Data.apply)(Data.unapply)

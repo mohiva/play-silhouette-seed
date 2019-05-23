@@ -60,8 +60,10 @@
                             @helper.CSRF.formField
                             @b3.text(totpForm("verificationCode"), '_hiddenLabel -> messages("verificationCode"), 'placeholder -> messages("verificationCode"), 'autocomplete -> "off", 'class -> "form-control input-lg")
                             @b3.hidden(totpForm("sharedKey"))
-                            @helper.repeatWithIndex(totpForm("scratchCodes"), min = 1) { (scratchCodeField, index) =>
-                                @b3.hidden(scratchCodeField, '_label -> ("scratchCode #" + index))
+                            @helper.repeat(totpForm("scratchCodes"), min = 1) { scratchCodeField =>
+                                @b3.hidden(scratchCodeField("hasher"))
+                                @b3.hidden(scratchCodeField("password"))
+                                @b3.hidden(scratchCodeField("salt"))
                             }
                             <div class="form-group">
                                 <div>
