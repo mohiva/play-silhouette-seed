@@ -3,11 +3,11 @@
 # --- !Ups
 
 CREATE TABLE security_role (
-    myid INT AUTO_INCREMENT NOT NULL,
+    id INT AUTO_INCREMENT NOT NULL,
     name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (myid)
+    PRIMARY KEY (id)
 );
 
 # --- !Downs
 
-DROP TABLE security_role CASCADE;
+DROP TABLE IF EXISTS security_role CASCADE;
