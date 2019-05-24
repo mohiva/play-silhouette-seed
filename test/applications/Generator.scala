@@ -17,20 +17,19 @@ object Generator extends App {
   val pkg = "models.generated"
   val username = "dev"
   val password = "12345"
-
-  val db = Database.forURL(url, username, password)
+  val pkType = "Int"
   /**
     * The table names to generate models for
     */
-  val all = Set("user",
-                "security_role",
-                "user_security_role")
-  val PkType = "Int"
+  val modelTables = Set(
+    "user",
+    "security_role",
+    "user_security_role"
+  )
+
+  val db = Database.forURL(url, username, password)
   val model = db.run(MySQLProfile.createModel(Some(
-    MTable.getTables(None, None, None, Some(Seq("TABLE", "VIEW"))).map(_.filter { p: MTable =>
-      all.contains(p.name.name)
-    })
-  )))
+    MTable.getTables(None, None, None, Some(Seq("TABLE", "VIEW"))).map(_.filter { p: MTable => modelTables.contains(p.name.name) }))))
   // customize code generator
   val codegenFuture : Future[SourceCodeGenerator] = model.map(model => new SourceCodeGenerator(model) {
     override def code = "import models.daos.generic._\n" + super.code
@@ -53,8 +52,8 @@ object Generator extends App {
             /* `rowList` contains the names of the generated "Row" case classes we
                 wish to have extend our `EntityAutoInc` trait. */
             val newParents = name match {
-              case "UserRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(PkType, name))
-              case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(PkType, name))
+              case "UserRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
+              case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
               case _ => parents
             }
 
@@ -85,8 +84,8 @@ object Generator extends App {
           /* `tableList` contains the names of the generated table classes we
               wish to have extend our `IdentifyableTable` trait. */
           val newParents = name match {
-            case "User" => parents :+ s"IdentifyableTable[$PkType]"
-            case "SecurityRole"  => parents :+ s"IdentifyableTable[$PkType]"
+            case "User" => parents :+ s"IdentifyableTable[$pkType]"
+            case "SecurityRole"  => parents :+ s"IdentifyableTable[$pkType]"
             case _ => parents
           }
 
