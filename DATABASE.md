@@ -12,4 +12,4 @@
 
 ## Create MySQL user
 
-GRANT ALL PRIVILEGES ON *.* TO 'dev'@'localhost' IDENTIFIED BY '12345';
+`GRANT ALL PRIVILEGES ON *.* TO 'dev'@'localhost' IDENTIFIED BY '12345';`
