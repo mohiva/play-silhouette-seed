@@ -17,7 +17,7 @@ CREATE TABLE `user` (
 
 CREATE TABLE auth_token (
     token_id BINARY(16) PRIMARY KEY,
-    user_id BIGINT NOT NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
     expiry TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -32,8 +32,8 @@ CREATE TABLE login_info (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE user_login_info (
-    user_id BIGINT NOT NULL,
-    login_info_id BIGINT NOT NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
+    login_info_id BIGINT UNSIGNED NOT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
     FOREIGN KEY (login_info_id) REFERENCES login_info(id) ON DELETE CASCADE,
@@ -46,8 +46,8 @@ CREATE TABLE security_role (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE user_security_role (
-    user_id BIGINT NOT NULL,
-    security_role_id BIGINT NOT NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
+    security_role_id BIGINT UNSIGNED NOT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
     FOREIGN KEY (security_role_id) REFERENCES security_role(id) ON DELETE CASCADE,
@@ -65,7 +65,7 @@ BEGIN
     IF new.token_id IS NULL THEN
         SET new.token_id = UUID();
     END IF;
-END;
+END;;
 
 CREATE TRIGGER login_info_before_insert BEFORE INSERT ON login_info FOR EACH ROW
 BEGIN
@@ -75,7 +75,7 @@ BEGIN
     IF new.provider_key IS NULL THEN
         SET new.provider_key = UUID();
     END IF;
-END;
+END;;
 
 CREATE TRIGGER login_info_trigger_after_insert AFTER INSERT ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
 CREATE TRIGGER login_info_trigger_after_update AFTER UPDATE ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
