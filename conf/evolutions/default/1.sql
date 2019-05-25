@@ -60,13 +60,16 @@ INSERT INTO security_role (name) values ('administrator');
 CREATE TRIGGER user_after_insert AFTER INSERT ON `user` FOR EACH ROW SET @modified := CURRENT_TIME;
 CREATE TRIGGER user_trigger_after_update AFTER UPDATE ON `user` FOR EACH ROW SET @modified := CURRENT_TIME;
 
+delimiter $$
 CREATE TRIGGER auth_token_before_insert BEFORE INSERT ON auth_token FOR EACH ROW
 BEGIN
     IF new.token_id IS NULL THEN
         SET new.token_id = UUID();
     END IF;
-END;;
+END
+$$
 
+delimiter $$
 CREATE TRIGGER login_info_before_insert BEFORE INSERT ON login_info FOR EACH ROW
 BEGIN
     IF new.provider_id IS NULL THEN
@@ -75,7 +78,8 @@ BEGIN
     IF new.provider_key IS NULL THEN
         SET new.provider_key = UUID();
     END IF;
-END;;
+END
+$$
 
 CREATE TRIGGER login_info_trigger_after_insert AFTER INSERT ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
 CREATE TRIGGER login_info_trigger_after_update AFTER UPDATE ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
