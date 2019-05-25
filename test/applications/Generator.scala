@@ -23,6 +23,8 @@ object Generator extends App {
    */
   val modelTables = Set(
     "user",
+    "login_info",
+    "user_login_info",
     "security_role",
     "user_security_role"
   )
