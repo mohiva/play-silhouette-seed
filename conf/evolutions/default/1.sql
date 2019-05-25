@@ -16,7 +16,7 @@ CREATE TABLE `user` (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE auth_token (
-    token_id BINARY(16) NULL,
+    token_id CHAR(36) NULL,
     user_id BIGINT UNSIGNED NOT NULL,
     expiry TIMESTAMP,
     KEY idx_token_id (token_id),
@@ -25,8 +25,8 @@ CREATE TABLE auth_token (
 
 CREATE TABLE login_info (
     id SERIAL PRIMARY KEY,
-    provider_id BINARY(16) NOT NULL,
-    provider_key BINARY(16) NOT NULL,
+    provider_id CHAR(36) NOT NULL,
+    provider_key CHAR(36) NOT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
     KEY idx_provider_id (provider_id),
     KEY idx_provider_key (provider_key)
