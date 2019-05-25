@@ -9,6 +9,11 @@ import scala.concurrent.Future
 
 trait LoginInfoDao extends GenericDao[LoginInfo, LoginInfoRow, Long] {
   /**
+   * Returns newly created `LoginInfo`.
+   */
+  def create(userId: Long): Future[LoginInfoRow]
+
+  /**
    * Returns the `LoginInfo` found by provider id and key, None otherwise.
    *
    * @param providerId The provider id

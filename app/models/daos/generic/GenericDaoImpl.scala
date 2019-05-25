@@ -4,13 +4,12 @@ import models.generated.Tables.profile.api._
 import play.api.db.slick._
 import slick.lifted.CanBeQueryCondition
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 
 /**
  * Generic DAO implementation
  */
-abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK: BaseColumnType](dbConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T]) extends GenericDao[T, E, PK] {
+abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK: BaseColumnType](dbConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T])(implicit ec: ExecutionContext) extends GenericDao[T, E, PK] {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
@@ -52,9 +51,9 @@ abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Ent
    * @param entity entity to create, input id is ignored
    * @return newly created entity
    */
-  override def create(entity: E): Future[Unit] = {
+  override def create(entity: E): Future[Int] = {
     val action = (tableQuery += entity)
-    db.run(action).map(_ => ())
+    db.run(action)
   }
 
   //------------------------------------------------------------------------
@@ -63,7 +62,10 @@ abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Ent
    * @param entities to be inserted
    * @return number of inserted entities
    */
-  override def create(entities: Seq[E]): Future[Unit] = db.run(tableQuery ++= entities).map(_ => ())
+  override def create(entities: Seq[E]): Future[Unit] = {
+    val action = (tableQuery ++= entities)
+    db.run(action).map(_ => ())
+  }
 
   //------------------------------------------------------------------------
   /**
@@ -71,8 +73,9 @@ abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Ent
    * @param update Entity to update (by id)
    * @return returns a Future
    */
-  override def update(update: E): Future[Unit] = {
-    db.run(tableQuery.filter(_.id === update.id).update(update)).map(_ => ())
+  override def update(update: E): Future[Int] = {
+    val action = tableQuery.filter(_.id === update.id).update(update)
+    db.run(action)
   }
 
   //------------------------------------------------------------------------
@@ -81,12 +84,18 @@ abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Ent
    * @param id The Id to delete
    * @return returns a Future
    */
-  override def delete(id: PK): Future[Unit] = db.run(tableQuery.filter(_.id === id).delete).map(_ => ())
+  override def delete(id: PK): Future[Int] = {
+    val action = tableQuery.filter(_.id === id).delete
+    db.run(action)
+  }
 
   //------------------------------------------------------------------------
   /**
    * Deletes the given entity by Id and returns a Future
    * @return returns a Future
    */
-  override def deleteAll: Future[Unit] = db.run(sqlu"""TRUNCATE TABLE "#${tableQuery.baseTableRow.tableName}" RESTART IDENTITY CASCADE""").map(_ => ())
+  override def deleteAll: Future[Int] = {
+    val action = sqlu"""TRUNCATE TABLE "#${tableQuery.baseTableRow.tableName}" RESTART IDENTITY CASCADE"""
+    db.run(action)
+  }
 }

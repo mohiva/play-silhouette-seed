@@ -4,9 +4,9 @@
 
 CREATE TABLE `user` (
     id SERIAL PRIMARY KEY,
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
-    date_of_birth DATE,
+    first_name VARCHAR(50) NULL DEFAULT NULL,
+    last_name VARCHAR(50) NULL DEFAULT NULL,
+    date_of_birth DATE NULL DEFAULT NULL,
     username VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     avatar_url VARCHAR(200) NOT NULL,

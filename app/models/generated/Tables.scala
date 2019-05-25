@@ -132,7 +132,16 @@ trait Tables {
    *  @param lastLogin Database column last_login SqlType(TIMESTAMP), Default(None)
    *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
-  case class UserRow(id: Long, firstName: Option[String] = None, lastName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, username: String, email: String, avatarUrl: String, activated: Boolean = false, lastLogin: Option[java.sql.Timestamp] = None, modified: Option[java.sql.Timestamp] = None) extends EntityAutoInc[Long, UserRow]
+  case class UserRow(id: Long, firstName: Option[String] = None, lastName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, username: String, email: String, avatarUrl: String, activated: Boolean = false, lastLogin: Option[java.sql.Timestamp] = None, modified: Option[java.sql.Timestamp] = None) extends EntityAutoInc[Long, UserRow] {
+    def name = {
+      (firstName -> lastName) match {
+        case (Some(f), Some(l)) => Some(f + " " + l)
+        case (Some(f), None) => Some(f)
+        case (None, Some(l)) => Some(l)
+        case _ => None
+      }
+    }
+  }
   /** GetResult implicit for fetching UserRow objects using plain SQL queries */
   implicit def GetResultUserRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[java.sql.Date]], e3: GR[String], e4: GR[Boolean], e5: GR[Option[java.sql.Timestamp]]): GR[UserRow] = GR {
     prs =>

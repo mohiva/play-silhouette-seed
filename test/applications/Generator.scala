@@ -71,6 +71,16 @@ object Generator extends App {
             /* Use our modified parent class sequence in place of the old one. */
             val prns = (newParents.take(1).map(" extends " + _) ++ newParents.drop(1).map(" with " + _)).mkString("")
             val newBody = name match {
+              case "UserRow" => "{\n" +
+                                "  def name = {\n" +
+                                "    (firstName -> lastName) match {\n" +
+                                "      case (Some(f), Some(l)) => Some(f + \" \" + l)\n" +
+                                "      case (Some(f), None) => Some(f)\n" +
+                                "      case (None, Some(l)) => Some(l)\n" +
+                                "      case _ => None\n" +
+                                "    }\n" +
+                                "  }\n" +
+                                "}"
               case "AuthTokenRow" => "{ override def id = userId }"
               case _ => ""
             }

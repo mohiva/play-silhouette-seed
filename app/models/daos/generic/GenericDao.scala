@@ -51,7 +51,7 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
    * @param entity entity to create, input id is ignored
    * @return returns a unit future
    */
-  def create(entity: E): Future[Unit]
+  def create(entity: E): Future[Int]
 
   //------------------------------------------------------------------------
   /**
@@ -67,7 +67,7 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
    * @param update Entity to update (by id)
    * @return returns a Future
    */
-  def update(update: E): Future[Unit]
+  def update(update: E): Future[Int]
 
   //------------------------------------------------------------------------
   /**
@@ -75,12 +75,12 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
    * @param id The Id to delete
    * @return returns a Future
    */
-  def delete(id: PK): Future[Unit]
+  def delete(id: PK): Future[Int]
 
   //------------------------------------------------------------------------
   /**
    * Deletes all entities and returns a Future
    * @return returns a Future
    */
-  def deleteAll: Future[Unit]
+  def deleteAll: Future[Int]
 }
