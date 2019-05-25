@@ -59,7 +59,7 @@ object Generator extends App {
                 wish to have extend our `EntityAutoInc` trait. */
             val newParents = name match {
               case "UserRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
-              case "AuthTokenRow"  => parents ++ Seq("Entity[%s]".format(pkType))
+              case "AuthTokenRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "LoginInfoRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
               case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
               /* override existing Silhouette case classes */
