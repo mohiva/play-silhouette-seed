@@ -7,7 +7,7 @@ import slick.jdbc.MySQLProfile
 import slick.jdbc.meta.MTable
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 
 object Generator extends App {
   val slickProfile = "slick.jdbc.MySQLProfile"
@@ -19,8 +19,8 @@ object Generator extends App {
   val password = "12345"
   val pkType = "Int"
   /**
-    * The table names to generate models for
-    */
+   * The table names to generate models for
+   */
   val modelTables = Set(
     "user",
     "security_role",
@@ -31,7 +31,7 @@ object Generator extends App {
   val model = db.run(MySQLProfile.createModel(Some(
     MTable.getTables(None, None, None, Some(Seq("TABLE", "VIEW"))).map(_.filter { p: MTable => modelTables.contains(p.name.name) }))))
   // customize code generator
-  val codegenFuture : Future[SourceCodeGenerator] = model.map(model => new SourceCodeGenerator(model) {
+  val codegenFuture: Future[SourceCodeGenerator] = model.map(model => new SourceCodeGenerator(model) {
     override def code = "import models.daos.generic._\n" + super.code
 
     override def Table = new Table(_) {
@@ -41,14 +41,14 @@ object Generator extends App {
            All code is identical except for those lines which have a corresponding
            comment above them. */
         override def code = {
-          val args = columns.map(c=>
-            c.default.map( v =>
+          val args = columns.map(c =>
+            c.default.map(v =>
               s"${c.name}: ${c.exposedType} = $v"
             ).getOrElse(
               s"${c.name}: ${c.exposedType}"
             )
           ).mkString(", ")
-          if(classEnabled){
+          if (classEnabled) {
             /* `rowList` contains the names of the generated "Row" case classes we
                 wish to have extend our `EntityAutoInc` trait. */
             val newParents = name match {
@@ -58,9 +58,9 @@ object Generator extends App {
             }
 
             /* Use our modified parent class sequence in place of the old one. */
-            val prns = (newParents.take(1).map(" extends "+_) ++ newParents.drop(1).map(" with "+_)).mkString("")
+            val prns = (newParents.take(1).map(" extends " + _) ++ newParents.drop(1).map(" with " + _)).mkString("")
             val newBody = name match {
-              case "WHATEVER"  => "{ override def id = userId }"
+              case "TODO" => "{ override def id = userId }"
               case _ => ""
             }
             s"""case class $name($args)$prns $newBody"""
@@ -85,15 +85,15 @@ object Generator extends App {
               wish to have extend our `IdentifyableTable` trait. */
           val newParents = name match {
             case "User" => parents :+ s"IdentifyableTable[$pkType]"
-            case "SecurityRole"  => parents :+ s"IdentifyableTable[$pkType]"
+            case "SecurityRole" => parents :+ s"IdentifyableTable[$pkType]"
             case _ => parents
           }
 
           /* Use our modified parent class sequence in place of the old one. */
           val prns = newParents.map(" with " + _).mkString("")
-          val args = model.name.schema.map(n => s"""Some("$n")""") ++ Seq("\""+model.name.table+"\"")
-          val newBody : Seq[Seq[String]] = name match {
-            case "WHATEVER" => Seq("override def id = userId") +: body
+          val args = model.name.schema.map(n => s"""Some("$n")""") ++ Seq("\"" + model.name.table + "\"")
+          val newBody: Seq[Seq[String]] = name match {
+            case "TODO" => Seq("override def id = userId") +: body
             case _ => body
           }
           s"""class $name(_tableTag: Tag) extends profile.api.Table[$elementType](_tableTag, ${args.mkString(", ")})$prns {

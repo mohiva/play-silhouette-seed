@@ -5,7 +5,6 @@
 CREATE TABLE `user` (
     id INT AUTO_INCREMENT NOT NULL,
     first_name VARCHAR(50),
-    middle_name VARCHAR(50),
     last_name VARCHAR(50),
     date_of_birth DATE,
     username VARCHAR(100) NOT NULL,
