@@ -5,7 +5,7 @@ import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.util.Clock
 import models.AuthToken
-import models.daos.AuthTokenDAO
+import models.daos.AuthTokenDao
 import org.joda.time.DateTimeZone
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -20,7 +20,7 @@ import scala.language.postfixOps
  * @param ex           The execution context.
  */
 class AuthTokenServiceImpl @Inject() (
-  authTokenDAO: AuthTokenDAO,
+  authTokenDAO: AuthTokenDao,
   clock: Clock
 )(
   implicit

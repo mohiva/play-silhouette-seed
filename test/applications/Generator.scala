@@ -17,12 +17,13 @@ object Generator extends App {
   val pkg = "models.generated"
   val username = "dev"
   val password = "12345"
-  val pkType = "Int"
+  val pkType = "Long"
   /**
    * The table names to generate models for
    */
   val modelTables = Set(
     "user",
+    "auth_token",
     "login_info",
     "user_login_info",
     "security_role",
@@ -59,9 +60,9 @@ object Generator extends App {
             val newParents = name match {
               case "UserRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
               case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
-
+              case "AuthTokenRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
               /* override existing Silhouette case classes */
-              case "LoginInfoRow" => parents ++ Seq("com.mohiva.play.silhouette.api.LoginInfo(providerId, providerKey)")
+              //case "LoginInfoRow" => parents ++ Seq("com.mohiva.play.silhouette.api.LoginInfo(providerId, providerKey)")
 
               case _ => parents
             }
@@ -69,7 +70,7 @@ object Generator extends App {
             /* Use our modified parent class sequence in place of the old one. */
             val prns = (newParents.take(1).map(" extends " + _) ++ newParents.drop(1).map(" with " + _)).mkString("")
             val newBody = name match {
-              case "TODO" => "{ override def id = userId }"
+              case "AuthTokenRow" => "{ override def id = userId }"
               case _ => ""
             }
             s"""case class $name($args)$prns $newBody"""
@@ -95,6 +96,7 @@ object Generator extends App {
           val newParents = name match {
             case "User" => parents :+ s"IdentifyableTable[$pkType]"
             case "SecurityRole" => parents :+ s"IdentifyableTable[$pkType]"
+            case "AuthToken" => parents :+ s"IdentifyableTable[$pkType]"
             case _ => parents
           }
 
@@ -102,7 +104,7 @@ object Generator extends App {
           val prns = newParents.map(" with " + _).mkString("")
           val args = model.name.schema.map(n => s"""Some("$n")""") ++ Seq("\"" + model.name.table + "\"")
           val newBody: Seq[Seq[String]] = name match {
-            case "TODO" => Seq("override def id = userId") +: body
+            case "AuthToken" => Seq("override def id = userId") +: body
             case _ => body
           }
           s"""class ${name}(_tableTag: Tag) extends profile.api.Table[$elementType](_tableTag, ${args.mkString(", ")})$prns {

@@ -16,9 +16,10 @@ CREATE TABLE `user` (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE auth_token (
-    token_id BINARY(16) PRIMARY KEY,
+    token_id BINARY(16) NULL,
     user_id BIGINT UNSIGNED NOT NULL,
     expiry TIMESTAMP,
+    KEY idx_token_id (token_id),
     FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

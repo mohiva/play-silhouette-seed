@@ -12,7 +12,7 @@ import scala.concurrent.Future
 /**
  * Give access to the [[AuthToken]] object.
  */
-class AuthTokenDAOImpl extends AuthTokenDAO {
+class AuthTokenDAOImpl extends AuthTokenDao {
 
   /**
    * Finds a token by its ID.

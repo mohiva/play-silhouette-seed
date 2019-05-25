@@ -6,7 +6,7 @@ import javax.inject.Inject
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.impl.providers.CommonSocialProfile
 import models.User
-import models.daos.UserDAO
+import models.daos.UserDao
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -16,7 +16,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param userDAO The user DAO implementation.
  * @param ex      The execution context.
  */
-class UserServiceImpl @Inject() (userDAO: UserDAO)(implicit ex: ExecutionContext) extends UserService {
+class UserServiceImpl @Inject() (userDAO: UserDao)(implicit ex: ExecutionContext) extends UserService {
 
   /**
    * Retrieves a user that matches the specified ID.

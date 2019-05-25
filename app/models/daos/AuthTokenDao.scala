@@ -10,7 +10,7 @@ import scala.concurrent.Future
 /**
  * Give access to the [[AuthToken]] object.
  */
-trait AuthTokenDAO {
+trait AuthTokenDao {
 
   /**
    * Finds a token by its ID.
