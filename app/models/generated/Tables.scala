@@ -25,7 +25,7 @@ trait Tables {
    *  @param userId Database column user_id SqlType(BIGINT UNSIGNED)
    *  @param expiry Database column expiry SqlType(TIMESTAMP)
    */
-  case class AuthTokenRow(tokenId: Option[java.sql.Blob] = None, userId: Long, expiry: java.sql.Timestamp) extends EntityAutoInc[Long, AuthTokenRow] { override def id = userId }
+  case class AuthTokenRow(tokenId: Option[java.sql.Blob] = None, userId: Long, expiry: java.sql.Timestamp) extends Entity[Long] { override def id = userId }
   /** GetResult implicit for fetching AuthTokenRow objects using plain SQL queries */
   implicit def GetResultAuthTokenRow(implicit e0: GR[Option[java.sql.Blob]], e1: GR[Long], e2: GR[java.sql.Timestamp]): GR[AuthTokenRow] = GR {
     prs =>
@@ -63,7 +63,7 @@ trait Tables {
    *  @param providerKey Database column provider_key SqlType(BINARY)
    *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
-  case class LoginInfoRow(id: Long, providerId: java.sql.Blob, providerKey: java.sql.Blob, modified: Option[java.sql.Timestamp] = None)
+  case class LoginInfoRow(id: Long, providerId: java.sql.Blob, providerKey: java.sql.Blob, modified: Option[java.sql.Timestamp] = None) extends EntityAutoInc[Long, LoginInfoRow]
   /** GetResult implicit for fetching LoginInfoRow objects using plain SQL queries */
   implicit def GetResultLoginInfoRow(implicit e0: GR[Long], e1: GR[java.sql.Blob], e2: GR[Option[java.sql.Timestamp]]): GR[LoginInfoRow] = GR {
     prs =>
@@ -71,7 +71,7 @@ trait Tables {
       LoginInfoRow.tupled((<<[Long], <<[java.sql.Blob], <<[java.sql.Blob], <<?[java.sql.Timestamp]))
   }
   /** Table description of table login_info. Objects of this class serve as prototypes for rows in queries. */
-  class LoginInfo(_tableTag: Tag) extends profile.api.Table[LoginInfoRow](_tableTag, Some("myappdb"), "login_info") {
+  class LoginInfo(_tableTag: Tag) extends profile.api.Table[LoginInfoRow](_tableTag, Some("myappdb"), "login_info") with IdentifyableTable[Long] {
     def * = (id, providerId, providerKey, modified) <> (LoginInfoRow.tupled, LoginInfoRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = ((Rep.Some(id), Rep.Some(providerId), Rep.Some(providerKey), modified)).shaped.<>({ r => import r._; _1.map(_ => LoginInfoRow.tupled((_1.get, _2.get, _3.get, _4))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))

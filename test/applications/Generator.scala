@@ -59,8 +59,9 @@ object Generator extends App {
                 wish to have extend our `EntityAutoInc` trait. */
             val newParents = name match {
               case "UserRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
+              case "AuthTokenRow"  => parents ++ Seq("Entity[%s]".format(pkType))
+              case "LoginInfoRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
               case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
-              case "AuthTokenRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
               /* override existing Silhouette case classes */
               //case "LoginInfoRow" => parents ++ Seq("com.mohiva.play.silhouette.api.LoginInfo(providerId, providerKey)")
 
@@ -95,8 +96,9 @@ object Generator extends App {
               wish to have extend our `IdentifyableTable` trait. */
           val newParents = name match {
             case "User" => parents :+ s"IdentifyableTable[$pkType]"
-            case "SecurityRole" => parents :+ s"IdentifyableTable[$pkType]"
             case "AuthToken" => parents :+ s"IdentifyableTable[$pkType]"
+            case "LoginInfo" => parents :+ s"IdentifyableTable[$pkType]"
+            case "SecurityRole" => parents :+ s"IdentifyableTable[$pkType]"
             case _ => parents
           }
 
