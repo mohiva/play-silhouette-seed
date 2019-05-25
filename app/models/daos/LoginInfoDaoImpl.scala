@@ -20,6 +20,7 @@ class LoginInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfig
    * @return some loginInfo if exists, None otherwise
    */
   override def find(providerId: UUID, providerKey: UUID): Future[Option[Tables.LoginInfoRow]] = {
-    ???
+    db.run(LoginInfo.filter(loginInfo => loginInfo.providerId === providerId &&
+      loginInfo.providerKey === providerKey).result.headOption)
   }
 }

@@ -25,12 +25,12 @@ trait Tables {
    *  @param userId Database column user_id SqlType(BIGINT UNSIGNED)
    *  @param expiry Database column expiry SqlType(TIMESTAMP)
    */
-  case class AuthTokenRow(tokenId: Option[java.sql.Blob] = None, userId: Long, expiry: java.sql.Timestamp) extends Entity[Long] { override def id = userId }
+  case class AuthTokenRow(tokenId: Option[java.util.UUID] = None, userId: Long, expiry: java.sql.Timestamp) extends Entity[Long] { override def id = userId }
   /** GetResult implicit for fetching AuthTokenRow objects using plain SQL queries */
-  implicit def GetResultAuthTokenRow(implicit e0: GR[Option[java.sql.Blob]], e1: GR[Long], e2: GR[java.sql.Timestamp]): GR[AuthTokenRow] = GR {
+  implicit def GetResultAuthTokenRow(implicit e0: GR[Option[java.util.UUID]], e1: GR[Long], e2: GR[java.sql.Timestamp]): GR[AuthTokenRow] = GR {
     prs =>
       import prs._
-      AuthTokenRow.tupled((<<?[java.sql.Blob], <<[Long], <<[java.sql.Timestamp]))
+      AuthTokenRow.tupled((<<?[java.util.UUID], <<[Long], <<[java.sql.Timestamp]))
   }
   /** Table description of table auth_token. Objects of this class serve as prototypes for rows in queries. */
   class AuthToken(_tableTag: Tag) extends profile.api.Table[AuthTokenRow](_tableTag, Some("myappdb"), "auth_token") with IdentifyableTable[Long] {
@@ -41,7 +41,7 @@ trait Tables {
     def ? = ((tokenId, Rep.Some(userId), Rep.Some(expiry))).shaped.<>({ r => import r._; _2.map(_ => AuthTokenRow.tupled((_1, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column token_id SqlType(BINARY), Default(None) */
-    val tokenId: Rep[Option[java.sql.Blob]] = column[Option[java.sql.Blob]]("token_id", O.Default(None))
+    val tokenId: Rep[Option[java.util.UUID]] = column[Option[java.util.UUID]]("token_id", O.Default(None))
     /** Database column user_id SqlType(BIGINT UNSIGNED) */
     val userId: Rep[Long] = column[Long]("user_id")
     /** Database column expiry SqlType(TIMESTAMP) */
@@ -63,12 +63,12 @@ trait Tables {
    *  @param providerKey Database column provider_key SqlType(BINARY)
    *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
-  case class LoginInfoRow(id: Long, providerId: java.sql.Blob, providerKey: java.sql.Blob, modified: Option[java.sql.Timestamp] = None) extends EntityAutoInc[Long, LoginInfoRow]
+  case class LoginInfoRow(id: Long, providerId: java.util.UUID, providerKey: java.util.UUID, modified: Option[java.sql.Timestamp] = None) extends EntityAutoInc[Long, LoginInfoRow]
   /** GetResult implicit for fetching LoginInfoRow objects using plain SQL queries */
-  implicit def GetResultLoginInfoRow(implicit e0: GR[Long], e1: GR[java.sql.Blob], e2: GR[Option[java.sql.Timestamp]]): GR[LoginInfoRow] = GR {
+  implicit def GetResultLoginInfoRow(implicit e0: GR[Long], e1: GR[java.util.UUID], e2: GR[Option[java.sql.Timestamp]]): GR[LoginInfoRow] = GR {
     prs =>
       import prs._
-      LoginInfoRow.tupled((<<[Long], <<[java.sql.Blob], <<[java.sql.Blob], <<?[java.sql.Timestamp]))
+      LoginInfoRow.tupled((<<[Long], <<[java.util.UUID], <<[java.util.UUID], <<?[java.sql.Timestamp]))
   }
   /** Table description of table login_info. Objects of this class serve as prototypes for rows in queries. */
   class LoginInfo(_tableTag: Tag) extends profile.api.Table[LoginInfoRow](_tableTag, Some("myappdb"), "login_info") with IdentifyableTable[Long] {
@@ -79,9 +79,9 @@ trait Tables {
     /** Database column id SqlType(BIGINT UNSIGNED), AutoInc, PrimaryKey */
     val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
     /** Database column provider_id SqlType(BINARY) */
-    val providerId: Rep[java.sql.Blob] = column[java.sql.Blob]("provider_id")
+    val providerId: Rep[java.util.UUID] = column[java.util.UUID]("provider_id")
     /** Database column provider_key SqlType(BINARY) */
-    val providerKey: Rep[java.sql.Blob] = column[java.sql.Blob]("provider_key")
+    val providerKey: Rep[java.util.UUID] = column[java.util.UUID]("provider_key")
     /** Database column modified SqlType(TIMESTAMP), Default(None) */
     val modified: Rep[Option[java.sql.Timestamp]] = column[Option[java.sql.Timestamp]]("modified", O.Default(None))
 
