@@ -34,6 +34,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick-codegen" % "3.3.0",
   "mysql" % "mysql-connector-java" % "8.0.16",
   "com.mohiva" %% "play-silhouette-testkit" % "6.0.1-SNAPSHOT" % "test",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.2" % "test",
   specs2 % Test,
   jdbc % Test,
   ehcache,

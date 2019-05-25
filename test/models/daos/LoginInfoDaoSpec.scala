@@ -1,7 +1,6 @@
 package models.daos
 
 import java.util.UUID
-
 import org.specs2.mock._
 import org.specs2.mutable._
 import utils.AwaitUtil
@@ -13,7 +12,7 @@ class LoginInfoDaoSpec @Inject() (loginInfoDao: LoginInfoDao) extends Specificat
   "Creating a new LoginInfo" should {
     "return a valid instance" in {
       loginInfoDao.create(LoginInfoRow(0, UUID.randomUUID().toString, UUID.randomUUID().toString))
-      loginInfoDao.findAll.size should equalTo(1)
+      loginInfoDao.findAll.size should beEqualTo(1)
     }
   }
 }
