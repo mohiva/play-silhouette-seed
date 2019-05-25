@@ -11,8 +11,8 @@ CREATE TABLE `user` (
     email VARCHAR(100) NOT NULL,
     avatar_url VARCHAR(200) NOT NULL,
     activated BOOLEAN NOT NULL DEFAULT FALSE,
-    last_login TIMESTAMP,
-    modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_login TIMESTAMP NULL DEFAULT NULL,
+    modified TIMESTAMP NULL DEFAULT NULL,
     PRIMARY KEY (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -20,7 +20,7 @@ CREATE TABLE login_info (
     id INT AUTO_INCREMENT NOT NULL AUTO_INCREMENT,
     provider_id VARCHAR(100) NOT NULL,
     provider_key VARCHAR(50) NOT NULL,
-    modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    modified TIMESTAMP NULL DEFAULT NULL,
     KEY idx_provider_id (provider_id),
     KEY idx_provider_key (provider_key),
     PRIMARY KEY (id)
@@ -29,7 +29,7 @@ CREATE TABLE login_info (
 CREATE TABLE user_login_info (
     user_id INT NOT NULL,
     login_info_id INT NOT NULL,
-    modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    modified TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
     FOREIGN KEY (login_info_id) REFERENCES login_info(id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, login_info_id)
@@ -44,7 +44,7 @@ CREATE TABLE security_role (
 CREATE TABLE user_security_role (
     user_id INT NOT NULL,
     security_role_id INT NOT NULL,
-    modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    modified TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
     FOREIGN KEY (security_role_id) REFERENCES security_role(id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, security_role_id)

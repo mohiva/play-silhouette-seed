@@ -37,6 +37,8 @@ object Generator extends App {
     override def code = "import models.daos.generic._\n" + super.code
 
     override def Table = new Table(_) {
+      override type Column = ColumnDef
+
       override def EntityType = new EntityTypeDef {
         /* This code is adapted from the `EntityTypeDef` trait's `code` method
            within `AbstractSourceCodeGenerator`.
@@ -50,12 +52,17 @@ object Generator extends App {
               s"${c.name}: ${c.exposedType}"
             )
           ).mkString(", ")
+
           if (classEnabled) {
             /* `rowList` contains the names of the generated "Row" case classes we
                 wish to have extend our `EntityAutoInc` trait. */
             val newParents = name match {
               case "UserRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
               case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
+
+              /* override existing Silhouette case classes */
+              case "LoginInfoRow" => parents ++ Seq("com.mohiva.play.silhouette.api.LoginInfo(providerId, providerKey)")
+
               case _ => parents
             }
 
@@ -98,7 +105,7 @@ object Generator extends App {
             case "TODO" => Seq("override def id = userId") +: body
             case _ => body
           }
-          s"""class $name(_tableTag: Tag) extends profile.api.Table[$elementType](_tableTag, ${args.mkString(", ")})$prns {
+          s"""class ${name}(_tableTag: Tag) extends profile.api.Table[$elementType](_tableTag, ${args.mkString(", ")})$prns {
             ${indent(newBody.map(_.mkString("\n")).mkString("\n\n"))}
             }
           """.trim()
