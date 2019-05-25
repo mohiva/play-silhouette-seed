@@ -10,7 +10,7 @@ import models.generated.Tables.LoginInfoRow
 class LoginInfoDaoSpec @Inject() (loginInfoDao: LoginInfoDao) extends Specification with Mockito with AwaitUtil {
 
   "Creating a new LoginInfo" should {
-    "return a valid instance" in {
+    "save it in the empty database" in {
       loginInfoDao.create(LoginInfoRow(0, UUID.randomUUID().toString, UUID.randomUUID().toString))
       loginInfoDao.findAll.size should beEqualTo(1)
     }
