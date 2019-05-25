@@ -35,6 +35,7 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "8.0.16",
   "com.mohiva" %% "play-silhouette-testkit" % "6.0.1-SNAPSHOT" % "test",
   specs2 % Test,
+  jdbc % Test,
   ehcache,
   guice,
   filters
