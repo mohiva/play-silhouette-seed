@@ -62,8 +62,6 @@ CREATE TRIGGER user_after_insert AFTER INSERT ON `user` FOR EACH ROW SET @modifi
 CREATE TRIGGER user_trigger_after_update AFTER UPDATE ON `user` FOR EACH ROW SET @modified := CURRENT_TIME;
 
 CREATE TRIGGER auth_token_before_insert BEFORE INSERT ON auth_token FOR EACH ROW SET new.token_id = UUID();
-CREATE TRIGGER login_info_provider_id_before_insert BEFORE INSERT ON login_info FOR EACH ROW SET new.provider_id = UUID();
-CREATE TRIGGER login_info_provider_key_before_insert BEFORE INSERT ON login_info FOR EACH ROW SET new.provider_key = UUID();
 
 CREATE TRIGGER login_info_trigger_after_insert AFTER INSERT ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
 CREATE TRIGGER login_info_trigger_after_update AFTER UPDATE ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
