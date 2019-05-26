@@ -24,25 +24,34 @@ trait UserService extends IdentityService[UserRow] {
    * Saves a user.
    *
    * @param user The user to save.
+   * @param extLoginInfo The Silhouette LoginInfo instance
    * @return The saved user.
    */
-  def save(user: UserRow): Future[UserRow]
+  def create(user: UserRow, extLoginInfo: ExtLoginInfo): Future[UserRow]
 
   /**
    * Saves the social profile for a user.
    *
    * If a user exists for this profile then update the user, otherwise create a new user with the given profile.
    *
-   * @param profile The social profile to save.
+   * @param profile The social profile to save that contains the required LoginInfo.
    * @return The user for whom the profile was saved.
    */
-  def save(profile: CommonSocialProfile): Future[UserRow]
+  def create(profile: CommonSocialProfile): Future[UserRow]
 
   /**
    * Returns the LoginInfo that corresponds to the user.
+   *
    * @return the LoginInfo that corresponds to the user.
    */
   def loginInfo(user: UserRow): Future[Option[LoginInfoRow]]
+
+  /**
+   * Returns the number of affected rows, one if succeeded, zero otherwise.
+   * @param user the user to update
+   * @return the number of affected rows, one if succeeded, zero otherwise.
+   */
+  def update(user: UserRow): Future[Int]
 }
 
 /**

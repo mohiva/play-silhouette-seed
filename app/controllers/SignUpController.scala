@@ -92,7 +92,6 @@ class SignUpController @Inject() (
             val authInfo = passwordHasherRegistry.current.hash(data.password)
             val user = UserRow(
               id = 0L,
-              //loginInfo = loginInfo,
               firstName = Some(data.firstName),
               lastName = Some(data.lastName),
               email = Some(data.email),
@@ -101,7 +100,7 @@ class SignUpController @Inject() (
             )
             for {
               avatar <- avatarService.retrieveURL(data.email)
-              user <- userService.save(user.copy(avatarUrl = avatar))
+              user <- userService.create(user.copy(avatarUrl = avatar), loginInfo)
               authInfo <- authInfoRepository.add(loginInfo, authInfo)
               authToken <- authTokenService.create(user.id)
             } yield {

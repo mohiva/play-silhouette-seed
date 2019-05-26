@@ -36,12 +36,13 @@ class UserServiceImpl @Inject() (userDao: UserDao, loginInfoDao: LoginInfoDao)(i
   }
 
   /**
-   * Saves a user.
+   * Creates a new user.
    *
    * @param user The user to save.
+   * @param extLoginInfo The Silhouette LoginInfo instance
    * @return The saved user.
    */
-  def save(user: UserRow): Future[UserRow] = userDao.createAndFetch(user)
+  override def create(user: UserRow, extLoginInfo: ExtLoginInfo): Future[UserRow] = userDao.create(user, extLoginInfo)
 
   /**
    * Saves the social profile for a user.
@@ -51,7 +52,7 @@ class UserServiceImpl @Inject() (userDao: UserDao, loginInfoDao: LoginInfoDao)(i
    * @param profile The social profile to save.
    * @return The user for whom the profile was saved.
    */
-  override def save(profile: CommonSocialProfile): Future[UserRow] = {
+  override def create(profile: CommonSocialProfile): Future[UserRow] = {
     userDao.find(profile.loginInfo).flatMap {
       case Some(user) => { // update user with profile
         val updated = user.copy(
@@ -60,8 +61,7 @@ class UserServiceImpl @Inject() (userDao: UserDao, loginInfoDao: LoginInfoDao)(i
           email = profile.email,
           avatarUrl = profile.avatarURL
         )
-        userDao.update(updated)
-        Future.successful(updated)
+        userDao.update(updated).map(affected => if (affected == 1) updated else None.asInstanceOf[UserRow])
       }
       case None => // insert a new user
         userDao.create(UserRow(
@@ -77,9 +77,20 @@ class UserServiceImpl @Inject() (userDao: UserDao, loginInfoDao: LoginInfoDao)(i
 
   /**
    * Returns the LoginInfo that corresponds to the user.
+   *
    * @return the LoginInfo that corresponds to the user.
    */
   override def loginInfo(user: Tables.UserRow): Future[Option[LoginInfoRow]] = {
     loginInfoDao.findById(user.id)
+  }
+
+  /**
+   * Returns the number of affected rows, one if succeeded, zero otherwise.
+   *
+   * @param user the user to update
+   * @return the number of affected rows, one if succeeded, zero otherwise.
+   */
+  override def update(user: UserRow): Future[Int] = {
+    userDao.update(user)
   }
 }

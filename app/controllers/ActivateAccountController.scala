@@ -78,7 +78,7 @@ class ActivateAccountController @Inject() (
           user.loginInfo.flatMap {
             case Some(loginInfo) => {
               if (loginInfo.providerID == CredentialsProvider.ID) {
-                userService.save(user.copy(activated = true)).map { _ =>
+                userService.update(user.copy(activated = true)).map { _ =>
                   Redirect(routes.SignInController.view()).flashing("success" -> Messages("account.activated"))
                 }
               } else {
