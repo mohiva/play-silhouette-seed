@@ -10,6 +10,7 @@ import org.joda.time.DateTime
 import scala.concurrent._
 import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
+import com.github.tototoshi.slick.MySQLJodaSupport._
 
 /**
  * Give access to the [[AuthToken]] object.
@@ -35,27 +36,8 @@ class AuthTokenDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfig
    * @param dateTime The current date time.
    */
   override def findExpired(dateTime: DateTime): Future[Seq[AuthTokenRow]] = {
-    /**
-     *
-     * tokens.filter {
-     * case (_, token) =>
-     * token.expiry.isBefore(dateTime)
-     * }.values.toSeq
-     *
-     * val action = sql"""
-     * SELECT t1.*
-     * FROM "#${AuthToken.baseTableRow.tableName}" t1
-     * WHERE t1.active=true
-     * AND EXISTS (SELECT * FROM #${LinkedAccount.baseTableRow.tableName} t2
-     * WHERE t2.user_id=t1.id
-     * AND t2.provider_key=$providerKey
-     * AND t2.provider_user_id=$providerUserId)
-     * """.as[UserRow].headOption
-     *
-     */
-    //val action = AuthToken.filter(authToken => authToken.expiry.before(dateTime)).result
-    //db.run(action)
-    ???
+    val action = AuthToken.filter(authToken => authToken.expiry < dateTime).result
+    db.run(action)
   }
 
   /**

@@ -50,7 +50,7 @@ class ActivateAccountController @Inject() (
     userService.retrieve(loginInfo).flatMap {
       case Some(user) if !user.activated =>
         authTokenService.create(user.id).map { authToken =>
-          val url = routes.ActivateAccountController.activate(UUID.fromString(authToken.tokenId)).absoluteURL()
+          val url = routes.ActivateAccountController.activate(authToken.tokenUuId).absoluteURL()
 
           mailerClient.send(Email(
             subject = Messages("email.activate.account.subject"),

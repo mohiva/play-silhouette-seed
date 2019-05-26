@@ -35,9 +35,9 @@ class AuthTokenServiceImpl @Inject() (
    * @return The saved auth token.
    */
   def create(userId: Long, duration: FiniteDuration = 5 minutes) = {
-    val expiry = new java.sql.Timestamp(clock.now.withZone(DateTimeZone.UTC).plusSeconds(duration.toSeconds.toInt).getMillis)
+    val expiry = clock.now.withZone(DateTimeZone.UTC).plusSeconds(duration.toSeconds.toInt)
     val token = AuthTokenRow(userId, UUID.randomUUID().toString, expiry)
-    authTokenDao.create(token).map(_ => token)
+    authTokenDao.create(token).map(inserted => if (inserted == 1) token else None.asInstanceOf[AuthTokenRow])
   }
 
   /**

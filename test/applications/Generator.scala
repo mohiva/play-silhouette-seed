@@ -34,10 +34,18 @@ object Generator extends App {
     MTable.getTables(None, None, None, Some(Seq("TABLE", "VIEW"))).map(_.filter { p: MTable => modelTables.contains(p.name.name) }))))
   // customize code generator
   val codegenFuture: Future[SourceCodeGenerator] = model.map(model => new SourceCodeGenerator(model) {
-    override def code = "import models.daos.generic._\n" + super.code
+    override def code = "import models.daos.generic._\n" +
+      "import com.github.tototoshi.slick.MySQLJodaSupport._\n" + super.code
 
     override def Table = new Table(_) {
-      override type Column = ColumnDef
+      override def Column = new Column(_) {
+        override def rawType = model.tpe match {
+          case "java.sql.Timestamp" => "org.joda.time.DateTime" // kill java.sql.Timestamp
+          case _ => {
+            super.rawType
+          }
+        }
+      }
 
       override def EntityType = new EntityTypeDef {
         /* This code is adapted from the `EntityTypeDef` trait's `code` method
@@ -57,7 +65,7 @@ object Generator extends App {
             /* `rowList` contains the names of the generated "Row" case classes we
                 wish to have extend our `EntityAutoInc` trait. */
             val newParents = name match {
-              case "UserRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name)) ++ "com.mohiva.play.silhouette.api.Identity"
+              case "UserRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name), "com.mohiva.play.silhouette.api.Identity")
               case "LoginInfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "AuthTokenRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
@@ -71,17 +79,20 @@ object Generator extends App {
             val prns = (newParents.take(1).map(" extends " + _) ++ newParents.drop(1).map(" with " + _)).mkString("")
             val newBody = name match {
               case "UserRow" => "{\n" +
-                                "  def fullName = {\n" +
-                                "    (firstName -> lastName) match {\n" +
-                                "      case (Some(f), Some(l)) => Some(f + \" \" + l)\n" +
-                                "      case (Some(f), None) => Some(f)\n" +
-                                "      case (None, Some(l)) => Some(l)\n" +
-                                "      case _ => None\n" +
-                                "    }\n" +
-                                "  }\n" +
-                                "}"
+                "  def fullName = {\n" +
+                "    (firstName -> lastName) match {\n" +
+                "      case (Some(f), Some(l)) => Some(f + \" \" + l)\n" +
+                "      case (Some(f), None) => Some(f)\n" +
+                "      case (None, Some(l)) => Some(l)\n" +
+                "      case _ => None\n" +
+                "    }\n" +
+                "  }\n" +
+                "}"
               case "LoginInfoRow" => "{ override def id = userId }"
-              case "AuthTokenRow" => "{ override def id = userId }"
+              case "AuthTokenRow" => "{\n" +
+                  "  override def id = userId\n" +
+                  "  def tokenUuId = java.util.UUID.fromString(tokenId)\n" +
+                  "}"
               case _ => ""
             }
             s"""case class $name($args)$prns $newBody"""
