@@ -15,30 +15,21 @@ CREATE TABLE `user` (
     modified TIMESTAMP NULL DEFAULT NULL
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE auth_token (
-    token_id CHAR(36) NULL,
-    user_id BIGINT UNSIGNED NOT NULL,
-    expiry TIMESTAMP,
-    KEY idx_token_id (token_id),
-    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE login_info (
-    id SERIAL PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
     provider_id CHAR(36) NOT NULL,
     provider_key CHAR(36) NOT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
-    KEY idx_provider_id (provider_id),
-    KEY idx_provider_key (provider_key)
+    KEY idx_provider_id_key (provider_id, provider_key),
+    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE user_login_info (
+CREATE TABLE auth_token (
     user_id BIGINT UNSIGNED NOT NULL,
-    login_info_id BIGINT UNSIGNED NOT NULL,
-    modified TIMESTAMP NULL DEFAULT NULL,
-    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
-    FOREIGN KEY (login_info_id) REFERENCES login_info(id) ON DELETE CASCADE,
-    PRIMARY KEY (user_id, login_info_id)
+    token_id CHAR(36) NOT NULL,
+    expiry TIMESTAMP NOT NULL,
+    KEY idx_token_id (token_id),
+    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE security_role (
@@ -66,22 +57,17 @@ CREATE TRIGGER auth_token_before_insert BEFORE INSERT ON auth_token FOR EACH ROW
 CREATE TRIGGER login_info_trigger_after_insert AFTER INSERT ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
 CREATE TRIGGER login_info_trigger_after_update AFTER UPDATE ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
 
-CREATE TRIGGER user_login_info_after_insert AFTER INSERT ON user_login_info FOR EACH ROW SET @modified := CURRENT_TIME;
-CREATE TRIGGER user_login_info_after_update AFTER UPDATE ON user_login_info FOR EACH ROW SET @modified := CURRENT_TIME;
-
 CREATE TRIGGER user_security_role_after_insert AFTER INSERT ON user_security_role FOR EACH ROW SET @modified := CURRENT_TIME;
 CREATE TRIGGER user_security_role_after_update AFTER UPDATE ON user_security_role FOR EACH ROW SET @modified := CURRENT_TIME;
 
 # --- !Downs
-
-DROP TABLE user_login_info CASCADE;
-
-DROP TABLE login_info CASCADE;
 
 DROP TABLE user_security_role CASCADE;
 
 DROP TABLE security_role CASCADE;
 
 DROP TABLE auth_token CASCADE;
+
+DROP TABLE login_info CASCADE;
 
 DROP TABLE `user` CASCADE;
