@@ -24,7 +24,7 @@ class UserDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigProvi
    */
   override def find(extLoginInfo: ExtLoginInfo): Future[Option[UserRow]] = {
     val action = (for {
-      loginInfo <- LoginInfo if loginInfo.providerId == extLoginInfo.providerID && loginInfo.providerKey == extLoginInfo.providerKey
+      loginInfo <- LoginInfo if loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey
       user <- User if user.id === loginInfo.userId
     } yield user).result.headOption
     db.run(action)

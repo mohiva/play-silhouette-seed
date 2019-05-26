@@ -1,8 +1,7 @@
 package models.services
 
 import java.util.UUID
-
-import models.AuthToken
+import models.generated.Tables.AuthTokenRow
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -20,7 +19,7 @@ trait AuthTokenService {
    * @param expiry The duration a token expires.
    * @return The saved auth token.
    */
-  def create(userId: Long, expiry: FiniteDuration = 5 minutes): Future[AuthToken]
+  def create(userId: Long, expiry: FiniteDuration = 5 minutes): Future[AuthTokenRow]
 
   /**
    * Validates a token ID.
@@ -28,12 +27,12 @@ trait AuthTokenService {
    * @param id The token ID to validate.
    * @return The token if it's valid, None otherwise.
    */
-  def validate(id: UUID): Future[Option[AuthToken]]
+  def validate(id: UUID): Future[Option[AuthTokenRow]]
 
   /**
    * Cleans expired tokens.
    *
    * @return The list of deleted tokens.
    */
-  def clean: Future[Seq[AuthToken]]
+  def clean: Future[Seq[AuthTokenRow]]
 }

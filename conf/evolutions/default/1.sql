@@ -51,8 +51,6 @@ INSERT INTO security_role (name) values ('administrator');
 CREATE TRIGGER user_after_insert AFTER INSERT ON `user` FOR EACH ROW SET @modified := CURRENT_TIME;
 CREATE TRIGGER user_trigger_after_update AFTER UPDATE ON `user` FOR EACH ROW SET @modified := CURRENT_TIME;
 
-CREATE TRIGGER auth_token_before_insert BEFORE INSERT ON auth_token FOR EACH ROW SET new.token_id = UUID();
-
 CREATE TRIGGER login_info_trigger_after_insert AFTER INSERT ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
 CREATE TRIGGER login_info_trigger_after_update AFTER UPDATE ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
 

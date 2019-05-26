@@ -12,7 +12,7 @@ object TotpForm {
    */
   val form = Form(
     mapping(
-      "userID" -> longNumber,
+      "userId" -> longNumber,
       "sharedKey" -> nonEmptyText,
       "rememberMe" -> boolean,
       "verificationCode" -> nonEmptyText(minLength = 6, maxLength = 6)
