@@ -22,7 +22,6 @@ import scala.concurrent.{ ExecutionContext, Future }
  *
  * @param components
  * @param silhouette
- * @param userService
  * @param credentialsProvider
  * @param socialProviderRegistry
  * @param authInfoRepository
@@ -31,12 +30,12 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param clock
  * @param webJarsUtil
  * @param assets
- * @param ex
+ * @param userService
+ * @param ec
  */
 class SignInController @Inject() (
   components: ControllerComponents,
   silhouette: Silhouette[DefaultEnv],
-  userService: UserService,
   credentialsProvider: CredentialsProvider,
   socialProviderRegistry: SocialProviderRegistry,
   authInfoRepository: AuthInfoRepository,
@@ -47,8 +46,10 @@ class SignInController @Inject() (
   implicit
   webJarsUtil: WebJarsUtil,
   assets: AssetsFinder,
-  ex: ExecutionContext
+  userService: UserService,
+  ec: ExecutionContext
 ) extends AbstractAuthController(silhouette, configuration, clock) with I18nSupport {
+  import UserService._
 
   /**
    * Views the `Sign In` page.
@@ -71,12 +72,17 @@ class SignInController @Inject() (
           userService.retrieve(loginInfo).flatMap {
             case Some(user) if !user.activated =>
               Future.successful(Ok(views.html.activateAccount(data.email)))
-            case Some(user) =>
-              authInfoRepository.find[TotpInfo](user.loginInfo).flatMap {
-                case Some(totpInfo) => Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(
-                  user.userID, totpInfo.sharedKey, data.rememberMe)))))
-                case _ => authenticateUser(user, data.rememberMe)
+            case Some(user) => {
+              user.loginInfo.flatMap {
+                case Some(loginInfo) =>
+                  authInfoRepository.find[TotpInfo](loginInfo).flatMap {
+                    case Some(totpInfo) => Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(
+                      user.id, totpInfo.sharedKey, data.rememberMe)))))
+                    case _ => authenticateUser(user, data.rememberMe)
+                  }
+                case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
               }
+            }
             case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
           }
         }.recover {

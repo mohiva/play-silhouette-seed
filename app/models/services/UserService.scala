@@ -1,17 +1,16 @@
 package models.services
 
-import java.util.UUID
-
+import com.mohiva.play.silhouette.api.{ LoginInfo => ExtLoginInfo }
 import com.mohiva.play.silhouette.api.services.IdentityService
 import com.mohiva.play.silhouette.impl.providers.CommonSocialProfile
-import models.User
+import models.generated.Tables.{ LoginInfoRow, UserRow }
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * Handles actions to users.
  */
-trait UserService extends IdentityService[User] {
+trait UserService extends IdentityService[UserRow] {
 
   /**
    * Retrieves a user that matches the specified ID.
@@ -19,7 +18,7 @@ trait UserService extends IdentityService[User] {
    * @param id The ID to retrieve a user.
    * @return The retrieved user or None if no user could be retrieved for the given ID.
    */
-  def retrieve(id: UUID): Future[Option[User]]
+  def retrieve(id: Long): Future[Option[UserRow]]
 
   /**
    * Saves a user.
@@ -27,7 +26,7 @@ trait UserService extends IdentityService[User] {
    * @param user The user to save.
    * @return The saved user.
    */
-  def save(user: User): Future[User]
+  def save(user: UserRow): Future[UserRow]
 
   /**
    * Saves the social profile for a user.
@@ -37,5 +36,32 @@ trait UserService extends IdentityService[User] {
    * @param profile The social profile to save.
    * @return The user for whom the profile was saved.
    */
-  def save(profile: CommonSocialProfile): Future[User]
+  def save(profile: CommonSocialProfile): Future[UserRow]
+
+  /**
+   * Returns the LoginInfo that corresponds to the user.
+   * @return the LoginInfo that corresponds to the user.
+   */
+  def loginInfo(user: UserRow): Future[Option[LoginInfoRow]]
+}
+
+/**
+ * Companion object for the UserService interface
+ */
+object UserService {
+  /**
+   * Provides implicit extensions to the UserRow e.g. looking up and attaching the
+   * corresponding LoginInfo
+   *
+   * @param user the `UserRow` instance
+   * @param userService the implicit `UserService` instance.
+   * @param ec the implicit `ExecutionContext` instance.
+   */
+  implicit class withExtensions(user: UserRow)(implicit userService: UserService, ec: ExecutionContext) {
+    def loginInfo: Future[Option[ExtLoginInfo]] = {
+      userService.loginInfo(user).map(_.map { loginInfoRow =>
+        ExtLoginInfo(loginInfoRow.providerId, loginInfoRow.providerKey)
+      })
+    }
+  }
 }

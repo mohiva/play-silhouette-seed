@@ -19,5 +19,5 @@ trait GenericDaoAutoInc[T <: Table[E] with IdentifyableTable[PK], E <: EntityAut
    * @param entity entity to create, input id is ignored
    * @return newly created entity with updated id
    */
-  def createAndFetch(entity: E)(implicit mkLens: MkFieldLens.Aux[E, Symbol @@ Witness.`"id"`.T, PK]): Future[E]
+  def createAndFetch(entity: E)(implicit mkLens: MkFieldLens.Aux[E, Symbol @@ Witness.`"id"`.T, PK], ec: ExecutionContext): Future[E]
 }

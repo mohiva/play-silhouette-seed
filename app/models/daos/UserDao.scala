@@ -1,38 +1,30 @@
 package models.daos
 
-import java.util.UUID
-
-import com.mohiva.play.silhouette.api.LoginInfo
-import models.User
+import models.generated.Tables._
+import models.daos.generic.GenericDaoAutoInc
+import com.mohiva.play.silhouette.api.{ LoginInfo => ExtLoginInfo }
 
 import scala.concurrent.Future
 
 /**
  * Give access to the user object.
  */
-trait UserDao {
-
+trait UserDao extends GenericDaoAutoInc[User, UserRow, Long] {
   /**
-   * Finds a user by its login info.
+   * Finds an user by its loginInfo.
    *
-   * @param loginInfo The login info of the user to find.
+   * @param extLoginInfo The login info of the user to find.
    * @return The found user or None if no user for the given login info could be found.
    */
-  def find(loginInfo: LoginInfo): Future[Option[User]]
+  def find(extLoginInfo: ExtLoginInfo): Future[Option[UserRow]]
 
   /**
-   * Finds a user by its user ID.
-   *
-   * @param userID The ID of the user to find.
-   * @return The found user or None if no user for the given ID could be found.
-   */
-  def find(userID: UUID): Future[Option[User]]
-
-  /**
-   * Saves a user.
+   * Returns the newly created user. Creates an user including and links
+   * her to the given loginInfo.
    *
    * @param user The user to save.
-   * @return The saved user.
+   * @param extLoginInfo the loginInfo to save with the user.
+   * @return the newly created user with updated id.
    */
-  def save(user: User): Future[User]
+  def create(user: UserRow, extLoginInfo: ExtLoginInfo): Future[UserRow]
 }

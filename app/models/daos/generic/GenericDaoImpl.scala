@@ -9,7 +9,7 @@ import scala.concurrent._
 /**
  * Generic DAO implementation
  */
-abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK: BaseColumnType](dbConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T])(implicit ec: ExecutionContext) extends GenericDao[T, E, PK] {
+abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK: BaseColumnType](dbConfigProvider: DatabaseConfigProvider, tableQuery: TableQuery[T]) extends GenericDao[T, E, PK] {
   //------------------------------------------------------------------------
   // public
   //------------------------------------------------------------------------
@@ -62,7 +62,7 @@ abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Ent
    * @param entities to be inserted
    * @return number of inserted entities
    */
-  override def create(entities: Seq[E]): Future[Unit] = {
+  override def create(entities: Seq[E])(implicit ec: ExecutionContext): Future[Unit] = {
     val action = (tableQuery ++= entities)
     db.run(action).map(_ => ())
   }

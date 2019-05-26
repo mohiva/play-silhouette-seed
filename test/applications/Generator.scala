@@ -57,7 +57,7 @@ object Generator extends App {
             /* `rowList` contains the names of the generated "Row" case classes we
                 wish to have extend our `EntityAutoInc` trait. */
             val newParents = name match {
-              case "UserRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
+              case "UserRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name)) ++ "com.mohiva.play.silhouette.api.Identity"
               case "LoginInfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "AuthTokenRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
@@ -71,7 +71,7 @@ object Generator extends App {
             val prns = (newParents.take(1).map(" extends " + _) ++ newParents.drop(1).map(" with " + _)).mkString("")
             val newBody = name match {
               case "UserRow" => "{\n" +
-                                "  def name = {\n" +
+                                "  def fullName = {\n" +
                                 "    (firstName -> lastName) match {\n" +
                                 "      case (Some(f), Some(l)) => Some(f + \" \" + l)\n" +
                                 "      case (Some(f), None) => Some(f)\n" +

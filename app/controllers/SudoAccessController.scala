@@ -8,17 +8,31 @@ import play.api.i18n._
 import play.api.mvc._
 import utils.auth.DefaultEnv
 import com.mohiva.play.silhouette.api.actions._
+import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import constants.SessionKeys
+import models.services.UserService
+
 import scala.concurrent.{ ExecutionContext, Future }
 
+/**
+ * The `SudoAccessController` implementation
+ *
+ * @param silhouette
+ * @param webJarsUtil
+ * @param assets
+ * @param ec
+ */
 class SudoAccessController @Inject() (
   silhouette: Silhouette[DefaultEnv]
 )(
   implicit
   webJarsUtil: WebJarsUtil,
   assets: AssetsFinder,
-  ex: ExecutionContext
+  userService: UserService,
+  ec: ExecutionContext
 ) extends InjectedController with I18nSupport {
+  import UserService._
+
   /**
    * A local error handler.
    */
@@ -38,6 +52,9 @@ class SudoAccessController @Inject() (
    * @return The result to display.
    */
   def restrictedSudoAccess = silhouette.SecuredAction(errorHandler)(SudoAccessAuthorization[DefaultEnv#A]()).async { implicit request =>
-    Future.successful(Ok(views.html.restrictedSudoAccess(request.identity)))
+    request.identity.loginInfo.flatMap {
+      case Some(loginInfo) => Future.successful(Ok(views.html.restrictedSudoAccess(request.identity, loginInfo)))
+      case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+    }
   }
 }

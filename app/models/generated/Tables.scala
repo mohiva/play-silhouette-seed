@@ -135,8 +135,8 @@ trait Tables {
    *  @param lastLogin Database column last_login SqlType(TIMESTAMP), Default(None)
    *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
-  case class UserRow(id: Long, firstName: Option[String] = None, lastName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, username: Option[String] = None, email: Option[String] = None, avatarUrl: Option[String] = None, activated: Boolean = false, lastLogin: Option[java.sql.Timestamp] = None, modified: Option[java.sql.Timestamp] = None) extends EntityAutoInc[Long, UserRow] {
-    def name = {
+  case class UserRow(id: Long, firstName: Option[String] = None, lastName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, username: Option[String] = None, email: Option[String] = None, avatarUrl: Option[String] = None, activated: Boolean = false, lastLogin: Option[java.sql.Timestamp] = None, modified: Option[java.sql.Timestamp] = None) extends EntityAutoInc[Long, UserRow] with com.mohiva.play.silhouette.api.Identity {
+    def fullName = {
       (firstName -> lastName) match {
         case (Some(f), Some(l)) => Some(f + " " + l)
         case (Some(f), None) => Some(f)

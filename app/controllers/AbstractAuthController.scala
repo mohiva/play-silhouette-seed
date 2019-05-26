@@ -4,8 +4,10 @@ import com.mohiva.play.silhouette.api.Authenticator.Implicits._
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.services.AuthenticatorResult
 import com.mohiva.play.silhouette.api.util.Clock
+import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import constants.SessionKeys
-import models.User
+import models.generated.Tables.UserRow
+import models.services.UserService
 import net.ceedubs.ficus.Ficus._
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
@@ -24,7 +26,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param clock
  * @param webJarsUtil
  * @param assets
- * @param ex
+ * @param ec
  */
 abstract class AbstractAuthController(
   silhouette: Silhouette[DefaultEnv],
@@ -34,10 +36,12 @@ abstract class AbstractAuthController(
   implicit
   webJarsUtil: WebJarsUtil,
   assets: AssetsFinder,
-  ex: ExecutionContext
+  userService: UserService,
+  ec: ExecutionContext
 ) extends InjectedController with I18nSupport {
+  import models.services.UserService._
 
-  protected def authenticateUser(user: User, rememberMe: Boolean)(implicit request: Request[_]): Future[AuthenticatorResult] = {
+  protected def authenticateUser(user: UserRow, rememberMe: Boolean)(implicit request: Request[_]): Future[AuthenticatorResult] = {
     val authenticatorExpiry = configuration.underlying.as[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorExpiry")
     val authenticatorIdleTimeout = configuration.underlying.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorIdleTimeout")
     val cookieMaxAge = configuration.underlying.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.cookieMaxAge")
@@ -48,19 +52,23 @@ abstract class AbstractAuthController(
       Redirect(routes.ApplicationController.index())
     }.withSession(request.session + (SessionKeys.HAS_SUDO_ACCESS -> "true"))
 
-    silhouette.env.authenticatorService.create(user.loginInfo).map {
-      case authenticator if rememberMe =>
-        authenticator.copy(
-          expirationDateTime = clock.now + authenticatorExpiry,
-          idleTimeout = authenticatorIdleTimeout,
-          cookieMaxAge = cookieMaxAge
-        )
-      case authenticator => authenticator
-    }.flatMap { authenticator =>
-      silhouette.env.eventBus.publish(LoginEvent(user, request))
-      silhouette.env.authenticatorService.init(authenticator).flatMap { v =>
-        silhouette.env.authenticatorService.embed(v, result)
-      }
+    user.loginInfo.flatMap {
+      case Some(loginInfo) =>
+        silhouette.env.authenticatorService.create(loginInfo).map {
+          case authenticator if rememberMe =>
+            authenticator.copy(
+              expirationDateTime = clock.now + authenticatorExpiry,
+              idleTimeout = authenticatorIdleTimeout,
+              cookieMaxAge = cookieMaxAge
+            )
+          case authenticator => authenticator
+        }.flatMap { authenticator =>
+          silhouette.env.eventBus.publish(LoginEvent(user, request))
+          silhouette.env.authenticatorService.init(authenticator).flatMap { v =>
+            silhouette.env.authenticatorService.embed(v, result)
+          }
+        }
+      case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
     }
   }
 }

@@ -59,7 +59,7 @@ trait GenericDao[T <: Table[E] with IdentifyableTable[PK], E <: Entity[PK], PK] 
    * @param entities to be inserted
    * @return number of inserted entities
    */
-  def create(entities: Seq[E]): Future[Unit]
+  def create(entities: Seq[E])(implicit ec: ExecutionContext): Future[Unit]
 
   //------------------------------------------------------------------------
   /**

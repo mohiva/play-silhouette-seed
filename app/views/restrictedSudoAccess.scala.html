@@ -2,10 +2,12 @@
 @import play.api.mvc.RequestHeader
 @import org.webjars.play.WebJarsUtil
 @import controllers.AssetsFinder
+@import models.generated.Tables.UserRow
+@import com.mohiva.play.silhouette.api.LoginInfo
 
-@(user: models.User)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+@(user: UserRow, loginInfo: LoginInfo)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
 
-@main(messages("restricted.forbid.cookie"), Some(user)) {
+@main(messages("restricted.forbid.cookie"), Some((user, loginInfo))) {
 
 <div class="user col-md-6 col-md-offset-3">
     <div class="row">

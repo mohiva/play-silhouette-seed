@@ -16,11 +16,11 @@ trait AuthTokenService {
   /**
    * Creates a new auth token and saves it in the backing store.
    *
-   * @param userID The user ID for which the token should be created.
+   * @param userId The user ID for which the token should be created.
    * @param expiry The duration a token expires.
    * @return The saved auth token.
    */
-  def create(userID: UUID, expiry: FiniteDuration = 5 minutes): Future[AuthToken]
+  def create(userId: Long, expiry: FiniteDuration = 5 minutes): Future[AuthToken]
 
   /**
    * Validates a token ID.

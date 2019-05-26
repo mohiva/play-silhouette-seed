@@ -3,7 +3,9 @@ package controllers
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import javax.inject.Inject
 import com.mohiva.play.silhouette.api.{LogoutEvent, Silhouette}
+import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers.TotpInfo
+import models.services.UserService
 import org.webjars.play.WebJarsUtil
 import play.api.i18n.{I18nSupport, Lang}
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -13,12 +15,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * The basic application controller.
- * @param components  The Play controller components.
- * @param silhouette  The Silhouette stack.
+ * @param components The Play controller components.
+ * @param silhouette The Silhouette stack.
  * @param authInfoRepository The auth information repository.
  * @param webJarsUtil The webjar util.
- * @param assets      The Play assets finder.
- * @param ex          The Execution context.
+ * @param assets The Play assets finder.
+ * @param userService The user service implementation.
+ * @param ec The Execution context.
  */
 class ApplicationController @Inject() (
   components: ControllerComponents,
@@ -28,16 +31,23 @@ class ApplicationController @Inject() (
   implicit
   webJarsUtil: WebJarsUtil,
   assets: AssetsFinder,
-  ex: ExecutionContext,
+  userService: UserService,
+  ec: ExecutionContext,
 ) extends AbstractController(components) with I18nSupport {
+  import UserService._
 
   /**
    * Handles the index action.
    * @return The result to display.
    */
   def index = silhouette.SecuredAction.async { implicit request =>
-    authInfoRepository.find[TotpInfo](request.identity.loginInfo).map { totpInfoOpt =>
-      Ok(views.html.home(request.identity, totpInfoOpt))
+    request.identity.loginInfo.flatMap {
+      case Some(loginInfo) => {
+        authInfoRepository.find[TotpInfo](loginInfo).map { totpInfoOpt =>
+          Ok(views.html.home(request.identity, loginInfo, totpInfoOpt))
+        }
+      }
+      case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
     }
   }
 

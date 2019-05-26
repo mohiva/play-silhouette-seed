@@ -11,7 +11,8 @@ import org.joda.time.DateTime
  * @param userID The unique ID of the user the token is associated with.
  * @param expiry The date-time the token expires.
  */
+@deprecated("Remove as soon as possible", "use instead the corresponding models.generated.Tables.AuthTokenRow")
 case class AuthToken(
   id: UUID,
-  userID: UUID,
+  userID: Long,
   expiry: DateTime)

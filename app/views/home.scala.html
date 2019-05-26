@@ -6,19 +6,21 @@
 @import forms.TotpSetupForm.Data
 @import com.mohiva.play.silhouette.impl.providers.TotpCredentials
 @import com.mohiva.play.silhouette.impl.providers.TotpInfo
+@import models.generated.Tables.UserRow
+@import com.mohiva.play.silhouette.api.LoginInfo
 
-@(user: models.User, totpInfoOpt: Option[TotpInfo], totpDataOpt: Option[(Form[Data], TotpCredentials)] = None)(implicit request: RequestHeader,
+@(user: UserRow, loginInfo: LoginInfo, totpInfoOpt: Option[TotpInfo], totpDataOpt: Option[(Form[Data], TotpCredentials)] = None)(implicit request: RequestHeader,
         messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
 
 @implicitFieldConstructor = @{ b3.vertical.fieldConstructor() }
 
-@main(messages("home.title"), Some(user)) {
+@main(messages("home.title"), Some((user, loginInfo))) {
     <div class="user col-md-6 col-md-offset-3">
         <div class="row">
             <hr class="col-md-12" />
             <h4 class="col-md-8">@messages("welcome.signed.in")</h4>
             <div class="col-md-4 text-right">
-                <img src="@user.avatarURL.getOrElse(assets.path("images/silhouette.png"))" height="40px" />
+                <img src="@user.avatarUrl.getOrElse(assets.path("images/silhouette.png"))" height="40px" />
             </div>
             <hr class="col-md-12" />
         </div>

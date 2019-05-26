@@ -6,6 +6,7 @@ import javax.inject.Inject
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{ PasswordHasherRegistry, PasswordInfo }
+import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import constants.SessionKeys
 import forms.ResetPasswordForm
@@ -20,20 +21,19 @@ import scala.concurrent.{ ExecutionContext, Future }
 /**
  * The `Reset Password` controller.
  *
- * @param components             The Play controller components.
- * @param silhouette             The Silhouette stack.
- * @param userService            The user service implementation.
- * @param authInfoRepository     The auth info repository.
+ * @param components The Play controller components.
+ * @param silhouette The Silhouette stack.
+ * @param authInfoRepository The auth info repository.
  * @param passwordHasherRegistry The password hasher registry.
- * @param authTokenService       The auth token service implementation.
- * @param webJarsUtil            The webjar util.
- * @param assets                 The Play assets finder.
- * @param ex                     The execution context.
+ * @param authTokenService The auth token service implementation.
+ * @param webJarsUtil The webjar util.
+ * @param assets The Play assets finder.
+ * @param userService The user service implementation.
+ * @param ec The execution context.
  */
 class ResetPasswordController @Inject() (
   components: ControllerComponents,
   silhouette: Silhouette[DefaultEnv],
-  userService: UserService,
   authInfoRepository: AuthInfoRepository,
   passwordHasherRegistry: PasswordHasherRegistry,
   authTokenService: AuthTokenService
@@ -41,8 +41,10 @@ class ResetPasswordController @Inject() (
   implicit
   webJarsUtil: WebJarsUtil,
   assets: AssetsFinder,
-  ex: ExecutionContext
+  userService: UserService,
+  ec: ExecutionContext
 ) extends AbstractController(components) with I18nSupport {
+  import UserService._
 
   /**
    * Views the `Reset Password` page.
@@ -64,25 +66,34 @@ class ResetPasswordController @Inject() (
    * @return The result to display.
    */
   def submit(token: UUID) = silhouette.UnsecuredAction.async { implicit request =>
+    val invalidResetLinkRedirect = Redirect(routes.SignInController.view()).
+      flashing("error" -> Messages("invalid.reset.link")).
+      withSession(request.session - SessionKeys.HAS_SUDO_ACCESS - SessionKeys.REDIRECT_TO_URI)
     authTokenService.validate(token).flatMap {
       case Some(authToken) =>
         ResetPasswordForm.form.bindFromRequest.fold(
           form => Future.successful(BadRequest(views.html.resetPassword(form, token))),
           data => userService.retrieve(authToken.userID).flatMap {
-            case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
-              val passwordInfo = passwordHasherRegistry.current.hash(data.password)
-              authInfoRepository.update[PasswordInfo](user.loginInfo, passwordInfo).map { _ =>
-                Redirect(routes.SignInController.view()).flashing("success" -> Messages("password.reset")).
-                  withSession(request.session - SessionKeys.HAS_SUDO_ACCESS - SessionKeys.REDIRECT_TO_URI)
+            case Some(user) => {
+              user.loginInfo.flatMap {
+                case Some(loginInfo) => {
+                  if (loginInfo.providerID == CredentialsProvider.ID) {
+                    val passwordInfo = passwordHasherRegistry.current.hash(data.password)
+                    authInfoRepository.update[PasswordInfo](loginInfo, passwordInfo).map { _ =>
+                      Redirect(routes.SignInController.view()).flashing("success" -> Messages("password.reset")).
+                        withSession(request.session - SessionKeys.HAS_SUDO_ACCESS - SessionKeys.REDIRECT_TO_URI)
+                    }
+                  } else {
+                    Future.successful(invalidResetLinkRedirect)
+                  }
+                }
+                case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
               }
-            case _ => Future.successful(Redirect(routes.SignInController.view()).
-              flashing("error" -> Messages("invalid.reset.link")).
-              withSession(request.session - SessionKeys.HAS_SUDO_ACCESS - SessionKeys.REDIRECT_TO_URI))
+            }
+            case _ => Future.successful(invalidResetLinkRedirect)
           }
         )
-      case None => Future.successful(Redirect(routes.SignInController.view()).
-        flashing("error" -> Messages("invalid.reset.link")).
-        withSession(request.session - SessionKeys.HAS_SUDO_ACCESS - SessionKeys.REDIRECT_TO_URI))
+      case None => Future.successful(invalidResetLinkRedirect)
     }
   }
 }
