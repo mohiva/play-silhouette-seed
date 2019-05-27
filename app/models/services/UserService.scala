@@ -47,11 +47,12 @@ trait UserService extends IdentityService[UserRow] {
   def loginInfo(user: UserRow): Future[Option[LoginInfoRow]]
 
   /**
-   * Returns the number of affected rows, one if succeeded, zero otherwise.
+   * Returns the updated user.
+   *
    * @param user the user to update
-   * @return the number of affected rows, one if succeeded, zero otherwise.
+   * @return the updated user.
    */
-  def update(user: UserRow): Future[Int]
+  def update(user: UserRow): Future[UserRow]
 }
 
 /**

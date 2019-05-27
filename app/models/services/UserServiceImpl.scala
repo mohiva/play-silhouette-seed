@@ -90,7 +90,7 @@ class UserServiceImpl @Inject() (userDao: UserDao, loginInfoDao: LoginInfoDao)(i
    * @param user the user to update
    * @return the number of affected rows, one if succeeded, zero otherwise.
    */
-  override def update(user: UserRow): Future[Int] = {
-    userDao.update(user)
+  override def update(user: UserRow): Future[UserRow] = {
+    userDao.update(user).map(affected => if (affected == 1) user else None.asInstanceOf[UserRow])
   }
 }

@@ -39,7 +39,6 @@ CREATE TABLE security_role (
 CREATE TABLE user_security_role (
     user_id BIGINT UNSIGNED NOT NULL,
     security_role_id BIGINT UNSIGNED NOT NULL,
-    modified TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
     FOREIGN KEY (security_role_id) REFERENCES security_role(id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, security_role_id)
@@ -48,14 +47,11 @@ CREATE TABLE user_security_role (
 INSERT INTO security_role (name) values ('user');
 INSERT INTO security_role (name) values ('administrator');
 
-CREATE TRIGGER user_after_insert AFTER INSERT ON `user` FOR EACH ROW SET @modified := CURRENT_TIME;
-CREATE TRIGGER user_trigger_after_update AFTER UPDATE ON `user` FOR EACH ROW SET @modified := CURRENT_TIME;
+CREATE TRIGGER user_trigger_before_insert BEFORE INSERT ON `user` FOR EACH ROW SET NEW.modified := CURRENT_TIME;
+CREATE TRIGGER user_trigger_before_update BEFORE UPDATE ON `user` FOR EACH ROW SET NEW.modified := CURRENT_TIME;
 
-CREATE TRIGGER login_info_trigger_after_insert AFTER INSERT ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
-CREATE TRIGGER login_info_trigger_after_update AFTER UPDATE ON login_info FOR EACH ROW SET @modified := CURRENT_TIME;
-
-CREATE TRIGGER user_security_role_after_insert AFTER INSERT ON user_security_role FOR EACH ROW SET @modified := CURRENT_TIME;
-CREATE TRIGGER user_security_role_after_update AFTER UPDATE ON user_security_role FOR EACH ROW SET @modified := CURRENT_TIME;
+CREATE TRIGGER login_info_trigger_before_insert BEFORE INSERT ON login_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
+CREATE TRIGGER login_info_trigger_before_update BEFORE UPDATE ON login_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
 
 # --- !Downs
 
