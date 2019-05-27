@@ -74,6 +74,9 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[LoginInfoDao].to[LoginInfoDaoImpl]
     bind[AuthInfoDAO[PasswordInfo]].to[PasswordInfoDaoImpl]
     bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDelegableDao]
+    bind[AuthInfoDAO[TotpInfo]].to[TotpInfoDaoImpl]
+    bind[DelegableAuthInfoDAO[TotpInfo]].to[TotpInfoDelegableDao]
+    bind[ScratchCodeDao].to[ScratchCodeDaoImpl]
 
     bind[CacheLayer].to[PlayCacheLayer]
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
@@ -82,7 +85,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[Clock].toInstance(Clock())
 
     // Replace this with the bindings to your concrete DAOs
-    bind[DelegableAuthInfoDAO[TotpInfo]].toInstance(new InMemoryAuthInfoDAO[TotpInfo])
     bind[DelegableAuthInfoDAO[OAuth1Info]].toInstance(new InMemoryAuthInfoDAO[OAuth1Info])
     bind[DelegableAuthInfoDAO[OAuth2Info]].toInstance(new InMemoryAuthInfoDAO[OAuth2Info])
     bind[DelegableAuthInfoDAO[OpenIDInfo]].toInstance(new InMemoryAuthInfoDAO[OpenIDInfo])

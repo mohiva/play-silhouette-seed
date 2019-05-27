@@ -3,11 +3,12 @@ package controllers
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
-import com.mohiva.play.silhouette.api.util.Clock
+import com.mohiva.play.silhouette.api.util.{ Clock, PasswordInfo }
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import forms.TotpRecoveryForm
 import javax.inject.Inject
+import models.daos.ScratchCodeDao
 import models.services.UserService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
@@ -33,7 +34,8 @@ class TotpRecoveryController @Inject() (
   silhouette: Silhouette[DefaultEnv],
   totpProvider: TotpProvider,
   configuration: Configuration,
-  clock: Clock
+  clock: Clock,
+  scratchCodeDao: ScratchCodeDao
 )(
   implicit
   webJarsUtil: WebJarsUtil,
@@ -72,8 +74,9 @@ class TotpRecoveryController @Inject() (
                 authInfoRepository.find[TotpInfo](loginInfo).flatMap {
                   case Some(totpInfo) =>
                     totpProvider.authenticate(totpInfo, data.recoveryCode).flatMap {
-                      case Some(updated) => {
+                      case Some((deleted, updated)) => {
                         authInfoRepository.update[TotpInfo](loginInfo, updated)
+                        scratchCodeDao.delete(user.id, deleted)
                         authenticateUser(user, data.rememberMe)
                       }
                       case _ => Future.successful(Redirect(totpRecoveryControllerRoute).flashing("error" -> Messages("invalid.recovery.code")))

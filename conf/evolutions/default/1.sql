@@ -33,9 +33,25 @@ CREATE TABLE auth_token (
 
 CREATE TABLE password_info (
     user_id BIGINT UNSIGNED NOT NULL,
-    hasher VARCHAR(100) NOT NULL,
+    hasher VARCHAR(50) NOT NULL,
     password VARCHAR(100) NOT NULL,
-    salt VARCHAR(100) NULL DEFAULT NULL,
+    salt VARCHAR(50) NULL DEFAULT NULL,
+    modified TIMESTAMP NULL DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE totp_info (
+    user_id BIGINT UNSIGNED NOT NULL,
+    shared_key CHAR(36) NOT NULL,
+    modified TIMESTAMP NULL DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE scratch_code (
+    user_id BIGINT UNSIGNED NOT NULL,
+    hasher VARCHAR(50) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    salt VARCHAR(50) NULL DEFAULT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -65,11 +81,21 @@ CREATE TRIGGER login_info_trigger_before_update BEFORE UPDATE ON login_info FOR 
 CREATE TRIGGER password_info_trigger_before_insert BEFORE INSERT ON password_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
 CREATE TRIGGER password_info_trigger_before_update BEFORE UPDATE ON password_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
 
+CREATE TRIGGER totp_info_trigger_before_insert BEFORE INSERT ON totp_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
+CREATE TRIGGER totp_info_trigger_before_update BEFORE UPDATE ON totp_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
+
+CREATE TRIGGER scratch_code_trigger_before_insert BEFORE INSERT ON scratch_code FOR EACH ROW SET NEW.modified := CURRENT_TIME;
+CREATE TRIGGER scratch_code_trigger_before_update BEFORE UPDATE ON scratch_code FOR EACH ROW SET NEW.modified := CURRENT_TIME;
+
 # --- !Downs
 
 DROP TABLE user_security_role CASCADE;
 
 DROP TABLE security_role CASCADE;
+
+DROP TABLE scratch_code CASCADE;
+
+DROP TABLE totp_info CASCADE;
 
 DROP TABLE password_info CASCADE;
 

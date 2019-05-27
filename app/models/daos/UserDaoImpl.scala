@@ -10,7 +10,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
 
 /**
- * Give access to the user object.
+ * Gives access to the user object.
  */
 @Singleton
 class UserDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext)

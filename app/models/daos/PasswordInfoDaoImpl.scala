@@ -106,7 +106,7 @@ class PasswordInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseCon
       }.result.head.map(_.userId)
     } yield userId).flatMap { userId =>
       val updated = PasswordInfoRow(userId, extPasswordInfo.hasher, extPasswordInfo.password, extPasswordInfo.salt)
-      func(updated).map(_ => updated.toExt)
+      func(updated).map(_ => extPasswordInfo)
     }.transactionally
   }
 }
