@@ -73,7 +73,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[UserDao].to[UserDaoImpl]
     bind[LoginInfoDao].to[LoginInfoDaoImpl]
     bind[AuthInfoDAO[PasswordInfo]].to[PasswordInfoDaoImpl]
-    bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordDelegableInfoDao]
+    bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDelegableDao]
 
     bind[CacheLayer].to[PlayCacheLayer]
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())

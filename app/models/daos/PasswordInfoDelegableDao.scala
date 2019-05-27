@@ -12,7 +12,7 @@ import scala.concurrent.Future
  *
  * @param passwordInfoDao the injected actual component to delegate to.
  */
-class PasswordDelegableInfoDao @Inject()(passwordInfoDao: AuthInfoDAO[PasswordInfo]) extends DelegableAuthInfoDAO[PasswordInfo] {
+class PasswordInfoDelegableDao @Inject() (passwordInfoDao: AuthInfoDAO[PasswordInfo]) extends DelegableAuthInfoDAO[PasswordInfo] {
   override def find(loginInfo: LoginInfo): Future[Option[PasswordInfo]] = passwordInfoDao.find(loginInfo)
 
   override def add(loginInfo: LoginInfo, passwordInfo: PasswordInfo): Future[PasswordInfo] = passwordInfoDao.add(loginInfo, passwordInfo)
