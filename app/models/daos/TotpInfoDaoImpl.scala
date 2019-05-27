@@ -39,11 +39,13 @@ class TotpInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigP
   }
 
   /**
-   * Adds new auth info for the given login info.
+   * Returns the inserted `totpInfo` instance including the hashed scratch codes. We first
+   * look up the `LoginInfo` by the relevant search criteria, fetching its `userId`
+   * which is then used to persist a `TotpInfo` and multiple `ScratchCode`.
    *
    * @param extLoginInfo The login info for which the auth info should be added.
-   * @param extTotpInfo The auth info to add.
-   * @return The added auth info.
+   * @param extTotpInfo The TOTP info to add containing the scratch codes.
+   * @return the inserted `totpInfo` instance including the hashed scratch codes.
    */
   def add(extLoginInfo: ExtLoginInfo, extTotpInfo: ExtTotpInfo): Future[ExtTotpInfo] = {
     val insertion = (for {
