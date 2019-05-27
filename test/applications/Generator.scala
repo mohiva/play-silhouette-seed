@@ -23,8 +23,9 @@ object Generator extends App {
    */
   val modelTables = Set(
     "user",
-    "auth_token",
     "login_info",
+    "auth_token",
+    "password_info",
     "security_role",
     "user_security_role"
   )
@@ -68,6 +69,7 @@ object Generator extends App {
               case "UserRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name), "com.mohiva.play.silhouette.api.Identity")
               case "LoginInfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "AuthTokenRow" => parents ++ Seq("Entity[%s]".format(pkType))
+              case "PasswordInfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
               /* override existing Silhouette case classes */
               //case "LoginInfoRow" => parents ++ Seq("com.mohiva.play.silhouette.api.LoginInfo(providerId, providerKey)")
@@ -92,6 +94,10 @@ object Generator extends App {
               case "AuthTokenRow" => "{\n" +
                   "  override def id = userId\n" +
                   "  def tokenUuId = java.util.UUID.fromString(tokenId)\n" +
+                  "}"
+              case "PasswordInfoRow" => "{\n" +
+                  "  override def id = userId\n" +
+                  "  def toExt = com.mohiva.play.silhouette.api.util.PasswordInfo(hasher, password, salt) \n" +
                   "}"
               case _ => ""
             }
@@ -119,6 +125,7 @@ object Generator extends App {
             case "User" => parents :+ s"IdentifyableTable[$pkType]"
             case "LoginInfo" => parents :+ s"IdentifyableTable[$pkType]"
             case "AuthToken" => parents :+ s"IdentifyableTable[$pkType]"
+            case "PasswordInfo" => parents :+ s"IdentifyableTable[$pkType]"
             case "SecurityRole" => parents :+ s"IdentifyableTable[$pkType]"
             case _ => parents
           }
@@ -129,6 +136,7 @@ object Generator extends App {
           val newBody: Seq[Seq[String]] = name match {
             case "LoginInfo" => Seq("override def id = userId") +: body
             case "AuthToken" => Seq("override def id = userId") +: body
+            case "PasswordInfo" => Seq("override def id = userId") +: body
             case _ => body
           }
           s"""class ${name}(_tableTag: Tag) extends profile.api.Table[$elementType](_tableTag, ${args.mkString(", ")})$prns {

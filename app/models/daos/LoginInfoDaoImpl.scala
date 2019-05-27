@@ -1,7 +1,5 @@
 package models.daos
 
-import java.util.UUID
-
 import javax.inject._
 import models.daos.generic.GenericDaoImpl
 import models.generated.Tables._

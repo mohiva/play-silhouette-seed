@@ -31,6 +31,15 @@ CREATE TABLE auth_token (
     FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE password_info (
+    user_id BIGINT UNSIGNED NOT NULL,
+    hasher VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    salt VARCHAR(100) NULL DEFAULT NULL,
+    modified TIMESTAMP NULL DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE security_role (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL
@@ -53,11 +62,16 @@ CREATE TRIGGER user_trigger_before_update BEFORE UPDATE ON `user` FOR EACH ROW S
 CREATE TRIGGER login_info_trigger_before_insert BEFORE INSERT ON login_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
 CREATE TRIGGER login_info_trigger_before_update BEFORE UPDATE ON login_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
 
+CREATE TRIGGER password_info_trigger_before_insert BEFORE INSERT ON password_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
+CREATE TRIGGER password_info_trigger_before_update BEFORE UPDATE ON password_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
+
 # --- !Downs
 
 DROP TABLE user_security_role CASCADE;
 
 DROP TABLE security_role CASCADE;
+
+DROP TABLE password_info CASCADE;
 
 DROP TABLE auth_token CASCADE;
 

@@ -16,7 +16,7 @@ trait Tables {
   import slick.jdbc.{ GetResult => GR }
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = AuthToken.schema ++ LoginInfo.schema ++ SecurityRole.schema ++ User.schema ++ UserSecurityRole.schema
+  lazy val schema: profile.SchemaDescription = Array(AuthToken.schema, LoginInfo.schema, PasswordInfo.schema, SecurityRole.schema, User.schema, UserSecurityRole.schema).reduceLeft(_ ++ _)
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -99,6 +99,49 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table LoginInfo */
   lazy val LoginInfo = new TableQuery(tag => new LoginInfo(tag))
+
+  /**
+   * Entity class storing rows of table PasswordInfo
+   *  @param userId Database column user_id SqlType(BIGINT UNSIGNED)
+   *  @param hasher Database column hasher SqlType(VARCHAR), Length(100,true)
+   *  @param password Database column password SqlType(VARCHAR), Length(100,true)
+   *  @param salt Database column salt SqlType(VARCHAR), Length(100,true), Default(None)
+   *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
+   */
+  case class PasswordInfoRow(userId: Long, hasher: String, password: String, salt: Option[String] = None, modified: Option[org.joda.time.DateTime] = None) extends Entity[Long] {
+    override def id = userId
+    def toExt = com.mohiva.play.silhouette.api.util.PasswordInfo(hasher, password, salt)
+  }
+  /** GetResult implicit for fetching PasswordInfoRow objects using plain SQL queries */
+  implicit def GetResultPasswordInfoRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[String]], e3: GR[Option[org.joda.time.DateTime]]): GR[PasswordInfoRow] = GR {
+    prs =>
+      import prs._
+      PasswordInfoRow.tupled((<<[Long], <<[String], <<[String], <<?[String], <<?[org.joda.time.DateTime]))
+  }
+  /** Table description of table password_info. Objects of this class serve as prototypes for rows in queries. */
+  class PasswordInfo(_tableTag: Tag) extends profile.api.Table[PasswordInfoRow](_tableTag, Some("myappdb"), "password_info") with IdentifyableTable[Long] {
+    override def id = userId
+
+    def * = (userId, hasher, password, salt, modified) <> (PasswordInfoRow.tupled, PasswordInfoRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = ((Rep.Some(userId), Rep.Some(hasher), Rep.Some(password), salt, modified)).shaped.<>({ r => import r._; _1.map(_ => PasswordInfoRow.tupled((_1.get, _2.get, _3.get, _4, _5))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column user_id SqlType(BIGINT UNSIGNED) */
+    val userId: Rep[Long] = column[Long]("user_id")
+    /** Database column hasher SqlType(VARCHAR), Length(100,true) */
+    val hasher: Rep[String] = column[String]("hasher", O.Length(100, varying = true))
+    /** Database column password SqlType(VARCHAR), Length(100,true) */
+    val password: Rep[String] = column[String]("password", O.Length(100, varying = true))
+    /** Database column salt SqlType(VARCHAR), Length(100,true), Default(None) */
+    val salt: Rep[Option[String]] = column[Option[String]]("salt", O.Length(100, varying = true), O.Default(None))
+    /** Database column modified SqlType(TIMESTAMP), Default(None) */
+    val modified: Rep[Option[org.joda.time.DateTime]] = column[Option[org.joda.time.DateTime]]("modified", O.Default(None))
+
+    /** Foreign key referencing User (database name password_info_ibfk_1) */
+    lazy val userFk = foreignKey("password_info_ibfk_1", userId, User)(r => r.id, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
+  }
+  /** Collection-like TableQuery object for table PasswordInfo */
+  lazy val PasswordInfo = new TableQuery(tag => new PasswordInfo(tag))
 
   /**
    * Entity class storing rows of table SecurityRole
@@ -186,27 +229,24 @@ trait Tables {
    * Entity class storing rows of table UserSecurityRole
    *  @param userId Database column user_id SqlType(BIGINT UNSIGNED)
    *  @param securityRoleId Database column security_role_id SqlType(BIGINT UNSIGNED)
-   *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
-  case class UserSecurityRoleRow(userId: Long, securityRoleId: Long, modified: Option[org.joda.time.DateTime] = None)
+  case class UserSecurityRoleRow(userId: Long, securityRoleId: Long)
   /** GetResult implicit for fetching UserSecurityRoleRow objects using plain SQL queries */
-  implicit def GetResultUserSecurityRoleRow(implicit e0: GR[Long], e1: GR[Option[org.joda.time.DateTime]]): GR[UserSecurityRoleRow] = GR {
+  implicit def GetResultUserSecurityRoleRow(implicit e0: GR[Long]): GR[UserSecurityRoleRow] = GR {
     prs =>
       import prs._
-      UserSecurityRoleRow.tupled((<<[Long], <<[Long], <<?[org.joda.time.DateTime]))
+      UserSecurityRoleRow.tupled((<<[Long], <<[Long]))
   }
   /** Table description of table user_security_role. Objects of this class serve as prototypes for rows in queries. */
   class UserSecurityRole(_tableTag: Tag) extends profile.api.Table[UserSecurityRoleRow](_tableTag, Some("myappdb"), "user_security_role") {
-    def * = (userId, securityRoleId, modified) <> (UserSecurityRoleRow.tupled, UserSecurityRoleRow.unapply)
+    def * = (userId, securityRoleId) <> (UserSecurityRoleRow.tupled, UserSecurityRoleRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = ((Rep.Some(userId), Rep.Some(securityRoleId), modified)).shaped.<>({ r => import r._; _1.map(_ => UserSecurityRoleRow.tupled((_1.get, _2.get, _3))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+    def ? = ((Rep.Some(userId), Rep.Some(securityRoleId))).shaped.<>({ r => import r._; _1.map(_ => UserSecurityRoleRow.tupled((_1.get, _2.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column user_id SqlType(BIGINT UNSIGNED) */
     val userId: Rep[Long] = column[Long]("user_id")
     /** Database column security_role_id SqlType(BIGINT UNSIGNED) */
     val securityRoleId: Rep[Long] = column[Long]("security_role_id")
-    /** Database column modified SqlType(TIMESTAMP), Default(None) */
-    val modified: Rep[Option[org.joda.time.DateTime]] = column[Option[org.joda.time.DateTime]]("modified", O.Default(None))
 
     /** Primary key of UserSecurityRole (database name user_security_role_PK) */
     val pk = primaryKey("user_security_role_PK", (userId, securityRoleId))
