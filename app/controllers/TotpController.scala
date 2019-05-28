@@ -13,7 +13,6 @@ import models.services.UserService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.i18n.{ I18nSupport, Messages }
-import utils.AwaitUtil
 import utils.auth.DefaultEnv
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -88,7 +87,7 @@ class TotpController @Inject() (
           }
         }
       }
-      case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+      case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
     }
   }
 
@@ -120,7 +119,7 @@ class TotpController @Inject() (
           }
         )
       }
-      case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+      case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
     }
   }
 
@@ -141,7 +140,7 @@ class TotpController @Inject() (
               case _: ProviderException =>
                 Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
             }
-          case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
+          case None => Future.failed(new IdentityNotFoundException(Messages("internal.error.no.user.found")))
         }
       }
     )

@@ -57,7 +57,7 @@ class SocialAuthController @Inject() (
             result
           }
         }
-      case _ => Future.failed(new ProviderException(s"Cannot authenticate with unexpected social provider $provider"))
+      case _ => Future.failed(new ProviderException(Messages("cannot.authenticate.with.unknown.social.provider", provider)))
     }).recover {
       case e: ProviderException =>
         logger.error("Unexpected provider error", e)

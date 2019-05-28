@@ -80,10 +80,10 @@ class SignInController @Inject() (
                       user.id, totpInfo.sharedKey, data.rememberMe)))))
                     case _ => authenticateUser(user, data.rememberMe)
                   }
-                case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+                case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
               }
             }
-            case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
+            case None => Future.failed(new IdentityNotFoundException(Messages("internal.error.no.user.found")))
           }
         }.recover {
           case _: ProviderException =>

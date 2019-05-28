@@ -6,7 +6,6 @@ import javax.inject.Inject
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{ PasswordHasherRegistry, PasswordInfo }
-import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import constants.SessionKeys
 import forms.ResetPasswordForm
@@ -87,7 +86,7 @@ class ResetPasswordController @Inject() (
                     Future.successful(invalidResetLinkRedirect)
                   }
                 }
-                case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+                case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
               }
             }
             case _ => Future.successful(invalidResetLinkRedirect)

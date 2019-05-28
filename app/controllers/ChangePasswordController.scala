@@ -6,7 +6,6 @@ import com.mohiva.play.silhouette.api.actions.SecuredRequest
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{ Credentials, PasswordHasherRegistry, PasswordInfo }
-import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import constants.SessionKeys
 import forms.ChangePasswordForm
@@ -54,7 +53,7 @@ class ChangePasswordController @Inject() (
     implicit request: SecuredRequest[DefaultEnv, AnyContent] =>
       request.identity.loginInfo.flatMap {
         case Some(loginInfo) => Future.successful(Ok(views.html.changePassword(ChangePasswordForm.form, request.identity, loginInfo)))
-        case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+        case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
       }
   }
 
@@ -85,7 +84,7 @@ class ChangePasswordController @Inject() (
               }
             }
           )
-        case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+        case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
       }
   }
 }

@@ -12,7 +12,7 @@ import net.ceedubs.ficus.Ficus._
 import org.joda.time.DateTime
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
-import play.api.i18n.I18nSupport
+import play.api.i18n.{ I18nSupport, Messages }
 import play.api.mvc._
 import utils.auth.DefaultEnv
 
@@ -70,7 +70,7 @@ abstract class AbstractAuthController(
               silhouette.env.authenticatorService.embed(v, result)
             }
           }
-        case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+        case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
       }
     }
   }

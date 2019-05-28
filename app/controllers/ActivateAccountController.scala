@@ -85,7 +85,7 @@ class ActivateAccountController @Inject() (
                 Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.activation.link")))
               }
             }
-            case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+            case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
           }
         }
         case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.activation.link")))

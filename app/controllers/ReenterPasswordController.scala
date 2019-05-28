@@ -55,7 +55,7 @@ class ReenterPasswordController @Inject() (
     val data = Data(email = request.identity.email.getOrElse(""), password = "")
     request.identity.loginInfo.flatMap {
       case Some(loginInfo) => Future.successful(Ok(views.html.reenterPassword(ReenterPasswordForm.form.fill(data), request.identity, loginInfo)))
-      case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+      case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
     }
   }
 
@@ -77,7 +77,7 @@ class ReenterPasswordController @Inject() (
                 Redirect(routes.ApplicationController.index())
               }.withSession(request.session + (SessionKeys.HAS_SUDO_ACCESS -> "true")))
               userService.retrieve(loginInfo).flatMap {
-                case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
+                case None => Future.failed(new IdentityNotFoundException(Messages("internal.error.no.user.found")))
                 case _ => result
               }
             }.recover {
@@ -86,7 +86,7 @@ class ReenterPasswordController @Inject() (
             }
           }
         )
-      case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+      case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
     }
   }
 }

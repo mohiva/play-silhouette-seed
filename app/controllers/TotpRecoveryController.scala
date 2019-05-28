@@ -3,7 +3,7 @@ package controllers
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
-import com.mohiva.play.silhouette.api.util.{ Clock, PasswordInfo }
+import com.mohiva.play.silhouette.api.util.Clock
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import forms.TotpRecoveryForm
@@ -87,10 +87,10 @@ class TotpRecoveryController @Inject() (
                   case _ => Future.successful(Redirect(totpRecoveryControllerRoute).flashing("error" -> Messages("invalid.unexpected.totp")))
                 }
               }
-              case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+              case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
             }
           }
-          case None => Future.failed(new IdentityNotFoundException("Couldn't find user"))
+          case None => Future.failed(new IdentityNotFoundException(Messages("internal.error.no.user.found")))
         }
       }
     )

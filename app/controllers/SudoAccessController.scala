@@ -8,7 +8,6 @@ import play.api.i18n._
 import play.api.mvc._
 import utils.auth.DefaultEnv
 import com.mohiva.play.silhouette.api.actions._
-import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import constants.SessionKeys
 import models.services.UserService
 
@@ -54,7 +53,7 @@ class SudoAccessController @Inject() (
   def restrictedSudoAccess = silhouette.SecuredAction(errorHandler)(SudoAccessAuthorization[DefaultEnv#A]()).async { implicit request =>
     request.identity.loginInfo.flatMap {
       case Some(loginInfo) => Future.successful(Ok(views.html.restrictedSudoAccess(request.identity, loginInfo)))
-      case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+      case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
     }
   }
 }

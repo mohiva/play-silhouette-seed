@@ -3,11 +3,10 @@ package controllers
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import javax.inject.Inject
 import com.mohiva.play.silhouette.api.{LogoutEvent, Silhouette}
-import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers.TotpInfo
 import models.services.UserService
 import org.webjars.play.WebJarsUtil
-import play.api.i18n.{I18nSupport, Lang}
+import play.api.i18n.{I18nSupport, Lang, Messages}
 import play.api.mvc.{AbstractController, ControllerComponents}
 import utils.auth.DefaultEnv
 
@@ -47,7 +46,7 @@ class ApplicationController @Inject() (
           Ok(views.html.home(request.identity, loginInfo, totpInfoOpt))
         }
       }
-      case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
+      case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
     }
   }
 
