@@ -57,15 +57,15 @@ class TotpInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigP
   }
 
   /**
-   * Updates the auth info for the given login info.
+   * Updates the auth info for the given login info. This method does nothing as
+   * the only update possible in this case is deletion of a scratchCode that's done
+    * manually and separately.
    *
    * @param extLoginInfo The login info for which the auth info should be updated.
    * @param extTotpInfo The auth info to update.
    * @return The updated auth info.
    */
   def update(extLoginInfo: ExtLoginInfo, extTotpInfo: ExtTotpInfo): Future[ExtTotpInfo] = {
-    // do nothing as the only update possible is a removal
-    // of a scratchCode that's done manually and separately.
     Future.successful(extTotpInfo)
   }
 
