@@ -70,7 +70,8 @@ CREATE TABLE o_auth2_info_param (
     user_id BIGINT UNSIGNED NOT NULL,
     `key` VARCHAR(100) NOT NULL,
     `value` VARCHAR(100) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, `key`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE security_role (

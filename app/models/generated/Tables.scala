@@ -174,6 +174,9 @@ trait Tables {
     /** Database column value SqlType(VARCHAR), Length(100,true) */
     val value: Rep[String] = column[String]("value", O.Length(100, varying = true))
 
+    /** Primary key of OAuth2InfoParam (database name o_auth2_info_param_PK) */
+    val pk = primaryKey("o_auth2_info_param_PK", (userId, key))
+
     /** Foreign key referencing User (database name o_auth2_info_param_ibfk_1) */
     lazy val userFk = foreignKey("o_auth2_info_param_ibfk_1", userId, User)(r => r.id, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
   }
