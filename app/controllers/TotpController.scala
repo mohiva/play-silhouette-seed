@@ -8,10 +8,12 @@ import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import forms.{ TotpForm, TotpSetupForm }
 import javax.inject.Inject
+import models.daos.LoginInfoDao
 import models.services.UserService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.i18n.{ I18nSupport, Messages }
+import utils.AwaitUtil
 import utils.auth.DefaultEnv
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -33,7 +35,8 @@ class TotpController @Inject() (
   silhouette: Silhouette[DefaultEnv],
   totpProvider: TotpProvider,
   configuration: Configuration,
-  clock: Clock
+  clock: Clock,
+  loginInfoDao: LoginInfoDao
 )(
   implicit
   webJarsUtil: WebJarsUtil,
@@ -79,8 +82,11 @@ class TotpController @Inject() (
     val user = request.identity
     user.loginInfo.flatMap {
       case Some(loginInfo) => {
-        authInfoRepository.remove[TotpInfo](loginInfo)
-        Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.disabling.info")))
+        authInfoRepository.remove[TotpInfo](loginInfo).flatMap { _ =>
+          loginInfoDao.delete(user.id, TotpProvider.ID).flatMap { _ =>
+            Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.disabling.info")))
+          }
+        }
       }
       case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
     }
@@ -101,8 +107,10 @@ class TotpController @Inject() (
           data => {
             totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
               case Some(loginInfo: LoginInfo) => {
-                authInfoRepository.add[TotpInfo](loginInfo, TotpInfo(data.sharedKey, data.scratchCodes))
-                Future(Redirect(routes.ApplicationController.index()).flashing("success" -> Messages("totp.enabling.info")))
+                loginInfoDao.create(user.id, loginInfo).flatMap { _ =>
+                  authInfoRepository.add[TotpInfo](loginInfo, TotpInfo(data.sharedKey, data.scratchCodes))
+                  Future(Redirect(routes.ApplicationController.index()).flashing("success" -> Messages("totp.enabling.info")))
+                }
               }
               case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verification.code")))
             }.recover {
