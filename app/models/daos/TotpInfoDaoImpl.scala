@@ -97,7 +97,8 @@ class TotpInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigP
       loginInfo.providerId === extLoginInfo.providerID &&
         loginInfo.providerKey === extLoginInfo.providerKey
     }.result.head.map(_.userId).flatMap { userId =>
-      DBIOAction.sequence(Seq(TotpInfo.filter(_.userId === userId).delete,
+      DBIOAction.sequence(Seq(
+        TotpInfo.filter(_.userId === userId).delete,
         ScratchCode.filter(_.userId === userId).delete))
     }.transactionally
     db.run(action).map(() => _)
