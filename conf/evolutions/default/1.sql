@@ -58,10 +58,10 @@ CREATE TABLE scratch_code (
 
 CREATE TABLE o_auth2_info (
     user_id BIGINT UNSIGNED NOT NULL,
-    access_token CHAR(36) NOT NULL,
+    access_token VARCHAR(200) NOT NULL,
     token_type VARCHAR(50) NULL DEFAULT NULL,
     expires_in INT NULL DEFAULT NULL,
-    refresh_token CHAR(36) NULL DEFAULT NULL,
+    refresh_token VARCHAR(200) NULL DEFAULT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
