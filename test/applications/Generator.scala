@@ -100,13 +100,13 @@ object Generator extends App {
                 "}"
               case "LoginInfoRow" => "{ override def id = userId }"
               case "AuthTokenRow" => "{\n" +
-                  "  override def id = userId\n" +
-                  "  def tokenUuId = java.util.UUID.fromString(tokenId)\n" +
-                  "}"
+                "  override def id = userId\n" +
+                "  def tokenUuId = java.util.UUID.fromString(tokenId)\n" +
+                "}"
               case "PasswordInfoRow" => "{\n" +
-                  "  override def id = userId\n" +
-                  "  def toExt = com.mohiva.play.silhouette.api.util.PasswordInfo(hasher, password, salt) \n" +
-                  "}"
+                "  override def id = userId\n" +
+                "  def toExt = com.mohiva.play.silhouette.api.util.PasswordInfo(hasher, password, salt) \n" +
+                "}"
               case "TotpInfoRow" => "{ override def id = userId }"
               case "ScratchCodeRow" => "{\n" +
                 "  override def id = userId\n" +

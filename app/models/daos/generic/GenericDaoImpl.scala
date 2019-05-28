@@ -95,7 +95,7 @@ abstract class GenericDaoImpl[T <: Table[E] with IdentifyableTable[PK], E <: Ent
    * @return returns a Future
    */
   override def deleteAll: Future[Int] = {
-    val action = sqlu"""TRUNCATE TABLE "#${tableQuery.baseTableRow.tableName}" RESTART IDENTITY CASCADE"""
+    val action = sqlu"""DELETE FROM #${tableQuery.baseTableRow.tableName}"""
     db.run(action)
   }
 }
