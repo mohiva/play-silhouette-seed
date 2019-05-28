@@ -50,22 +50,14 @@ class OAuth2InfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfi
    * @return the inserted `oauth2Info` instance including the params.
    */
   def add(extLoginInfo: ExtLoginInfo, extOAuth2Info: ExtOAuth2Info): Future[ExtOAuth2Info] = {
-    val insertion = extOAuth2Info.params match {
-      case Some(params) => {
-        (for {
-          userId <- LoginInfo.filter { loginInfo => loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey }.map(_.userId).result.head
-          _ <- (OAuth2Info += OAuth2InfoRow(userId, extOAuth2Info.accessToken, extOAuth2Info.tokenType, extOAuth2Info.expiresIn, extOAuth2Info.refreshToken))
-          _ <- DBIOAction.sequence(params.map { param => (OAuth2InfoParam += OAuth2InfoParamRow(userId, param._1, param._2)) })
-        } yield ())
-      }
-      case None => {
-        (for {
-          userId <- LoginInfo.filter { loginInfo => loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey }.map(_.userId).result.head
-          _ <- (OAuth2Info += OAuth2InfoRow(userId, extOAuth2Info.accessToken, extOAuth2Info.tokenType, extOAuth2Info.expiresIn, extOAuth2Info.refreshToken))
-        } yield ())
-      }
-    }
-    db.run(insertion.transactionally).map(_ => extOAuth2Info)
+    val insertion = (for {
+      userId <- LoginInfo.filter { loginInfo => loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey }.map(_.userId).result.head
+      _ <- (OAuth2Info += OAuth2InfoRow(userId, extOAuth2Info.accessToken, extOAuth2Info.tokenType, extOAuth2Info.expiresIn, extOAuth2Info.refreshToken))
+      _ <- extOAuth2Info.params.map { params =>
+        DBIOAction.sequence(params.map { param => (OAuth2InfoParam += OAuth2InfoParamRow(userId, param._1, param._2)) })
+      }.getOrElse(DBIOAction.seq())
+    } yield ()).transactionally
+    db.run(insertion).map(_ => extOAuth2Info)
   }
 
   /**
