@@ -1,6 +1,6 @@
 package controllers
 
-import action.SudoAccessAuthorization
+import action.WithSudoAccess
 import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject.Inject
 import org.webjars.play.WebJarsUtil
@@ -50,7 +50,7 @@ class SudoAccessController @Inject() (
    * Handles example restricted sudo access action.
    * @return The result to display.
    */
-  def restrictedSudoAccess = silhouette.SecuredAction(errorHandler)(SudoAccessAuthorization[DefaultEnv#A]()).async { implicit request =>
+  def restrictedSudoAccess = silhouette.SecuredAction(errorHandler)(WithSudoAccess[DefaultEnv#A]()).async { implicit request =>
     request.identity.loginInfo.flatMap {
       case Some(loginInfo) => Future.successful(Ok(views.html.restrictedSudoAccess(request.identity, loginInfo)))
       case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
