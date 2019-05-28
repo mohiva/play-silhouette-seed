@@ -59,7 +59,7 @@ class TotpInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigP
   /**
    * Updates the auth info for the given login info. This method does nothing as
    * the only update possible in this case is deletion of a scratchCode that's done
-    * manually and separately.
+   * manually and separately.
    *
    * @param extLoginInfo The login info for which the auth info should be updated.
    * @param extTotpInfo The auth info to update.
@@ -94,12 +94,9 @@ class TotpInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigP
    */
   def remove(extLoginInfo: ExtLoginInfo): Future[Unit] = {
     val action = LoginInfo.filter { loginInfo =>
-      loginInfo.providerId === extLoginInfo.providerID &&
-        loginInfo.providerKey === extLoginInfo.providerKey
+      loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey
     }.result.head.map(_.userId).flatMap { userId =>
-      DBIOAction.sequence(Seq(
-        TotpInfo.filter(_.userId === userId).delete,
-        ScratchCode.filter(_.userId === userId).delete))
+      DBIOAction.sequence(Seq(TotpInfo.filter(_.userId === userId).delete, ScratchCode.filter(_.userId === userId).delete))
     }.transactionally
     db.run(action).map(() => _)
   }

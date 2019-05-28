@@ -28,6 +28,8 @@ object Generator extends App {
     "password_info",
     "totp_info",
     "scratch_code",
+    "o_auth2_info",
+    "o_auth2_info_param",
     "security_role",
     "user_security_role"
   )
@@ -74,6 +76,8 @@ object Generator extends App {
               case "PasswordInfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "TotpInfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "ScratchCodeRow" => parents ++ Seq("Entity[%s]".format(pkType))
+              case "OAuth2InfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
+              case "OAuth2InfoParamRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "SecurityRoleRow" => parents ++ Seq("EntityAutoInc[%s, %s]".format(pkType, name))
               /* override existing Silhouette case classes */
               //case "LoginInfoRow" => parents ++ Seq("com.mohiva.play.silhouette.api.LoginInfo(providerId, providerKey)")
@@ -108,6 +112,11 @@ object Generator extends App {
                 "  override def id = userId\n" +
                 "  def toExt = com.mohiva.play.silhouette.api.util.PasswordInfo(hasher, password, salt) \n" +
                 "}"
+              case "OAuth2InfoRow" => "{\n" +
+                "  override def id = userId\n" +
+                "  def toExt(params: Option[Map[String, String]]) = com.mohiva.play.silhouette.impl.providers.OAuth2Info(accessToken, tokenType, expiresIn, refreshToken, params) \n" +
+                "}"
+              case "OAuth2InfoParamRow" => "{ override def id = userId }"
               case _ => ""
             }
             s"""case class $name($args)$prns $newBody"""
@@ -137,6 +146,8 @@ object Generator extends App {
             case "PasswordInfo" => parents :+ s"IdentifyableTable[$pkType]"
             case "TotpInfo" => parents :+ s"IdentifyableTable[$pkType]"
             case "ScratchCode" => parents :+ s"IdentifyableTable[$pkType]"
+            case "OAuth2Info" => parents :+ s"IdentifyableTable[$pkType]"
+            case "OAuth2InfoParam" => parents :+ s"IdentifyableTable[$pkType]"
             case "SecurityRole" => parents :+ s"IdentifyableTable[$pkType]"
             case _ => parents
           }
@@ -150,6 +161,8 @@ object Generator extends App {
             case "PasswordInfo" => Seq("override def id = userId") +: body
             case "TotpInfo" => Seq("override def id = userId") +: body
             case "ScratchCode" => Seq("override def id = userId") +: body
+            case "OAuth2Info" => Seq("override def id = userId") +: body
+            case "OAuth2InfoParam" => Seq("override def id = userId") +: body
             case _ => body
           }
           s"""class ${name}(_tableTag: Tag) extends profile.api.Table[$elementType](_tableTag, ${args.mkString(", ")})$prns {

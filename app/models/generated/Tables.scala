@@ -16,7 +16,7 @@ trait Tables {
   import slick.jdbc.{ GetResult => GR }
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Array(AuthToken.schema, LoginInfo.schema, PasswordInfo.schema, ScratchCode.schema, SecurityRole.schema, TotpInfo.schema, User.schema, UserSecurityRole.schema).reduceLeft(_ ++ _)
+  lazy val schema: profile.SchemaDescription = Array(AuthToken.schema, LoginInfo.schema, OAuth2Info.schema, OAuth2InfoParam.schema, PasswordInfo.schema, ScratchCode.schema, SecurityRole.schema, TotpInfo.schema, User.schema, UserSecurityRole.schema).reduceLeft(_ ++ _)
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -99,6 +99,86 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table LoginInfo */
   lazy val LoginInfo = new TableQuery(tag => new LoginInfo(tag))
+
+  /**
+   * Entity class storing rows of table OAuth2Info
+   *  @param userId Database column user_id SqlType(BIGINT UNSIGNED)
+   *  @param accessToken Database column access_token SqlType(CHAR), Length(36,false)
+   *  @param tokenType Database column token_type SqlType(VARCHAR), Length(50,true), Default(None)
+   *  @param expiresIn Database column expires_in SqlType(INT), Default(None)
+   *  @param refreshToken Database column refresh_token SqlType(CHAR), Length(36,false), Default(None)
+   *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
+   */
+  case class OAuth2InfoRow(userId: Long, accessToken: String, tokenType: Option[String] = None, expiresIn: Option[Int] = None, refreshToken: Option[String] = None, modified: Option[org.joda.time.DateTime] = None) extends Entity[Long] {
+    override def id = userId
+    def toExt(params: Option[Map[String, String]]) = com.mohiva.play.silhouette.impl.providers.OAuth2Info(accessToken, tokenType, expiresIn, refreshToken, params)
+  }
+  /** GetResult implicit for fetching OAuth2InfoRow objects using plain SQL queries */
+  implicit def GetResultOAuth2InfoRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[String]], e3: GR[Option[Int]], e4: GR[Option[org.joda.time.DateTime]]): GR[OAuth2InfoRow] = GR {
+    prs =>
+      import prs._
+      OAuth2InfoRow.tupled((<<[Long], <<[String], <<?[String], <<?[Int], <<?[String], <<?[org.joda.time.DateTime]))
+  }
+  /** Table description of table o_auth2_info. Objects of this class serve as prototypes for rows in queries. */
+  class OAuth2Info(_tableTag: Tag) extends profile.api.Table[OAuth2InfoRow](_tableTag, Some("myappdb"), "o_auth2_info") with IdentifyableTable[Long] {
+    override def id = userId
+
+    def * = (userId, accessToken, tokenType, expiresIn, refreshToken, modified) <> (OAuth2InfoRow.tupled, OAuth2InfoRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = ((Rep.Some(userId), Rep.Some(accessToken), tokenType, expiresIn, refreshToken, modified)).shaped.<>({ r => import r._; _1.map(_ => OAuth2InfoRow.tupled((_1.get, _2.get, _3, _4, _5, _6))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column user_id SqlType(BIGINT UNSIGNED) */
+    val userId: Rep[Long] = column[Long]("user_id")
+    /** Database column access_token SqlType(CHAR), Length(36,false) */
+    val accessToken: Rep[String] = column[String]("access_token", O.Length(36, varying = false))
+    /** Database column token_type SqlType(VARCHAR), Length(50,true), Default(None) */
+    val tokenType: Rep[Option[String]] = column[Option[String]]("token_type", O.Length(50, varying = true), O.Default(None))
+    /** Database column expires_in SqlType(INT), Default(None) */
+    val expiresIn: Rep[Option[Int]] = column[Option[Int]]("expires_in", O.Default(None))
+    /** Database column refresh_token SqlType(CHAR), Length(36,false), Default(None) */
+    val refreshToken: Rep[Option[String]] = column[Option[String]]("refresh_token", O.Length(36, varying = false), O.Default(None))
+    /** Database column modified SqlType(TIMESTAMP), Default(None) */
+    val modified: Rep[Option[org.joda.time.DateTime]] = column[Option[org.joda.time.DateTime]]("modified", O.Default(None))
+
+    /** Foreign key referencing User (database name o_auth2_info_ibfk_1) */
+    lazy val userFk = foreignKey("o_auth2_info_ibfk_1", userId, User)(r => r.id, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
+  }
+  /** Collection-like TableQuery object for table OAuth2Info */
+  lazy val OAuth2Info = new TableQuery(tag => new OAuth2Info(tag))
+
+  /**
+   * Entity class storing rows of table OAuth2InfoParam
+   *  @param userId Database column user_id SqlType(BIGINT UNSIGNED)
+   *  @param key Database column key SqlType(VARCHAR), Length(100,true)
+   *  @param value Database column value SqlType(VARCHAR), Length(100,true)
+   */
+  case class OAuth2InfoParamRow(userId: Long, key: String, value: String) extends Entity[Long] { override def id = userId }
+  /** GetResult implicit for fetching OAuth2InfoParamRow objects using plain SQL queries */
+  implicit def GetResultOAuth2InfoParamRow(implicit e0: GR[Long], e1: GR[String]): GR[OAuth2InfoParamRow] = GR {
+    prs =>
+      import prs._
+      OAuth2InfoParamRow.tupled((<<[Long], <<[String], <<[String]))
+  }
+  /** Table description of table o_auth2_info_param. Objects of this class serve as prototypes for rows in queries. */
+  class OAuth2InfoParam(_tableTag: Tag) extends profile.api.Table[OAuth2InfoParamRow](_tableTag, Some("myappdb"), "o_auth2_info_param") with IdentifyableTable[Long] {
+    override def id = userId
+
+    def * = (userId, key, value) <> (OAuth2InfoParamRow.tupled, OAuth2InfoParamRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = ((Rep.Some(userId), Rep.Some(key), Rep.Some(value))).shaped.<>({ r => import r._; _1.map(_ => OAuth2InfoParamRow.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column user_id SqlType(BIGINT UNSIGNED) */
+    val userId: Rep[Long] = column[Long]("user_id")
+    /** Database column key SqlType(VARCHAR), Length(100,true) */
+    val key: Rep[String] = column[String]("key", O.Length(100, varying = true))
+    /** Database column value SqlType(VARCHAR), Length(100,true) */
+    val value: Rep[String] = column[String]("value", O.Length(100, varying = true))
+
+    /** Foreign key referencing User (database name o_auth2_info_param_ibfk_1) */
+    lazy val userFk = foreignKey("o_auth2_info_param_ibfk_1", userId, User)(r => r.id, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
+  }
+  /** Collection-like TableQuery object for table OAuth2InfoParam */
+  lazy val OAuth2InfoParam = new TableQuery(tag => new OAuth2InfoParam(tag))
 
   /**
    * Entity class storing rows of table PasswordInfo
