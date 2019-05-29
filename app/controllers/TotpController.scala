@@ -8,8 +8,7 @@ import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import forms.{ TotpForm, TotpSetupForm }
 import javax.inject.Inject
-import models.daos.LoginInfoDao
-import models.services.UserService
+import models.services.{ LoginInfoService, UserService }
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.i18n.{ I18nSupport, Messages }
@@ -24,6 +23,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param totpProvider The totp provider.
  * @param configuration The Play configuration.
  * @param clock The clock instance.
+ * @param loginInfoService the login info service.
  * @param webJarsUtil The webjar util.
  * @param assets The Play assets finder.
  * @param userService The user service implementation.
@@ -35,7 +35,7 @@ class TotpController @Inject() (
   totpProvider: TotpProvider,
   configuration: Configuration,
   clock: Clock,
-  loginInfoDao: LoginInfoDao
+  loginInfoService: LoginInfoService
 )(
   implicit
   webJarsUtil: WebJarsUtil,
@@ -82,7 +82,7 @@ class TotpController @Inject() (
     user.loginInfo.flatMap {
       case Some(loginInfo) => {
         authInfoRepository.remove[TotpInfo](loginInfo).flatMap { _ =>
-          loginInfoDao.delete(user.id, TotpProvider.ID).flatMap { _ =>
+          loginInfoService.delete(user.id, TotpProvider.ID).flatMap { _ =>
             Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.disabling.info")))
           }
         }
@@ -106,7 +106,7 @@ class TotpController @Inject() (
           data => {
             totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
               case Some(loginInfo: LoginInfo) => {
-                loginInfoDao.create(user.id, loginInfo).flatMap { _ =>
+                loginInfoService.create(user.id, loginInfo).flatMap { _ =>
                   authInfoRepository.add[TotpInfo](loginInfo, TotpInfo(data.sharedKey, data.scratchCodes))
                   Future(Redirect(routes.ApplicationController.index()).flashing("success" -> Messages("totp.enabling.info")))
                 }

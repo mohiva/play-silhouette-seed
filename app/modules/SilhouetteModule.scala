@@ -26,7 +26,7 @@ import com.mohiva.play.silhouette.persistence.daos.{ AuthInfoDAO, DelegableAuthI
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
 import com.typesafe.config.Config
 import models.daos._
-import models.services.{ UserService, UserServiceImpl }
+import models.services._
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 import net.ceedubs.ficus.readers.ValueReader
@@ -72,6 +72,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[UserService].to[UserServiceImpl]
     bind[UserDao].to[UserDaoImpl]
     bind[LoginInfoDao].to[LoginInfoDaoImpl]
+    bind[LoginInfoService].to[LoginInfoServiceImpl]
     bind[AuthInfoDAO[PasswordInfo]].to[PasswordInfoDaoImpl]
     bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDelegableDao]
     bind[AuthInfoDAO[TotpInfo]].to[TotpInfoDaoImpl]
@@ -79,6 +80,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[AuthInfoDAO[OAuth2Info]].to[OAuth2InfoDaoImpl]
     bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDelegableDao]
     bind[ScratchCodeDao].to[ScratchCodeDaoImpl]
+    bind[ScratchCodeService].to[ScratchCodeServiceImpl]
 
     bind[CacheLayer].to[PlayCacheLayer]
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())

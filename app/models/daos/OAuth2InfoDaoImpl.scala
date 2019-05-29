@@ -8,39 +8,40 @@ import models.daos.generic.GenericDaoImpl
 import models.generated.Tables._
 import models.generated.Tables.profile.api._
 import play.api.db.slick.DatabaseConfigProvider
+import slick.basic.StaticDatabaseConfig
 import slick.dbio.DBIOAction
 
 import scala.concurrent._
 
+/**
+ * Concrete implementation for [[AuthInfoDAO]].
+ *
+ * @param dbConfigProvider the [[DatabaseConfigProvider]] instance
+ * @param ec the [[ExecutionContext]] instance
+ */
 @Singleton
 class OAuth2InfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext)
   extends GenericDaoImpl[OAuth2Info, OAuth2InfoRow, Long](dbConfigProvider, OAuth2Info) with AuthInfoDAO[ExtOAuth2Info] {
 
   /**
-   * Finds the auth info which is linked with the specified login info.
+   * Returns the matching Silhouette [[ExtOAuth2Info]] used for social
+   * (e.g. the Facebook) authentication provider given a Silhouette [[ExtLoginInfo]].
+   * The [[ExtLoginInfo]] is looked up using the `providerId` and `providerKey` and
+   * then the result's `userId` used as look up key.
    *
-   * @param extLoginInfo The linked login info.
-   * @return The retrieved auth info or None if no auth info could be retrieved for the given login info.
+   * @param extLoginInfo The linked Silhouette login info instance.
+   * @return the matching Silhouette [[ExtOAuth2Info]] used for social.
    */
   def find(extLoginInfo: ExtLoginInfo): Future[Option[ExtOAuth2Info]] = {
+    // TODO: implement params look up
     val action = (for {
       loginInfo <- LoginInfo if loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey
-      (oauth2Info, oauth2InfoParam) <- OAuth2Info.filter(_.userId === loginInfo.userId).joinLeft(OAuth2InfoParam).on(_.userId === _.userId)
-    } yield (oauth2Info, oauth2InfoParam)).result
-    db.run(action).map {
-      case results => {
-        val params = results.map(_._2).map {
-          case Some(param) => Some(param.key -> param.value)
-          case _ => None.asInstanceOf[Option[(String, String)]]
-        }.filterNot(_.isEmpty).map(_.get) match {
-          case seq if (seq.nonEmpty) => Some(seq.toMap)
-          case _ => None
-        }
+      oauth2Info <- OAuth2Info if oauth2Info.userId === loginInfo.userId
+    } yield oauth2Info).result.headOption
 
-        results.headOption.map {
-          case (oauth2Info, _) => oauth2Info.toExt(params)
-        }
-      }
+    db.run(action).map {
+      case Some(oauth2Info) => Some(oauth2Info.toExt(None))
+      case _ => None
     }
   }
 
