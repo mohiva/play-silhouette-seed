@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 import scala.concurrent.Future
 
 /**
- * Give access to the [[AuthToken]] object.
+ * Provides access to the [[AuthToken]] object.
  */
 trait AuthTokenDao extends GenericDao[AuthToken, AuthTokenRow, Long] {
 

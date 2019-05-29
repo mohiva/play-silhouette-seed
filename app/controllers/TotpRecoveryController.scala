@@ -8,8 +8,7 @@ import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import forms.TotpRecoveryForm
 import javax.inject.Inject
-import models.daos.ScratchCodeDao
-import models.services.UserService
+import models.services.{ ScratchCodeService, UserService }
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.i18n.{ I18nSupport, Messages }
@@ -24,6 +23,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param totpProvider The totp provider.
  * @param configuration The Play configuration.
  * @param clock The clock instance.
+ * @param scratchCodeService the TOTP scratch code service.
  * @param webJarsUtil The webjar util.
  * @param assets The Play assets finder.
  * @param userService The user service implementation.
@@ -35,7 +35,7 @@ class TotpRecoveryController @Inject() (
   totpProvider: TotpProvider,
   configuration: Configuration,
   clock: Clock,
-  scratchCodeDao: ScratchCodeDao
+  scratchCodeService: ScratchCodeService
 )(
   implicit
   webJarsUtil: WebJarsUtil,
@@ -76,7 +76,8 @@ class TotpRecoveryController @Inject() (
                     totpProvider.authenticate(totpInfo, data.recoveryCode).flatMap {
                       case Some((deleted, updated)) => {
                         authInfoRepository.update[TotpInfo](loginInfo, updated)
-                        scratchCodeDao.delete(user.id, deleted)
+                        // TODO: clean this up by finding scratch code differences within the `TotpInfoDaoImpl`
+                        scratchCodeService.delete(user.id, deleted)
                         authenticateUser(user, data.rememberMe)
                       }
                       case _ => Future.successful(Redirect(totpRecoveryControllerRoute).flashing("error" -> Messages("invalid.recovery.code")))
