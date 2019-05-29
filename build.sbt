@@ -44,10 +44,6 @@ libraryDependencies ++= Seq(
   filters
 )
 
-javaOptions in Test += "-Dconfig.file=conf/application.test.conf"
-
-fork in Test := true
-
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 routesImport += "utils.route.Binders._"
@@ -82,3 +78,6 @@ ScalariformKeys.preferences := ScalariformKeys.preferences.value
   .setPreference(FormatXml, false)
   .setPreference(DoubleIndentConstructorArguments, false)
   .setPreference(DanglingCloseParenthesis, Preserve)
+
+fork in Test := true
+javaOptions in Test += "-Dconfig.file=conf/application.test.conf"
