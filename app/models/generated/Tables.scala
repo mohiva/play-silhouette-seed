@@ -103,10 +103,10 @@ trait Tables {
   /**
    * Entity class storing rows of table OAuth2Info
    *  @param userId Database column user_id SqlType(BIGINT UNSIGNED)
-   *  @param accessToken Database column access_token SqlType(CHAR), Length(36,false)
+   *  @param accessToken Database column access_token SqlType(VARCHAR), Length(200,true)
    *  @param tokenType Database column token_type SqlType(VARCHAR), Length(50,true), Default(None)
    *  @param expiresIn Database column expires_in SqlType(INT), Default(None)
-   *  @param refreshToken Database column refresh_token SqlType(CHAR), Length(36,false), Default(None)
+   *  @param refreshToken Database column refresh_token SqlType(VARCHAR), Length(200,true), Default(None)
    *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
   case class OAuth2InfoRow(userId: Long, accessToken: String, tokenType: Option[String] = None, expiresIn: Option[Int] = None, refreshToken: Option[String] = None, modified: Option[org.joda.time.DateTime] = None) extends Entity[Long] {
@@ -129,14 +129,14 @@ trait Tables {
 
     /** Database column user_id SqlType(BIGINT UNSIGNED) */
     val userId: Rep[Long] = column[Long]("user_id")
-    /** Database column access_token SqlType(CHAR), Length(36,false) */
-    val accessToken: Rep[String] = column[String]("access_token", O.Length(36, varying = false))
+    /** Database column access_token SqlType(VARCHAR), Length(200,true) */
+    val accessToken: Rep[String] = column[String]("access_token", O.Length(200, varying = true))
     /** Database column token_type SqlType(VARCHAR), Length(50,true), Default(None) */
     val tokenType: Rep[Option[String]] = column[Option[String]]("token_type", O.Length(50, varying = true), O.Default(None))
     /** Database column expires_in SqlType(INT), Default(None) */
     val expiresIn: Rep[Option[Int]] = column[Option[Int]]("expires_in", O.Default(None))
-    /** Database column refresh_token SqlType(CHAR), Length(36,false), Default(None) */
-    val refreshToken: Rep[Option[String]] = column[Option[String]]("refresh_token", O.Length(36, varying = false), O.Default(None))
+    /** Database column refresh_token SqlType(VARCHAR), Length(200,true), Default(None) */
+    val refreshToken: Rep[Option[String]] = column[Option[String]]("refresh_token", O.Length(200, varying = true), O.Default(None))
     /** Database column modified SqlType(TIMESTAMP), Default(None) */
     val modified: Rep[Option[org.joda.time.DateTime]] = column[Option[org.joda.time.DateTime]]("modified", O.Default(None))
 
