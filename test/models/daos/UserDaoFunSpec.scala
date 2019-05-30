@@ -42,15 +42,15 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers with AwaitUtil {
 
   describe("Update user") {
     new WithApplication() {
-      val dao: UserDao = daoContext.userDao
+      val userDao: UserDao = daoContext.userDao
       // ensure repeatability of the test
-      await(dao.deleteAll)
-      await(dao.create(testUser, testLoginInfo))
+      await(userDao.deleteAll)
+      await(userDao.create(testUser, testLoginInfo))
 
       val userOpt = for {
-        u <- dao.find(testLoginInfo)
-        _ <- dao.update(u.get.copy(firstName = Some("Harry"), lastName = Some("Potter")))
-        user <- dao.findById(u.get.id)
+        u <- userDao.find(testLoginInfo)
+        _ <- userDao.update(u.get.copy(firstName = Some("Harry"), lastName = Some("Potter")))
+        user <- userDao.findById(u.get.id)
       } yield user
 
       it("updated user should be correct") {
@@ -70,13 +70,13 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers with AwaitUtil {
 
   describe("Create user") {
     new WithApplication() {
-      val dao: UserDao = daoContext.userDao
+      val userDao: UserDao = daoContext.userDao
       // ensure repeatability of the test
-      await(dao.deleteAll)
+      await(userDao.deleteAll)
 
       val result = for {
-        user <- dao.createAndFetch(testUser)
-        all <- dao.findAll()
+        user <- userDao.createAndFetch(testUser)
+        all <- userDao.findAll()
       } yield (user, all)
 
       val user: UserRow = result._1
@@ -101,17 +101,17 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers with AwaitUtil {
 
   describe("Create user with LoginInfo") {
     new WithApplication() {
-      val dao: UserDao = daoContext.userDao
+      val userDao: UserDao = daoContext.userDao
       // ensure repeatability of the test
-      await(dao.deleteAll)
+      await(userDao.deleteAll)
 
-      await(dao.create(testUser, testLoginInfo))
-      await(dao.create(testUser2, testLoginInfo2))
+      await(userDao.create(testUser, testLoginInfo))
+      await(userDao.create(testUser2, testLoginInfo2))
 
       val result = for {
-        existingUser <- dao.find(testLoginInfo)
-        nonExistingUser <- dao.find(testLoginInfo3)
-        all <- dao.findAll()
+        existingUser <- userDao.find(testLoginInfo)
+        nonExistingUser <- userDao.find(testLoginInfo3)
+        all <- userDao.findAll()
       } yield (existingUser, nonExistingUser, all)
 
       val userOpt: Option[UserRow] = result._1
@@ -143,13 +143,13 @@ class UserDaoFunSpec extends AbstractDaoFunSpec with Matchers with AwaitUtil {
 
   describe("Delete user") {
     new WithApplication() {
-      val dao: UserDao = daoContext.userDao
+      val userDao: UserDao = daoContext.userDao
 
       val result = for {
-        user <- dao.find(testLoginInfo)
-        _ <- dao.delete(user.get.id)
-        nonExists <- dao.find(testLoginInfo)
-        exists <- dao.find(testLoginInfo2)
+        user <- userDao.find(testLoginInfo)
+        _ <- userDao.delete(user.get.id)
+        nonExists <- userDao.find(testLoginInfo)
+        exists <- userDao.find(testLoginInfo2)
       } yield (nonExists, exists)
 
       val nonExists: Option[UserRow] = result._1
