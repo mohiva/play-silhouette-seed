@@ -44,7 +44,7 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
     "return 200 if user is authorized" in new Context {
       new WithApplication(application) {
         val Some(result) = route(app, addCSRFToken(FakeRequest(routes.ApplicationController.index())
-          .withAuthenticator[DefaultEnv](testLoginInfo))
+          .withAuthenticator[DefaultEnv](testLoginInfo.toExt))
         )
 
         status(result) must beEqualTo(OK)
@@ -68,18 +68,17 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
       activated = true
     )
 
-    val testLoginInfo = LoginInfo("facebook", "user@facebook.com")
-    val testLoginInfoRow = LoginInfoRow(0L, "facebook", "user@facebook.com")
+    val testLoginInfo = LoginInfoRow(0L, "facebook", "user@facebook.com")
 
     /**
      * A Silhouette fake environment.
      */
     implicit val ec = scala.concurrent.ExecutionContext.global
-    implicit val env: Environment[DefaultEnv] = new FakeEnvironment[DefaultEnv](Seq(testLoginInfo -> testUser))
+    implicit val env: Environment[DefaultEnv] = new FakeEnvironment[DefaultEnv](Seq(testLoginInfo.toExt -> testUser))
 
     class FakeUserService extends UserServiceImpl(null, null) {
       override def loginInfo(user: UserRow): Future[Option[LoginInfoRow]] = {
-        Future.successful(if (user == testUser) Some(testLoginInfoRow) else None)
+        Future.successful(if (user == testUser) Some(testLoginInfo) else None)
       }
     }
 

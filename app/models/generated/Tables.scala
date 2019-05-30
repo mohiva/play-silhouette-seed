@@ -68,7 +68,10 @@ trait Tables {
    *  @param providerKey Database column provider_key SqlType(CHAR), Length(36,false)
    *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
-  case class LoginInfoRow(userId: Long, providerId: String, providerKey: String, modified: Option[org.joda.time.DateTime] = None) extends Entity[Long] { override def id = userId }
+  case class LoginInfoRow(userId: Long, providerId: String, providerKey: String, modified: Option[org.joda.time.DateTime] = None) extends Entity[Long] {
+    override def id = userId
+    def toExt = com.mohiva.play.silhouette.api.LoginInfo(providerId, providerKey)
+  }
   /** GetResult implicit for fetching LoginInfoRow objects using plain SQL queries */
   implicit def GetResultLoginInfoRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[org.joda.time.DateTime]]): GR[LoginInfoRow] = GR {
     prs =>

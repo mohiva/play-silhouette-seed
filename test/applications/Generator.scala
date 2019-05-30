@@ -100,7 +100,10 @@ object Generator extends App {
                 "    }\n" +
                 "  }\n" +
                 "}"
-              case "LoginInfoRow" => "{ override def id = userId }"
+              case "LoginInfoRow" => "{\n" +
+                "  override def id = userId\n" +
+                "  def toExt = com.mohiva.play.silhouette.api.LoginInfo(providerId, providerKey) \n" +
+                "}"
               case "AuthTokenRow" => "{\n" +
                 "  override def id = userId\n" +
                 "  def tokenUuId = java.util.UUID.fromString(tokenId)\n" +
