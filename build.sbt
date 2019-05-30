@@ -37,7 +37,6 @@ libraryDependencies ++= Seq(
   "org.joda" % "joda-convert" % "1.9.2",
   "mysql" % "mysql-connector-java" % "8.0.16",
   "com.mohiva" %% "play-silhouette-testkit" % "6.0.1-SNAPSHOT" % "test",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.2" % "test",
   specs2 % Test,
   ehcache,
   guice,
