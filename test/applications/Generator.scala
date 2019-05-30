@@ -40,7 +40,9 @@ object Generator extends App {
   // customize code generator
   val codegenFuture: Future[SourceCodeGenerator] = model.map(model => new SourceCodeGenerator(model) {
     override def code = "import models.daos.generic._\n" +
-      "import com.github.tototoshi.slick.MySQLJodaSupport._\n" + super.code
+      "import com.github.tototoshi.slick.MySQLJodaSupport._\n" +
+      //"val schemaName: Option[String] = Some(play.api.Play.current.configuration.get[String](\"slick.dbs.default.db.name\"))\n" + super.code
+      "val schemaName: Option[String] = None\n" + super.code
 
     override def Table = new Table(_) {
       override def Column = new Column(_) {
@@ -154,7 +156,7 @@ object Generator extends App {
 
           /* Use our modified parent class sequence in place of the old one. */
           val prns = newParents.map(" with " + _).mkString("")
-          val args = model.name.schema.map(n => s"""Some("$n")""") ++ Seq("\"" + model.name.table + "\"")
+          val args = /*model.name.schema.map(n => s"""Some("$n")""")*/ Seq("schemaName") ++ Seq("\"" + model.name.table + "\"")
           val newBody: Seq[Seq[String]] = name match {
             case "LoginInfo" => Seq("override def id = userId") +: body
             case "AuthToken" => Seq("override def id = userId") +: body
@@ -165,6 +167,7 @@ object Generator extends App {
             case "OAuth2InfoParam" => Seq("override def id = userId") +: body
             case _ => body
           }
+
           s"""class ${name}(_tableTag: Tag) extends profile.api.Table[$elementType](_tableTag, ${args.mkString(", ")})$prns {
             ${indent(newBody.map(_.mkString("\n")).mkString("\n\n"))}
             }

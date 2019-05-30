@@ -11,6 +11,7 @@ trait Tables {
   import profile.api._
   import models.daos.generic._
   import com.github.tototoshi.slick.MySQLJodaSupport._
+  val schemaName: Option[String] = None
   import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
@@ -37,7 +38,7 @@ trait Tables {
       AuthTokenRow.tupled((<<[Long], <<[String], <<[org.joda.time.DateTime]))
   }
   /** Table description of table auth_token. Objects of this class serve as prototypes for rows in queries. */
-  class AuthToken(_tableTag: Tag) extends profile.api.Table[AuthTokenRow](_tableTag, Some("myappdb"), "auth_token") with IdentifyableTable[Long] {
+  class AuthToken(_tableTag: Tag) extends profile.api.Table[AuthTokenRow](_tableTag, schemaName, "auth_token") with IdentifyableTable[Long] {
     override def id = userId
 
     def * = (userId, tokenId, expiry) <> (AuthTokenRow.tupled, AuthTokenRow.unapply)
@@ -75,7 +76,7 @@ trait Tables {
       LoginInfoRow.tupled((<<[Long], <<[String], <<[String], <<?[org.joda.time.DateTime]))
   }
   /** Table description of table login_info. Objects of this class serve as prototypes for rows in queries. */
-  class LoginInfo(_tableTag: Tag) extends profile.api.Table[LoginInfoRow](_tableTag, Some("myappdb"), "login_info") with IdentifyableTable[Long] {
+  class LoginInfo(_tableTag: Tag) extends profile.api.Table[LoginInfoRow](_tableTag, schemaName, "login_info") with IdentifyableTable[Long] {
     override def id = userId
 
     def * = (userId, providerId, providerKey, modified) <> (LoginInfoRow.tupled, LoginInfoRow.unapply)
@@ -120,7 +121,7 @@ trait Tables {
       OAuth2InfoRow.tupled((<<[Long], <<[String], <<?[String], <<?[Int], <<?[String], <<?[org.joda.time.DateTime]))
   }
   /** Table description of table o_auth2_info. Objects of this class serve as prototypes for rows in queries. */
-  class OAuth2Info(_tableTag: Tag) extends profile.api.Table[OAuth2InfoRow](_tableTag, Some("myappdb"), "o_auth2_info") with IdentifyableTable[Long] {
+  class OAuth2Info(_tableTag: Tag) extends profile.api.Table[OAuth2InfoRow](_tableTag, schemaName, "o_auth2_info") with IdentifyableTable[Long] {
     override def id = userId
 
     def * = (userId, accessToken, tokenType, expiresIn, refreshToken, modified) <> (OAuth2InfoRow.tupled, OAuth2InfoRow.unapply)
@@ -160,7 +161,7 @@ trait Tables {
       OAuth2InfoParamRow.tupled((<<[Long], <<[String], <<[String]))
   }
   /** Table description of table o_auth2_info_param. Objects of this class serve as prototypes for rows in queries. */
-  class OAuth2InfoParam(_tableTag: Tag) extends profile.api.Table[OAuth2InfoParamRow](_tableTag, Some("myappdb"), "o_auth2_info_param") with IdentifyableTable[Long] {
+  class OAuth2InfoParam(_tableTag: Tag) extends profile.api.Table[OAuth2InfoParamRow](_tableTag, schemaName, "o_auth2_info_param") with IdentifyableTable[Long] {
     override def id = userId
 
     def * = (userId, key, value) <> (OAuth2InfoParamRow.tupled, OAuth2InfoParamRow.unapply)
@@ -202,7 +203,7 @@ trait Tables {
       PasswordInfoRow.tupled((<<[Long], <<[String], <<[String], <<?[String], <<?[org.joda.time.DateTime]))
   }
   /** Table description of table password_info. Objects of this class serve as prototypes for rows in queries. */
-  class PasswordInfo(_tableTag: Tag) extends profile.api.Table[PasswordInfoRow](_tableTag, Some("myappdb"), "password_info") with IdentifyableTable[Long] {
+  class PasswordInfo(_tableTag: Tag) extends profile.api.Table[PasswordInfoRow](_tableTag, schemaName, "password_info") with IdentifyableTable[Long] {
     override def id = userId
 
     def * = (userId, hasher, password, salt, modified) <> (PasswordInfoRow.tupled, PasswordInfoRow.unapply)
@@ -245,7 +246,7 @@ trait Tables {
       ScratchCodeRow.tupled((<<[Long], <<[String], <<[String], <<?[String], <<?[org.joda.time.DateTime]))
   }
   /** Table description of table scratch_code. Objects of this class serve as prototypes for rows in queries. */
-  class ScratchCode(_tableTag: Tag) extends profile.api.Table[ScratchCodeRow](_tableTag, Some("myappdb"), "scratch_code") with IdentifyableTable[Long] {
+  class ScratchCode(_tableTag: Tag) extends profile.api.Table[ScratchCodeRow](_tableTag, schemaName, "scratch_code") with IdentifyableTable[Long] {
     override def id = userId
 
     def * = (userId, hasher, password, salt, modified) <> (ScratchCodeRow.tupled, ScratchCodeRow.unapply)
@@ -282,7 +283,7 @@ trait Tables {
       SecurityRoleRow.tupled((<<[Long], <<[String]))
   }
   /** Table description of table security_role. Objects of this class serve as prototypes for rows in queries. */
-  class SecurityRole(_tableTag: Tag) extends profile.api.Table[SecurityRoleRow](_tableTag, Some("myappdb"), "security_role") with IdentifyableTable[Long] {
+  class SecurityRole(_tableTag: Tag) extends profile.api.Table[SecurityRoleRow](_tableTag, schemaName, "security_role") with IdentifyableTable[Long] {
     def * = (id, name) <> (SecurityRoleRow.tupled, SecurityRoleRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = ((Rep.Some(id), Rep.Some(name))).shaped.<>({ r => import r._; _1.map(_ => SecurityRoleRow.tupled((_1.get, _2.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
@@ -309,7 +310,7 @@ trait Tables {
       TotpInfoRow.tupled((<<[Long], <<[String], <<?[org.joda.time.DateTime]))
   }
   /** Table description of table totp_info. Objects of this class serve as prototypes for rows in queries. */
-  class TotpInfo(_tableTag: Tag) extends profile.api.Table[TotpInfoRow](_tableTag, Some("myappdb"), "totp_info") with IdentifyableTable[Long] {
+  class TotpInfo(_tableTag: Tag) extends profile.api.Table[TotpInfoRow](_tableTag, schemaName, "totp_info") with IdentifyableTable[Long] {
     override def id = userId
 
     def * = (userId, sharedKey, modified) <> (TotpInfoRow.tupled, TotpInfoRow.unapply)
@@ -358,7 +359,7 @@ trait Tables {
       UserRow.tupled((<<[Long], <<?[String], <<?[String], <<?[java.sql.Date], <<?[String], <<?[String], <<[Boolean], <<?[org.joda.time.DateTime], <<?[org.joda.time.DateTime]))
   }
   /** Table description of table user. Objects of this class serve as prototypes for rows in queries. */
-  class User(_tableTag: Tag) extends profile.api.Table[UserRow](_tableTag, Some("myappdb"), "user") with IdentifyableTable[Long] {
+  class User(_tableTag: Tag) extends profile.api.Table[UserRow](_tableTag, schemaName, "user") with IdentifyableTable[Long] {
     def * = (id, firstName, lastName, dateOfBirth, email, avatarUrl, activated, lastLogin, modified) <> (UserRow.tupled, UserRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = ((Rep.Some(id), firstName, lastName, dateOfBirth, email, avatarUrl, Rep.Some(activated), lastLogin, modified)).shaped.<>({ r => import r._; _1.map(_ => UserRow.tupled((_1.get, _2, _3, _4, _5, _6, _7.get, _8, _9))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
@@ -398,7 +399,7 @@ trait Tables {
       UserSecurityRoleRow.tupled((<<[Long], <<[Long]))
   }
   /** Table description of table user_security_role. Objects of this class serve as prototypes for rows in queries. */
-  class UserSecurityRole(_tableTag: Tag) extends profile.api.Table[UserSecurityRoleRow](_tableTag, Some("myappdb"), "user_security_role") {
+  class UserSecurityRole(_tableTag: Tag) extends profile.api.Table[UserSecurityRoleRow](_tableTag, schemaName, "user_security_role") {
     def * = (userId, securityRoleId) <> (UserSecurityRoleRow.tupled, UserSecurityRoleRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = ((Rep.Some(userId), Rep.Some(securityRoleId))).shaped.<>({ r => import r._; _1.map(_ => UserSecurityRoleRow.tupled((_1.get, _2.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
