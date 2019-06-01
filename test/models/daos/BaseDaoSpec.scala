@@ -4,6 +4,8 @@ import java.time.LocalDate
 
 import com.mohiva.play.silhouette.impl.providers.OAuth2Info
 import com.mohiva.play.silhouette.api.util.PasswordInfo
+import com.mohiva.play.silhouette.impl.providers.TotpInfo
+import models.generated.Tables.ScratchCode
 import models.generated.Tables._
 import org.joda.time.DateTime
 import org.specs2.mock.Mockito
@@ -66,6 +68,16 @@ trait BaseDaoSpec extends PlaySpecification with Mockito {
       hasher = "hasher2",
       password = "password2",
       salt = Some("salt2")
+    )
+
+    val testTotpInfo = TotpInfo(
+      sharedKey = "sharedKey",
+      scratchCodes = Seq(testPasswordInfo)
+    )
+
+    val testTotpInfo2 = TotpInfo(
+      sharedKey = "sharedKey2",
+      scratchCodes = Seq(testPasswordInfo2)
     )
   }
 }

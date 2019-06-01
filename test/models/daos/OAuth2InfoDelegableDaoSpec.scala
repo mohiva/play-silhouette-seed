@@ -15,8 +15,8 @@ class OAuth2InfoDelegableDaoSpec extends BaseDaoSpec {
     "should save and find oAuth2Info" in new Context {
       val oAuth2InfoOpt: Option[OAuth2Info] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- delegableAuthInfoDao.save(testLoginInfo, testOAuth2Info)
-        oAuth2Info <- delegableAuthInfoDao.find(testLoginInfo)
+        _ <- authInfoDelegableDao.save(testLoginInfo, testOAuth2Info)
+        oAuth2Info <- authInfoDelegableDao.find(testLoginInfo)
       } yield oAuth2Info
 
       oAuth2InfoOpt should not be None
@@ -30,9 +30,9 @@ class OAuth2InfoDelegableDaoSpec extends BaseDaoSpec {
     "should update oAuth2Info" in new Context {
       val oAuth2InfoOpt: Option[OAuth2Info] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- delegableAuthInfoDao.save(testLoginInfo, testOAuth2Info)
-        _ <- delegableAuthInfoDao.save(testLoginInfo, testOAuth2Info2)
-        oAuth2Info <- delegableAuthInfoDao.find(testLoginInfo)
+        _ <- authInfoDelegableDao.save(testLoginInfo, testOAuth2Info)
+        _ <- authInfoDelegableDao.save(testLoginInfo, testOAuth2Info2)
+        oAuth2Info <- authInfoDelegableDao.find(testLoginInfo)
       } yield oAuth2Info
 
       oAuth2InfoOpt should not be None
@@ -46,15 +46,15 @@ class OAuth2InfoDelegableDaoSpec extends BaseDaoSpec {
     "should remove oAuth2Info" in new Context {
       val oAuth2InfoOpt: Option[OAuth2Info] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- delegableAuthInfoDao.save(testLoginInfo, testOAuth2Info)
-        oAuth2Info <- delegableAuthInfoDao.find(testLoginInfo)
+        _ <- authInfoDelegableDao.save(testLoginInfo, testOAuth2Info)
+        oAuth2Info <- authInfoDelegableDao.find(testLoginInfo)
       } yield oAuth2Info
 
       oAuth2InfoOpt should not be None
 
       val emptyOAuth2InfoOpt: Option[OAuth2Info] = for {
-        _ <- delegableAuthInfoDao.remove(testLoginInfo)
-        oAuth2Info <- delegableAuthInfoDao.find(testLoginInfo)
+        _ <- authInfoDelegableDao.remove(testLoginInfo)
+        oAuth2Info <- authInfoDelegableDao.find(testLoginInfo)
       } yield oAuth2Info
 
       oAuth2InfoOpt should be(None)
@@ -66,7 +66,7 @@ class OAuth2InfoDelegableDaoSpec extends BaseDaoSpec {
    */
   trait Context extends BaseContext {
 
-    val delegableAuthInfoDao: DelegableAuthInfoDAO[OAuth2Info] = daoContext.delegableAuthInfoDao
+    val authInfoDelegableDao: DelegableAuthInfoDAO[OAuth2Info] = daoContext.authInfoDelegableDao
 
     // ensure repeatability of the test
     await(userDao.deleteAll)

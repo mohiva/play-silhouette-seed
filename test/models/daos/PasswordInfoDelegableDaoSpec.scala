@@ -15,8 +15,8 @@ class PasswordInfoDelegableDaoSpec extends BaseDaoSpec {
     "should save and find PasswordInfo" in new Context {
       val passwordInfoOpt: Option[PasswordInfo] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- delegablePasswordInfoDao.save(testLoginInfo, testPasswordInfo)
-        passwordInfo <- delegablePasswordInfoDao.find(testLoginInfo)
+        _ <- passwordInfoDelegableDao.save(testLoginInfo, testPasswordInfo)
+        passwordInfo <- passwordInfoDelegableDao.find(testLoginInfo)
       } yield passwordInfo
 
       passwordInfoOpt should not be None
@@ -29,9 +29,9 @@ class PasswordInfoDelegableDaoSpec extends BaseDaoSpec {
     "should update PasswordInfo" in new Context {
       val passwordInfoOpt: Option[PasswordInfo] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- delegablePasswordInfoDao.save(testLoginInfo, testPasswordInfo)
-        _ <- delegablePasswordInfoDao.add(testLoginInfo, testPasswordInfo2)
-        passwordInfo <- delegablePasswordInfoDao.find(testLoginInfo)
+        _ <- passwordInfoDelegableDao.save(testLoginInfo, testPasswordInfo)
+        _ <- passwordInfoDelegableDao.add(testLoginInfo, testPasswordInfo2)
+        passwordInfo <- passwordInfoDelegableDao.find(testLoginInfo)
       } yield passwordInfo
 
       passwordInfoOpt should not be None
@@ -44,15 +44,15 @@ class PasswordInfoDelegableDaoSpec extends BaseDaoSpec {
     "should remove PasswordInfo" in new Context {
       val passwordInfoOpt: Option[PasswordInfo] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- delegablePasswordInfoDao.save(testLoginInfo, testPasswordInfo)
-        passwordInfo <- delegablePasswordInfoDao.find(testLoginInfo)
+        _ <- passwordInfoDelegableDao.save(testLoginInfo, testPasswordInfo)
+        passwordInfo <- passwordInfoDelegableDao.find(testLoginInfo)
       } yield passwordInfo
 
       passwordInfoOpt should not be None
 
       val emptyOAuth2InfoOpt: Option[PasswordInfo] = for {
-        _ <- delegablePasswordInfoDao.remove(testLoginInfo)
-        passwordInfo <- delegablePasswordInfoDao.find(testLoginInfo)
+        _ <- passwordInfoDelegableDao.remove(testLoginInfo)
+        passwordInfo <- passwordInfoDelegableDao.find(testLoginInfo)
       } yield passwordInfo
 
       passwordInfoOpt should be(None)
@@ -63,7 +63,7 @@ class PasswordInfoDelegableDaoSpec extends BaseDaoSpec {
    * Context reused by all tests
    */
   trait Context extends BaseContext {
-    val delegablePasswordInfoDao: AuthInfoDAO[PasswordInfo] = daoContext.delegablePasswordInfoDao
+    val passwordInfoDelegableDao: AuthInfoDAO[PasswordInfo] = daoContext.passwordInfoDelegableDao
 
     // ensure repeatability of the test
     await(userDao.deleteAll)
