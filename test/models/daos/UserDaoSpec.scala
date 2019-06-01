@@ -1,6 +1,7 @@
 package models.daos
 
 import java.time.LocalDate
+
 import models.generated.Tables._
 import org.joda.time.DateTime
 
@@ -14,41 +15,38 @@ class UserDaoSpec extends BaseDaoSpec {
 
   "The user dao" should {
     "should update an user correctly" in new Context {
-      // create Fixture
-      await(userDao.create(testUser1, testLoginInfo1))
-
-      val userOpt = for {
-        u <- userDao.find(testLoginInfo1)
+      val userOpt: Option[UserRow] = for {
+        _ <- userDao.create(testUser, testLoginInfo)
+        u <- userDao.find(testLoginInfo)
         _ <- userDao.update(u.get.copy(firstName = Some("Harry"), lastName = Some("Potter")))
         user <- userDao.findById(u.get.id)
       } yield user
 
       userOpt should not be None
-      val updated = userOpt.get
-      updated.firstName should beEqualTo(Some("Harry"))
-      updated.lastName should beEqualTo(Some("Potter"))
+      val updated: UserRow = userOpt.get
+      updated.firstName should beSome("Harry")
+      updated.lastName should beSome("Potter")
       updated.dateOfBirth should not be None
-      updated.email should beEqualTo(testUser1.email)
-      updated.avatarUrl should beEqualTo(testUser1.avatarUrl)
+      updated.email should beEqualTo(testUser.email)
+      updated.avatarUrl should beEqualTo(testUser.avatarUrl)
       updated.activated should beTrue
       updated.lastLogin should not be None
       updated.modified should not be None
     }
 
     "create an user correctly" in new Context {
-      val result = for {
-        user <- userDao.createAndFetch(testUser1)
+      val result: (UserRow, Seq[UserRow]) = for {
+        user <- userDao.createAndFetch(testUser)
         all <- userDao.findAll()
       } yield (user, all)
 
-      val user: UserRow = result._1
-      val all: Seq[UserRow] = result._2
+      val (user, all) = result
 
-      user.firstName should beEqualTo(testUser1.firstName)
-      user.lastName should beEqualTo(testUser1.lastName)
+      user.firstName should beEqualTo(testUser.firstName)
+      user.lastName should beEqualTo(testUser.lastName)
       user.dateOfBirth should not be None
-      user.email should beEqualTo(testUser1.email)
-      user.avatarUrl should beEqualTo(testUser1.avatarUrl)
+      user.email should beEqualTo(testUser.email)
+      user.avatarUrl should beEqualTo(testUser.avatarUrl)
       user.activated should beTrue
       user.lastLogin should not be None
       user.modified should not be None
@@ -57,29 +55,25 @@ class UserDaoSpec extends BaseDaoSpec {
     }
 
     "create an user with LoginInfo correctly" in new Context {
-      // create Fixture
-      await(userDao.create(testUser1, testLoginInfo1))
-      await(userDao.create(testUser2, testLoginInfo2))
-
-      val result = for {
-        existingUser <- userDao.find(testLoginInfo1)
+      val result: (Option[UserRow], Option[UserRow], Seq[UserRow]) = for {
+        _ <- userDao.create(testUser, testLoginInfo)
+        _ <- userDao.create(testUser2, testLoginInfo2)
+        existingUser <- userDao.find(testLoginInfo)
         nonExistingUser <- userDao.find(testLoginInfo3)
         all <- userDao.findAll()
       } yield (existingUser, nonExistingUser, all)
 
-      val userOpt: Option[UserRow] = result._1
-      val nonExistingUserOpt: Option[UserRow] = result._2
-      val all: Seq[UserRow] = result._3
+      val (userOpt, nonExistingUserOpt, all) = result
 
       nonExistingUserOpt should be(None)
 
       userOpt should not be None
-      val user = userOpt.get
-      user.firstName should beEqualTo(testUser1.firstName)
-      user.lastName should beEqualTo(testUser1.lastName)
+      val user: UserRow = userOpt.get
+      user.firstName should beEqualTo(testUser.firstName)
+      user.lastName should beEqualTo(testUser.lastName)
       user.dateOfBirth should not be None
-      user.email should beEqualTo(testUser1.email)
-      user.avatarUrl should beEqualTo(testUser1.avatarUrl)
+      user.email should beEqualTo(testUser.email)
+      user.avatarUrl should beEqualTo(testUser.avatarUrl)
       user.activated should beTrue
       user.lastLogin should not be None
       user.modified should not be None
@@ -88,14 +82,12 @@ class UserDaoSpec extends BaseDaoSpec {
     }
 
     "delete an user correctly" in new Context {
-      // create Fixture
-      await(userDao.create(testUser1, testLoginInfo1))
-      await(userDao.create(testUser2, testLoginInfo2))
-
-      val result = for {
-        user <- userDao.find(testLoginInfo1)
+      val result: (Option[UserRow], Option[UserRow]) = for {
+        _ <- userDao.create(testUser, testLoginInfo)
+        _ <- userDao.create(testUser2, testLoginInfo2)
+        user <- userDao.find(testLoginInfo)
         _ <- userDao.delete(user.get.id)
-        nonExists <- userDao.find(testLoginInfo1)
+        nonExists <- userDao.find(testLoginInfo)
         exists <- userDao.find(testLoginInfo2)
       } yield (nonExists, exists)
 
@@ -105,7 +97,7 @@ class UserDaoSpec extends BaseDaoSpec {
       nonExists should be(None)
 
       exists should not be None
-      val user = exists.get
+      val user: UserRow = exists.get
       user.firstName should beEqualTo(testUser2.firstName)
       user.lastName should beEqualTo(testUser2.lastName)
       user.dateOfBirth should not be None
@@ -121,17 +113,6 @@ class UserDaoSpec extends BaseDaoSpec {
    * Context reused by all tests
    */
   trait Context extends BaseContext {
-    val testUser1 = UserRow(
-      id = 0L,
-      firstName = Some("John"),
-      lastName = Some("Wick"),
-      dateOfBirth = Some(java.sql.Date.valueOf(LocalDate.now())),
-      email = Some("test@test.test"),
-      avatarUrl = Some("avatar.com"),
-      activated = true,
-      lastLogin = Some(DateTime.now()),
-      modified = Some(DateTime.now())
-    )
 
     val testUser2 = UserRow(
       id = 0L,
@@ -145,11 +126,9 @@ class UserDaoSpec extends BaseDaoSpec {
       modified = Some(DateTime.now())
     )
 
-    val testLoginInfo1 = com.mohiva.play.silhouette.api.LoginInfo("testProviderID", "testProviderKey")
     val testLoginInfo2 = com.mohiva.play.silhouette.api.LoginInfo("testProviderID2", "testProviderKey2")
     val testLoginInfo3 = com.mohiva.play.silhouette.api.LoginInfo("testProviderID3", "testProviderKey3")
 
-    val userDao: UserDao = daoContext.userDao
     // ensure repeatability of the test
     await(userDao.deleteAll)
   }

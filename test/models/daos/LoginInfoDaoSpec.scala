@@ -1,8 +1,8 @@
 package models.daos
 
-import java.time.LocalDate
+import com.mohiva.play.silhouette.api
+import models.generated.Tables
 import models.generated.Tables._
-import org.joda.time.DateTime
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -15,40 +15,44 @@ class LoginInfoDaoSpec extends BaseDaoSpec {
   "The LoginInfoDao should" should {
     "correctly find an existing `LoginInfo`" in new Context {
       // create Fixture
-      await(userDao.create(testUser1, testLoginInfo1))
+      await(userDao.create(testUser, testLoginInfo))
 
-      val result = loginInfoDao.find(testLoginInfo1.providerID, testLoginInfo1.providerKey)
+      val loginInfoOpt: Option[LoginInfoRow] = for {
+        _ <- userDao.create(testUser, testLoginInfo)
+        loginInfo <- loginInfoDao.find(testLoginInfo.providerID, testLoginInfo.providerKey)
+      } yield loginInfo
 
-      result should not be None
-      val loginInfo = result.get.toExt
+      loginInfoOpt should not be None
+      val loginInfo: api.LoginInfo = loginInfoOpt.get.toExt
 
-      loginInfo.providerID should beEqualTo(testLoginInfo1.providerID)
-      loginInfo.providerKey should beEqualTo(testLoginInfo1.providerID)
+      loginInfo.providerID should beEqualTo(testLoginInfo.providerID)
+      loginInfo.providerKey should beEqualTo(testLoginInfo.providerID)
     }
 
     "correctly create a new `LoginInfo` associated with an user id" in new Context {
       // create Fixture
-      val user = await(userDao.createAndFetch(testUser1))
-
-      val result = for {
-        _ <- loginInfoDao.create(user.id, testLoginInfo1)
+      val loginInfoOpt: Option[Tables.LoginInfoRow] = for {
+        user <- userDao.createAndFetch(testUser)
+        _ <- loginInfoDao.create(user.id, testLoginInfo)
         loginInfo <- loginInfoDao.findById(user.id)
-      } yield (loginInfo)
+      } yield loginInfo
 
-      result should not be None
-      val loginInfo = result.get.toExt
+      loginInfoOpt should not be None
+      val loginInfo: api.LoginInfo = loginInfoOpt.get.toExt
 
-      loginInfo.providerID should beEqualTo(testLoginInfo1.providerID)
-      loginInfo.providerKey should beEqualTo(testLoginInfo1.providerID)
+      loginInfo.providerID should beEqualTo(testLoginInfo.providerID)
+      loginInfo.providerKey should beEqualTo(testLoginInfo.providerID)
     }
 
     "correctly delete a `LoginInfo` by user and provider id" in new Context {
-      // create Fixture
-      val user = await(userDao.createAndFetch(testUser1))
-      await(loginInfoDao.create(user.id, testLoginInfo1))
+      val loginInfoOpt: Option[LoginInfoRow] = for {
+        user <- userDao.createAndFetch(testUser)
+        _ <- loginInfoDao.create(user.id, testLoginInfo)
+        _ <- loginInfoDao.delete(user.id, testLoginInfo.providerID)
+        loginInfo <- loginInfoDao.findById(user.id)
+      } yield loginInfo
 
-      val result = await(loginInfoDao.delete(user.id, testLoginInfo1.providerID))
-      result should beEqualTo(1)
+      loginInfoOpt should be(None)
     }
   }
 
@@ -56,21 +60,7 @@ class LoginInfoDaoSpec extends BaseDaoSpec {
    * Context reused by all tests
    */
   trait Context extends BaseContext {
-    val testUser1 = UserRow(
-      id = 0L,
-      firstName = Some("John"),
-      lastName = Some("Wick"),
-      dateOfBirth = Some(java.sql.Date.valueOf(LocalDate.now())),
-      email = Some("test@test.test"),
-      avatarUrl = Some("avatar.com"),
-      activated = true,
-      lastLogin = Some(DateTime.now()),
-      modified = Some(DateTime.now())
-    )
 
-    val testLoginInfo1 = com.mohiva.play.silhouette.api.LoginInfo("testProviderID", "testProviderKey")
-
-    val userDao: UserDao = daoContext.userDao
     val loginInfoDao: LoginInfoDao = daoContext.loginInfoDao
 
     // ensure repeatability of the test
