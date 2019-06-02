@@ -18,35 +18,32 @@ class ScratchCodeDaoSpec extends BaseDaoSpec {
       val (user, totpInfoOpt): (UserRow, Option[TotpInfo]) = for {
         user <- userDao.createAndFetch(testUser)
         _ <- loginInfoDao.create(user.id, testLoginInfo)
-        _ <- totpInfoDelegableDao.add(testLoginInfo, testTotpInfo.copy(scratchCodes = Seq()))
+        _ <- totpInfoDelegableDao.add(testLoginInfo, testTotpInfo.copy(scratchCodes = Seq(testScratchCode.copy(userId = user.id).toExt)))
         totpInfo <- totpInfoDelegableDao.find(testLoginInfo)
       } yield (user, totpInfo)
 
       totpInfoOpt should not be None
 
-      val scratchCodes: Seq[ScratchCodeRow] = for {
-        _ <- scratchCodeDao.create(testScratchCode.copy(userId = user.id))
-        scratchCodes <- scratchCodeDao.findAll()
-      } yield scratchCodes
-
+      val scratchCodes = await(scratchCodeDao.findAll())
       scratchCodes.size should beEqualTo(1)
+      scratchCodes.headOption should not be None
+      scratchCodes.head.userId should beEqualTo(user.id)
+      scratchCodes.head.hasher should beEqualTo(testScratchCode.hasher)
+      scratchCodes.head.password should beEqualTo(testScratchCode.password)
+      scratchCodes.head.salt should beEqualTo(testScratchCode.salt)
     }
 
     "should remove code correctly" in new Context {
       val (user, totpInfoOpt): (UserRow, Option[TotpInfo]) = for {
         user <- userDao.createAndFetch(testUser)
         _ <- loginInfoDao.create(user.id, testLoginInfo)
-        _ <- totpInfoDelegableDao.add(testLoginInfo, testTotpInfo.copy(scratchCodes = Seq()))
+        _ <- totpInfoDelegableDao.add(testLoginInfo, testTotpInfo.copy(scratchCodes = Seq(testScratchCode.copy(userId = user.id).toExt)))
         totpInfo <- totpInfoDelegableDao.find(testLoginInfo)
       } yield (user, totpInfo)
 
       totpInfoOpt should not be None
 
-      val scratchCodes: Seq[ScratchCodeRow] = for {
-        _ <- scratchCodeDao.create(testScratchCode.copy(userId = user.id))
-        scratchCodes <- scratchCodeDao.findAll()
-      } yield scratchCodes
-
+      val scratchCodes = await(scratchCodeDao.findAll())
       scratchCodes.size should beEqualTo(1)
 
       val newScratchCodes: Seq[ScratchCodeRow] = for {
