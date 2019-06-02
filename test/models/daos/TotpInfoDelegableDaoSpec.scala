@@ -20,6 +20,7 @@ class TotpInfoDelegableDaoSpec extends BaseDaoSpec {
       } yield totpInfo
 
       totpInfoOpt should not be None
+
       val totpInfo: TotpInfo = totpInfoOpt.get
       totpInfo.sharedKey should beEqualTo(testTotpInfo.sharedKey)
       totpInfo.scratchCodes should beEqualTo(testTotpInfo.scratchCodes)
@@ -33,6 +34,7 @@ class TotpInfoDelegableDaoSpec extends BaseDaoSpec {
       } yield totpInfo
 
       totpInfoOpt should not be None
+
       val totpInfo: TotpInfo = totpInfoOpt.get
       totpInfo.sharedKey should beEqualTo(testTotpInfo.sharedKey)
       totpInfo.scratchCodes should beEqualTo(testTotpInfo.scratchCodes)

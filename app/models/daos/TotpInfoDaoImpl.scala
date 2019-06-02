@@ -25,16 +25,20 @@ class TotpInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigP
    */
   def find(extLoginInfo: ExtLoginInfo): Future[Option[ExtTotpInfo]] = {
     val action = (for {
-      loginInfo <- LoginInfo if loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey
+      (loginInfo, scratchCode) <- LoginInfo.filter { loginInfo => loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey }.joinLeft(ScratchCode).on(_.userId === _.userId)
       totpInfo <- TotpInfo if totpInfo.userId === loginInfo.userId
-      scratchCode <- ScratchCode if scratchCode.userId === loginInfo.userId
     } yield (totpInfo, scratchCode)).result
     db.run(action).map {
-      case results =>
-        val scratchCodes = results.map(_._2).map { scratchCode => ExtPasswordInfo(scratchCode.hasher, scratchCode.password, scratchCode.salt) }
+      case results => {
+        val scratchCodes = results.map(_._2).map {
+          case Some(scratchCode) => Some(ExtPasswordInfo(scratchCode.hasher, scratchCode.password, scratchCode.salt))
+          case _ => None.asInstanceOf[Option[ExtPasswordInfo]]
+        }.filterNot(_.isEmpty).map(_.get)
+
         results.headOption.map {
           case (totpInfo, _) => ExtTotpInfo(totpInfo.sharedKey, scratchCodes)
         }
+      }
     }
   }
 

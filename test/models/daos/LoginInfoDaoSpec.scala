@@ -14,9 +14,6 @@ class LoginInfoDaoSpec extends BaseDaoSpec {
 
   "The LoginInfoDao should" should {
     "correctly find an existing `LoginInfo`" in new Context {
-      // create Fixture
-      await(userDao.create(testUser, testLoginInfo))
-
       val loginInfoOpt: Option[LoginInfoRow] = for {
         _ <- userDao.create(testUser, testLoginInfo)
         loginInfo <- loginInfoDao.find(testLoginInfo.providerID, testLoginInfo.providerKey)

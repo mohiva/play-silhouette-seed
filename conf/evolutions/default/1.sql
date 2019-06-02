@@ -44,7 +44,7 @@ CREATE TABLE totp_info (
     user_id BIGINT UNSIGNED PRIMARY KEY,
     shared_key CHAR(36) NOT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
-    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES `login_info`(user_id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE scratch_code (
@@ -53,7 +53,7 @@ CREATE TABLE scratch_code (
     password VARCHAR(100) NOT NULL,
     salt VARCHAR(50) NULL DEFAULT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
-    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES `totp_info`(user_id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE o_auth2_info (
@@ -63,14 +63,14 @@ CREATE TABLE o_auth2_info (
     expires_in INT NULL DEFAULT NULL,
     refresh_token VARCHAR(200) NULL DEFAULT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
-    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES `login_info`(user_id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE o_auth2_info_param (
     user_id BIGINT UNSIGNED NOT NULL,
     `key` VARCHAR(100) NOT NULL,
     `value` VARCHAR(100) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES `o_auth2_info`(user_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, `key`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

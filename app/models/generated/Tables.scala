@@ -144,8 +144,8 @@ trait Tables {
     /** Database column modified SqlType(TIMESTAMP), Default(None) */
     val modified: Rep[Option[org.joda.time.DateTime]] = column[Option[org.joda.time.DateTime]]("modified", O.Default(None))
 
-    /** Foreign key referencing User (database name o_auth2_info_ibfk_1) */
-    lazy val userFk = foreignKey("o_auth2_info_ibfk_1", userId, User)(r => r.id, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
+    /** Foreign key referencing LoginInfo (database name o_auth2_info_ibfk_1) */
+    lazy val loginInfoFk = foreignKey("o_auth2_info_ibfk_1", userId, LoginInfo)(r => r.userId, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
   }
   /** Collection-like TableQuery object for table OAuth2Info */
   lazy val OAuth2Info = new TableQuery(tag => new OAuth2Info(tag))
@@ -181,8 +181,8 @@ trait Tables {
     /** Primary key of OAuth2InfoParam (database name o_auth2_info_param_PK) */
     val pk = primaryKey("o_auth2_info_param_PK", (userId, key))
 
-    /** Foreign key referencing User (database name o_auth2_info_param_ibfk_1) */
-    lazy val userFk = foreignKey("o_auth2_info_param_ibfk_1", userId, User)(r => r.id, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
+    /** Foreign key referencing OAuth2Info (database name o_auth2_info_param_ibfk_1) */
+    lazy val oAuth2InfoFk = foreignKey("o_auth2_info_param_ibfk_1", userId, OAuth2Info)(r => r.userId, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
   }
   /** Collection-like TableQuery object for table OAuth2InfoParam */
   lazy val OAuth2InfoParam = new TableQuery(tag => new OAuth2InfoParam(tag))
@@ -267,8 +267,8 @@ trait Tables {
     /** Database column modified SqlType(TIMESTAMP), Default(None) */
     val modified: Rep[Option[org.joda.time.DateTime]] = column[Option[org.joda.time.DateTime]]("modified", O.Default(None))
 
-    /** Foreign key referencing User (database name scratch_code_ibfk_1) */
-    lazy val userFk = foreignKey("scratch_code_ibfk_1", userId, User)(r => r.id, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
+    /** Foreign key referencing TotpInfo (database name scratch_code_ibfk_1) */
+    lazy val totpInfoFk = foreignKey("scratch_code_ibfk_1", userId, TotpInfo)(r => r.userId, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
   }
   /** Collection-like TableQuery object for table ScratchCode */
   lazy val ScratchCode = new TableQuery(tag => new ScratchCode(tag))
@@ -327,8 +327,8 @@ trait Tables {
     /** Database column modified SqlType(TIMESTAMP), Default(None) */
     val modified: Rep[Option[org.joda.time.DateTime]] = column[Option[org.joda.time.DateTime]]("modified", O.Default(None))
 
-    /** Foreign key referencing User (database name totp_info_ibfk_1) */
-    lazy val userFk = foreignKey("totp_info_ibfk_1", userId, User)(r => r.id, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
+    /** Foreign key referencing LoginInfo (database name totp_info_ibfk_1) */
+    lazy val loginInfoFk = foreignKey("totp_info_ibfk_1", userId, LoginInfo)(r => r.userId, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
   }
   /** Collection-like TableQuery object for table TotpInfo */
   lazy val TotpInfo = new TableQuery(tag => new TotpInfo(tag))
