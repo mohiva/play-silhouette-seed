@@ -32,7 +32,7 @@ CREATE TABLE auth_token (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE password_info (
-    user_id BIGINT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED PRIMARY KEY,
     hasher VARCHAR(50) NOT NULL,
     password VARCHAR(100) NOT NULL,
     salt VARCHAR(50) NULL DEFAULT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE password_info (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE totp_info (
-    user_id BIGINT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED PRIMARY KEY,
     shared_key CHAR(36) NOT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE

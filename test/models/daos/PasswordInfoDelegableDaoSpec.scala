@@ -12,7 +12,22 @@ class PasswordInfoDelegableDaoSpec extends BaseDaoSpec {
   sequential
 
   "The password info delegable dao" should {
-    "should save and find PasswordInfo" in new Context {
+    "should add and find PasswordInfo" in new Context {
+      val passwordInfoOpt: Option[PasswordInfo] = for {
+        _ <- userDao.create(testUser, testLoginInfo)
+        _ <- passwordInfoDelegableDao.add(testLoginInfo, testPasswordInfo)
+        passwordInfo <- passwordInfoDelegableDao.find(testLoginInfo)
+      } yield passwordInfo
+
+      passwordInfoOpt should not be None
+
+      val passwordInfo: PasswordInfo = passwordInfoOpt.get
+      passwordInfo.hasher should beEqualTo(testPasswordInfo.hasher)
+      passwordInfo.password should beEqualTo(testPasswordInfo.password)
+      passwordInfo.salt should beEqualTo(testPasswordInfo.salt)
+    }
+
+    "should save (insert or update) PasswordInfo" in new Context {
       val passwordInfoOpt: Option[PasswordInfo] = for {
         _ <- userDao.create(testUser, testLoginInfo)
         _ <- passwordInfoDelegableDao.save(testLoginInfo, testPasswordInfo)
@@ -20,6 +35,7 @@ class PasswordInfoDelegableDaoSpec extends BaseDaoSpec {
       } yield passwordInfo
 
       passwordInfoOpt should not be None
+
       val passwordInfo: PasswordInfo = passwordInfoOpt.get
       passwordInfo.hasher should beEqualTo(testPasswordInfo.hasher)
       passwordInfo.password should beEqualTo(testPasswordInfo.password)
@@ -29,12 +45,13 @@ class PasswordInfoDelegableDaoSpec extends BaseDaoSpec {
     "should update PasswordInfo" in new Context {
       val passwordInfoOpt: Option[PasswordInfo] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- passwordInfoDelegableDao.save(testLoginInfo, testPasswordInfo)
-        _ <- passwordInfoDelegableDao.add(testLoginInfo, testPasswordInfo2)
+        _ <- passwordInfoDelegableDao.add(testLoginInfo, testPasswordInfo)
+        _ <- passwordInfoDelegableDao.update(testLoginInfo, testPasswordInfo2)
         passwordInfo <- passwordInfoDelegableDao.find(testLoginInfo)
       } yield passwordInfo
 
       passwordInfoOpt should not be None
+
       val passwordInfo: PasswordInfo = passwordInfoOpt.get
       passwordInfo.hasher should beEqualTo(testPasswordInfo2.hasher)
       passwordInfo.password should beEqualTo(testPasswordInfo2.password)
@@ -55,7 +72,7 @@ class PasswordInfoDelegableDaoSpec extends BaseDaoSpec {
         passwordInfo <- passwordInfoDelegableDao.find(testLoginInfo)
       } yield passwordInfo
 
-      passwordInfoOpt should be(None)
+      emptyOAuth2InfoOpt should be(None)
     }
   }
 

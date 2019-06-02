@@ -59,5 +59,4 @@ class ScratchCodeDaoSpec extends BaseDaoSpec {
     await(userDao.deleteAll)
     await(scratchCodeDao.deleteAll)
   }
-
 }

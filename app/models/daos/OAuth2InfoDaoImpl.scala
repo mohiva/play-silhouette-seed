@@ -120,11 +120,11 @@ class OAuth2InfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfi
    * @return A future to wait for the process to be completed.
    */
   def remove(extLoginInfo: ExtLoginInfo): Future[Unit] = {
-    val action = LoginInfo.filter { loginInfo =>
-      loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey
-    }.result.head.map(_.userId).flatMap { userId =>
-      DBIOAction.sequence(Seq(OAuth2Info.filter(_.userId === userId).delete, OAuth2InfoParam.filter(_.userId === userId).delete))
-    }.transactionally
-    db.run(action).map(() => _)
+    val action = (for {
+      userId <- LoginInfo.filter { loginInfo => loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey }.map(_.userId).result.head
+      _ <- OAuth2Info.filter(_.userId === userId).delete
+      _ <- OAuth2InfoParam.filter(_.userId === userId).delete
+    } yield ()).transactionally
+    db.run(action)
   }
 }

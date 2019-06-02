@@ -189,7 +189,7 @@ trait Tables {
 
   /**
    * Entity class storing rows of table PasswordInfo
-   *  @param userId Database column user_id SqlType(BIGINT UNSIGNED)
+   *  @param userId Database column user_id SqlType(BIGINT UNSIGNED), PrimaryKey
    *  @param hasher Database column hasher SqlType(VARCHAR), Length(50,true)
    *  @param password Database column password SqlType(VARCHAR), Length(100,true)
    *  @param salt Database column salt SqlType(VARCHAR), Length(50,true), Default(None)
@@ -213,8 +213,8 @@ trait Tables {
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = ((Rep.Some(userId), Rep.Some(hasher), Rep.Some(password), salt, modified)).shaped.<>({ r => import r._; _1.map(_ => PasswordInfoRow.tupled((_1.get, _2.get, _3.get, _4, _5))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
-    /** Database column user_id SqlType(BIGINT UNSIGNED) */
-    val userId: Rep[Long] = column[Long]("user_id")
+    /** Database column user_id SqlType(BIGINT UNSIGNED), PrimaryKey */
+    val userId: Rep[Long] = column[Long]("user_id", O.PrimaryKey)
     /** Database column hasher SqlType(VARCHAR), Length(50,true) */
     val hasher: Rep[String] = column[String]("hasher", O.Length(50, varying = true))
     /** Database column password SqlType(VARCHAR), Length(100,true) */
@@ -301,7 +301,7 @@ trait Tables {
 
   /**
    * Entity class storing rows of table TotpInfo
-   *  @param userId Database column user_id SqlType(BIGINT UNSIGNED)
+   *  @param userId Database column user_id SqlType(BIGINT UNSIGNED), PrimaryKey
    *  @param sharedKey Database column shared_key SqlType(CHAR), Length(36,false)
    *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
@@ -320,8 +320,8 @@ trait Tables {
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = ((Rep.Some(userId), Rep.Some(sharedKey), modified)).shaped.<>({ r => import r._; _1.map(_ => TotpInfoRow.tupled((_1.get, _2.get, _3))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
-    /** Database column user_id SqlType(BIGINT UNSIGNED) */
-    val userId: Rep[Long] = column[Long]("user_id")
+    /** Database column user_id SqlType(BIGINT UNSIGNED), PrimaryKey */
+    val userId: Rep[Long] = column[Long]("user_id", O.PrimaryKey)
     /** Database column shared_key SqlType(CHAR), Length(36,false) */
     val sharedKey: Rep[String] = column[String]("shared_key", O.Length(36, varying = false))
     /** Database column modified SqlType(TIMESTAMP), Default(None) */

@@ -12,7 +12,22 @@ class OAuth2InfoDelegableDaoSpec extends BaseDaoSpec {
   sequential
 
   "The oauth info delegable dao" should {
-    "should save and find oAuth2Info" in new Context {
+    "should add and find oAuth2Info" in new Context {
+      val oAuth2InfoOpt: Option[OAuth2Info] = for {
+        _ <- userDao.create(testUser, testLoginInfo)
+        _ <- authInfoDelegableDao.add(testLoginInfo, testOAuth2Info)
+        oAuth2Info <- authInfoDelegableDao.find(testLoginInfo)
+      } yield oAuth2Info
+
+      oAuth2InfoOpt should not be None
+      val oAuth2Info: OAuth2Info = oAuth2InfoOpt.get
+      oAuth2Info.accessToken should beEqualTo(testOAuth2Info.accessToken)
+      oAuth2Info.tokenType should beEqualTo(testOAuth2Info.tokenType)
+      oAuth2Info.expiresIn should beEqualTo(testOAuth2Info.expiresIn)
+      oAuth2Info.refreshToken should beEqualTo(testOAuth2Info.refreshToken)
+    }
+
+    "should save (insert or update) and find oAuth2Info" in new Context {
       val oAuth2InfoOpt: Option[OAuth2Info] = for {
         _ <- userDao.create(testUser, testLoginInfo)
         _ <- authInfoDelegableDao.save(testLoginInfo, testOAuth2Info)
@@ -30,8 +45,8 @@ class OAuth2InfoDelegableDaoSpec extends BaseDaoSpec {
     "should update oAuth2Info" in new Context {
       val oAuth2InfoOpt: Option[OAuth2Info] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- authInfoDelegableDao.save(testLoginInfo, testOAuth2Info)
-        _ <- authInfoDelegableDao.save(testLoginInfo, testOAuth2Info2)
+        _ <- authInfoDelegableDao.add(testLoginInfo, testOAuth2Info)
+        _ <- authInfoDelegableDao.update(testLoginInfo, testOAuth2Info2)
         oAuth2Info <- authInfoDelegableDao.find(testLoginInfo)
       } yield oAuth2Info
 
@@ -57,7 +72,7 @@ class OAuth2InfoDelegableDaoSpec extends BaseDaoSpec {
         oAuth2Info <- authInfoDelegableDao.find(testLoginInfo)
       } yield oAuth2Info
 
-      oAuth2InfoOpt should be(None)
+      emptyOAuth2InfoOpt should be(None)
     }
   }
 

@@ -23,7 +23,10 @@ class PasswordInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseCon
    * @return The retrieved auth info or None if no auth info could be retrieved for the given login info.
    */
   def find(extLoginInfo: ExtLoginInfo): Future[Option[ExtPasswordInfo]] = {
-    val action = createQueryTemplate(extLoginInfo).result.headOption
+    val action = (for {
+      loginInfo <- LoginInfo if loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey
+      passwordInfo <- PasswordInfo if passwordInfo.userId === loginInfo.userId
+    } yield passwordInfo).result.headOption
     db.run(action).map(_.map(_.toExt))
   }
 
@@ -74,21 +77,11 @@ class PasswordInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseCon
    * @return A future to wait for the process to be completed.
    */
   def remove(extLoginInfo: ExtLoginInfo): Future[Unit] = {
-    val action = createQueryTemplate(extLoginInfo).delete
+    val action = (for {
+      userId <- LoginInfo.filter { loginInfo => loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey }.map(_.userId).result.head
+      _ <- PasswordInfo.filter(_.userId === userId).delete
+    } yield ())
     db.run(action).map(_ => ())
-  }
-
-  /**
-   * Returns a reusable Query taking the loginInfo as argument.
-   *
-   * @param extLoginInfo the loginInfo instance.
-   * @return a reusable Query taking the loginInfo as argument.
-   */
-  private def createQueryTemplate(extLoginInfo: ExtLoginInfo) = {
-    (for {
-      loginInfo <- LoginInfo if loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey
-      passwordInfo <- PasswordInfo if passwordInfo.userId === loginInfo.userId
-    } yield passwordInfo)
   }
 
   /**
@@ -101,12 +94,11 @@ class PasswordInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseCon
    */
   private def createUpsertTemplate(extLoginInfo: ExtLoginInfo, extPasswordInfo: ExtPasswordInfo, func: (PasswordInfoRow) => FixedSqlAction[Int, NoStream, Effect.Write]) = {
     (for {
-      userId <- LoginInfo.filter { loginInfo =>
-        loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey
-      }.result.head.map(_.userId)
-    } yield userId).flatMap { userId =>
-      val updated = PasswordInfoRow(userId, extPasswordInfo.hasher, extPasswordInfo.password, extPasswordInfo.salt)
-      func(updated).map(_ => extPasswordInfo)
-    }.transactionally
+      userId <- LoginInfo.filter { loginInfo => loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey }.map(_.userId).result.head
+      extPasswordInfo <- {
+        val updated = PasswordInfoRow(userId, extPasswordInfo.hasher, extPasswordInfo.password, extPasswordInfo.salt)
+        func(updated).map(_ => extPasswordInfo)
+      }
+    } yield (extPasswordInfo))
   }
 }

@@ -92,11 +92,11 @@ class TotpInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigP
    * @return A future to wait for the process to be completed.
    */
   def remove(extLoginInfo: ExtLoginInfo): Future[Unit] = {
-    val action = LoginInfo.filter { loginInfo =>
-      loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey
-    }.result.head.map(_.userId).flatMap { userId =>
-      DBIOAction.sequence(Seq(TotpInfo.filter(_.userId === userId).delete, ScratchCode.filter(_.userId === userId).delete))
-    }.transactionally
-    db.run(action).map(() => _)
+    val action = (for {
+      userId <- LoginInfo.filter { loginInfo => loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey }.map(_.userId).result.head
+      _ <- TotpInfo.filter(_.userId === userId).delete
+      _ <- ScratchCode.filter(_.userId === userId).delete
+    } yield ()).transactionally
+    db.run(action)
   }
 }
