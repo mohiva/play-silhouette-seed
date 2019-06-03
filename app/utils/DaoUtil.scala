@@ -16,20 +16,6 @@ trait DaoUtil {
    * @return the simplified structure of a [[slick.lifted.TableQuery]] result
    */
   implicit def simplify[A, B](x: Future[Seq[(A, Option[B])]])(implicit ec: ExecutionContext): Future[Option[(A, Seq[B])]] = {
-    x.map {
-      case results => {
-        val seq: Seq[B] = results.map(_._2).map {
-          case Some(b) => Some(b)
-          case _ => None.asInstanceOf[Option[B]]
-        }.filterNot(_.isEmpty).map(_.get) match {
-          case seq if (seq.nonEmpty) => seq
-          case _ => Seq()
-        }
-
-        results.headOption.map {
-          case (a, _) => (a, seq)
-        }
-      }
-    }
+    x.map(_.groupBy(_._1).mapValues(_.flatMap(_._2)).toSeq.headOption)
   }
 }
