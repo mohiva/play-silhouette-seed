@@ -3,8 +3,10 @@
 @import play.twirl.api.Html
 @import org.webjars.play.WebJarsUtil
 @import controllers.AssetsFinder
+@import models.generated.Tables.UserRow
+@import com.mohiva.play.silhouette.api.LoginInfo
 
-@(title: String, user: Option[models.User] = None)(content: Html)(implicit request: RequestHeader, messages: Messages, assets: AssetsFinder, webJarsUtil: WebJarsUtil)
+@(title: String, user: Option[(UserRow, LoginInfo)] = None)(content: Html)(implicit request: RequestHeader, messages: Messages, assets: AssetsFinder, webJarsUtil: WebJarsUtil)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -50,10 +52,10 @@
                             <li><a href="@controllers.routes.ApplicationController.selectLang("en")">English</a></li>
                             }
                         </ul>
-                        @user.map { u =>
-                            <li><a href="@controllers.routes.ApplicationController.index">@u.name</a></li>
+                        @user.map { case (u, loginInfo) =>
+                            <li><a href="@controllers.routes.ApplicationController.index">@u.fullName</a></li>
                             <li><a href="@controllers.routes.SudoAccessController.restrictedSudoAccess">@messages("restricted.sudo.access")</a></li>
-                            @if(u.loginInfo.providerID == com.mohiva.play.silhouette.impl.providers.CredentialsProvider.ID) {
+                            @if(loginInfo.providerID == com.mohiva.play.silhouette.impl.providers.CredentialsProvider.ID) {
                                 <li><a href="@controllers.routes.ChangePasswordController.view">@messages("change.password")</a></li>
                             }
                             <li><a href="@controllers.routes.ApplicationController.signOut">@messages("sign.out")</a></li>

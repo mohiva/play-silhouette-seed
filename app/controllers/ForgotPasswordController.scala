@@ -1,7 +1,8 @@
 package controllers
 
-import javax.inject.Inject
+import java.util.UUID
 
+import javax.inject.Inject
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import forms.ForgotPasswordForm
@@ -64,8 +65,8 @@ class ForgotPasswordController @Inject() (
         val result = Redirect(routes.SignInController.view()).flashing("info" -> Messages("reset.email.sent"))
         userService.retrieve(loginInfo).flatMap {
           case Some(user) if user.email.isDefined =>
-            authTokenService.create(user.userID).map { authToken =>
-              val url = routes.ResetPasswordController.view(authToken.id).absoluteURL()
+            authTokenService.create(user.id).map { authToken =>
+              val url = routes.ResetPasswordController.view(authToken.tokenUuId).absoluteURL()
 
               mailerClient.send(Email(
                 subject = Messages("email.reset.password.subject"),

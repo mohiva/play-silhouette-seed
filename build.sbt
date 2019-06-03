@@ -27,6 +27,15 @@ libraryDependencies ++= Seq(
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.1-akka-2.5.x",
   "com.adrianhurt" %% "play-bootstrap" % "1.4-P26-B3-SNAPSHOT",
   "com.nappin" %% "play-recaptcha" % "2.3",
+  "com.chuusai" %% "shapeless" % "2.3.3",
+  "com.typesafe.play" %% "play-slick" % "4.0.1",
+  "com.typesafe.play" %% "play-slick-evolutions" % "4.0.1",
+  "com.typesafe.slick" %% "slick" % "3.3.0",
+  "com.typesafe.slick" %% "slick-codegen" % "3.3.0",
+  "com.github.tototoshi" %% "slick-joda-mapper" % "2.4.0",
+  "joda-time" % "joda-time" % "2.10.1",
+  "org.joda" % "joda-convert" % "1.9.2",
+  "mysql" % "mysql-connector-java" % "8.0.16",
   "com.mohiva" %% "play-silhouette-testkit" % "6.0.1-SNAPSHOT" % "test",
   specs2 % Test,
   ehcache,
@@ -68,3 +77,6 @@ ScalariformKeys.preferences := ScalariformKeys.preferences.value
   .setPreference(FormatXml, false)
   .setPreference(DoubleIndentConstructorArguments, false)
   .setPreference(DanglingCloseParenthesis, Preserve)
+
+fork in Test := true
+javaOptions in Test += "-Dconfig.file=conf/application.test.conf"

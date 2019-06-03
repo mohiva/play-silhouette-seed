@@ -11,13 +11,14 @@ import com.mohiva.play.silhouette.impl.providers._
 import com.nappin.play.recaptcha.{ RecaptchaVerifier, WidgetHelper }
 import views.html.recaptcha
 import forms.SignUpForm
-import models.User
+import models.generated.Tables.UserRow
 import models.services.{ AuthTokenService, UserService }
 import org.webjars.play.WebJarsUtil
 import play.api.i18n.{ I18nSupport, Messages }
 import play.api.libs.mailer.{ Email, MailerClient }
 import play.api.mvc.{ AbstractController, AnyContent, ControllerComponents, Request }
 import utils.auth.DefaultEnv
+
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
@@ -89,23 +90,21 @@ class SignUpController @Inject() (
             Future.successful(result)
           case None =>
             val authInfo = passwordHasherRegistry.current.hash(data.password)
-            val user = User(
-              userID = UUID.randomUUID(),
-              loginInfo = loginInfo,
+            val user = UserRow(
+              id = 0L,
               firstName = Some(data.firstName),
               lastName = Some(data.lastName),
-              fullName = Some(data.firstName + " " + data.lastName),
               email = Some(data.email),
-              avatarURL = None,
+              avatarUrl = None,
               activated = false
             )
             for {
               avatar <- avatarService.retrieveURL(data.email)
-              user <- userService.save(user.copy(avatarURL = avatar))
+              user <- userService.create(user.copy(avatarUrl = avatar), loginInfo)
               authInfo <- authInfoRepository.add(loginInfo, authInfo)
-              authToken <- authTokenService.create(user.userID)
+              authToken <- authTokenService.create(user.id)
             } yield {
-              val url = routes.ActivateAccountController.activate(authToken.id).absoluteURL()
+              val url = routes.ActivateAccountController.activate(authToken.tokenUuId).absoluteURL()
               mailerClient.send(Email(
                 subject = Messages("email.sign.up.subject"),
                 from = Messages("email.from"),

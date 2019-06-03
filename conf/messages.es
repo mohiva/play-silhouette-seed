@@ -99,6 +99,12 @@ password.reset = Hemos restablecido su contraseña. Ahora puede iniciar sesión 
 account.activated = ¡Tu cuenta ahora está activada! Por favor inicie sesión para usar su nueva cuenta.
 password.changed = Su contraseña ha sido cambiada.
 
+# errors
+
+cannot.authenticate.with.unknown.social.provider = ¡No es posible la autenticación usando el proveedor social desconocido {0}!
+internal.error.no.user.found = Error del sistema: la información de usuario no fue encontrada.
+internal.error.user.without.logininfo = Error del sistema: el usuario no tiene una información de inicio de sesión adjunta.
+
 google = Google
 facebook = Facebook
 twitter = Twitter

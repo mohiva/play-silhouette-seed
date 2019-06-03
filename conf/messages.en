@@ -99,6 +99,12 @@ password.reset = We have reset your password. You can now sign in with your cred
 account.activated = Your account is now activated! Please sign in to use your new account.
 password.changed = Your password has been changed.
 
+# errors
+
+cannot.authenticate.with.unknown.social.provider = Cannot authenticate with unknown/unsupported social provider {0}!
+internal.error.no.user.found = Internal error: no user information was found.
+internal.error.user.without.logininfo = Internal error: user doesn't have a login information attached.
+
 google = Google
 facebook = Facebook
 twitter = Twitter

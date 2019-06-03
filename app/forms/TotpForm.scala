@@ -1,7 +1,5 @@
 package forms
 
-import java.util.UUID
-
 import play.api.data.Form
 import play.api.data.Forms._
 
@@ -14,7 +12,7 @@ object TotpForm {
    */
   val form = Form(
     mapping(
-      "userID" -> uuid,
+      "userId" -> longNumber,
       "sharedKey" -> nonEmptyText,
       "rememberMe" -> boolean,
       "verificationCode" -> nonEmptyText(minLength = 6, maxLength = 6)
@@ -23,13 +21,13 @@ object TotpForm {
 
   /**
    * The form data.
-   * @param userID The unique identifier of the user.
+   * @param userId The unique identifier of the user.
    * @param sharedKey the TOTP shared key
    * @param rememberMe Indicates if the user should stay logged in on the next visit.
    * @param verificationCode Verification code for TOTP-authentication
    */
   case class Data(
-    userID: UUID,
+    userId: Long,
     sharedKey: String,
     rememberMe: Boolean,
     verificationCode: String = "")

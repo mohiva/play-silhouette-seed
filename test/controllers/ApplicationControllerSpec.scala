@@ -1,11 +1,10 @@
 package controllers
 
-import java.util.UUID
-
 import com.google.inject.AbstractModule
 import com.mohiva.play.silhouette.api.{ Environment, LoginInfo }
 import com.mohiva.play.silhouette.test._
-import models.User
+import models.generated.Tables._
+import models.services.{ UserService, UserServiceImpl }
 import net.codingwell.scalaguice.ScalaModule
 import org.specs2.mock.Mockito
 import org.specs2.specification.Scope
@@ -14,7 +13,7 @@ import play.api.test.CSRFTokenHelper._
 import play.api.test.{ FakeRequest, PlaySpecification, WithApplication }
 import utils.auth.DefaultEnv
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
  * Test case for the [[controllers.ApplicationController]] class.
@@ -45,7 +44,7 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
     "return 200 if user is authorized" in new Context {
       new WithApplication(application) {
         val Some(result) = route(app, addCSRFToken(FakeRequest(routes.ApplicationController.index())
-          .withAuthenticator[DefaultEnv](identity.loginInfo))
+          .withAuthenticator[DefaultEnv](testLoginInfo.toExt))
         )
 
         status(result) must beEqualTo(OK)
@@ -57,6 +56,31 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
    * The context.
    */
   trait Context extends Scope {
+    /**
+     * An identity.
+     */
+    val testUser = UserRow(
+      id = 0L,
+      firstName = None,
+      lastName = None,
+      email = None,
+      avatarUrl = None,
+      activated = true
+    )
+
+    val testLoginInfo = LoginInfoRow(0L, "facebook", "user@facebook.com")
+
+    /**
+     * A Silhouette fake environment.
+     */
+    implicit val ec = scala.concurrent.ExecutionContext.global
+    implicit val env: Environment[DefaultEnv] = new FakeEnvironment[DefaultEnv](Seq(testLoginInfo.toExt -> testUser))
+
+    class FakeUserService extends UserServiceImpl(null, null) {
+      override def loginInfo(user: UserRow): Future[Option[LoginInfoRow]] = {
+        Future.successful(if (user == testUser) Some(testLoginInfo) else None)
+      }
+    }
 
     /**
      * A fake Guice module.
@@ -64,27 +88,9 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
     class FakeModule extends AbstractModule with ScalaModule {
       override def configure() = {
         bind[Environment[DefaultEnv]].toInstance(env)
+        bind[UserService].toInstance(new FakeUserService())
       }
     }
-
-    /**
-     * An identity.
-     */
-    val identity = User(
-      userID = UUID.randomUUID(),
-      loginInfo = LoginInfo("facebook", "user@facebook.com"),
-      firstName = None,
-      lastName = None,
-      fullName = None,
-      email = None,
-      avatarURL = None,
-      activated = true
-    )
-
-    /**
-     * A Silhouette fake environment.
-     */
-    implicit val env: Environment[DefaultEnv] = new FakeEnvironment[DefaultEnv](Seq(identity.loginInfo -> identity))
 
     /**
      * The application.

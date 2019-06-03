@@ -47,7 +47,7 @@ class SocialAuthController @Inject() (
           case Left(result) => Future.successful(result)
           case Right(authInfo) => for {
             profile <- p.retrieveProfile(authInfo)
-            user <- userService.save(profile)
+            user <- userService.create(profile)
             authInfo <- authInfoRepository.save(profile.loginInfo, authInfo)
             authenticator <- silhouette.env.authenticatorService.create(profile.loginInfo)
             value <- silhouette.env.authenticatorService.init(authenticator)
@@ -57,7 +57,7 @@ class SocialAuthController @Inject() (
             result
           }
         }
-      case _ => Future.failed(new ProviderException(s"Cannot authenticate with unexpected social provider $provider"))
+      case _ => Future.failed(new ProviderException(Messages("cannot.authenticate.with.unknown.social.provider", provider)))
     }).recover {
       case e: ProviderException =>
         logger.error("Unexpected provider error", e)

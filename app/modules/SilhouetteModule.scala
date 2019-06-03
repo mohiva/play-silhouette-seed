@@ -22,11 +22,11 @@ import com.mohiva.play.silhouette.impl.providers.totp.GoogleTotpProvider
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
 import com.mohiva.play.silhouette.password.{ BCryptPasswordHasher, BCryptSha256PasswordHasher }
-import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, InMemoryAuthInfoDAO }
+import com.mohiva.play.silhouette.persistence.daos.{ AuthInfoDAO, DelegableAuthInfoDAO, InMemoryAuthInfoDAO }
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
 import com.typesafe.config.Config
 import models.daos._
-import models.services.{ UserService, UserServiceImpl }
+import models.services._
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 import net.ceedubs.ficus.readers.ValueReader
@@ -70,7 +70,19 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[UnsecuredErrorHandler].to[CustomUnsecuredErrorHandler]
     bind[SecuredErrorHandler].to[CustomSecuredErrorHandler]
     bind[UserService].to[UserServiceImpl]
-    bind[UserDAO].to[UserDAOImpl]
+    bind[UserDao].to[UserDaoImpl]
+    bind[SecurityRoleDao].to[SecurityRoleDaoImpl]
+    bind[LoginInfoDao].to[LoginInfoDaoImpl]
+    bind[LoginInfoService].to[LoginInfoServiceImpl]
+    bind[AuthInfoDAO[PasswordInfo]].to[PasswordInfoDaoImpl]
+    bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDelegableDao]
+    bind[AuthInfoDAO[TotpInfo]].to[TotpInfoDaoImpl]
+    bind[DelegableAuthInfoDAO[TotpInfo]].to[TotpInfoDelegableDao]
+    bind[AuthInfoDAO[OAuth2Info]].to[OAuth2InfoDaoImpl]
+    bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDelegableDao]
+    bind[ScratchCodeDao].to[ScratchCodeDaoImpl]
+    bind[ScratchCodeService].to[ScratchCodeServiceImpl]
+
     bind[CacheLayer].to[PlayCacheLayer]
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
     bind[FingerprintGenerator].toInstance(new DefaultFingerprintGenerator(false))
@@ -78,10 +90,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[Clock].toInstance(Clock())
 
     // Replace this with the bindings to your concrete DAOs
-    bind[DelegableAuthInfoDAO[TotpInfo]].toInstance(new InMemoryAuthInfoDAO[TotpInfo])
-    bind[DelegableAuthInfoDAO[PasswordInfo]].toInstance(new InMemoryAuthInfoDAO[PasswordInfo])
     bind[DelegableAuthInfoDAO[OAuth1Info]].toInstance(new InMemoryAuthInfoDAO[OAuth1Info])
-    bind[DelegableAuthInfoDAO[OAuth2Info]].toInstance(new InMemoryAuthInfoDAO[OAuth2Info])
     bind[DelegableAuthInfoDAO[OpenIDInfo]].toInstance(new InMemoryAuthInfoDAO[OpenIDInfo])
   }
 

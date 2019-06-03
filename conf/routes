@@ -25,7 +25,7 @@ GET         /disableTotp                     controllers.TotpController.disableT
 POST        /totpSubmit                      controllers.TotpController.submit
 POST        /enableTotpSubmit                controllers.TotpController.enableTotpSubmit
 
-GET         /totpRecovery                    controllers.TotpRecoveryController.view(userID: java.util.UUID, sharedKey: String, rememberMe: Boolean)
+GET         /totpRecovery                    controllers.TotpRecoveryController.view(userId: Long, sharedKey: String, rememberMe: Boolean)
 POST        /totpRecoverySubmit              controllers.TotpRecoveryController.submit
 
 GET         /password/forgot                 controllers.ForgotPasswordController.view

@@ -2,9 +2,10 @@ package controllers
 
 import java.net.URLDecoder
 import java.util.UUID
-import javax.inject.Inject
 
+import javax.inject.Inject
 import com.mohiva.play.silhouette.api._
+import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import models.services.{ AuthTokenService, UserService }
 import play.api.i18n.{ I18nSupport, Messages }
@@ -17,23 +18,24 @@ import scala.concurrent.{ ExecutionContext, Future }
 /**
  * The `Activate Account` controller.
  *
- * @param components       The Play controller components.
- * @param silhouette       The Silhouette stack.
- * @param userService      The user service implementation.
+ * @param components The Play controller components.
+ * @param silhouette The Silhouette stack.
  * @param authTokenService The auth token service implementation.
- * @param mailerClient     The mailer client.
- * @param ex               The execution context.
+ * @param mailerClient The mailer client.
+ * @param userService The user service implementation.
+ * @param ec The execution context.
  */
 class ActivateAccountController @Inject() (
   components: ControllerComponents,
   silhouette: Silhouette[DefaultEnv],
-  userService: UserService,
   authTokenService: AuthTokenService,
   mailerClient: MailerClient
 )(
   implicit
-  ex: ExecutionContext
+  userService: UserService,
+  ec: ExecutionContext
 ) extends AbstractController(components) with I18nSupport {
+  import UserService._
 
   /**
    * Sends an account activation email to the user with the given email.
@@ -45,11 +47,10 @@ class ActivateAccountController @Inject() (
     val decodedEmail = URLDecoder.decode(email, "UTF-8")
     val loginInfo = LoginInfo(CredentialsProvider.ID, decodedEmail)
     val result = Redirect(routes.SignInController.view()).flashing("info" -> Messages("activation.email.sent", decodedEmail))
-
     userService.retrieve(loginInfo).flatMap {
       case Some(user) if !user.activated =>
-        authTokenService.create(user.userID).map { authToken =>
-          val url = routes.ActivateAccountController.activate(authToken.id).absoluteURL()
+        authTokenService.create(user.id).map { authToken =>
+          val url = routes.ActivateAccountController.activate(authToken.tokenUuId).absoluteURL()
 
           mailerClient.send(Email(
             subject = Messages("email.activate.account.subject"),
@@ -72,14 +73,24 @@ class ActivateAccountController @Inject() (
    */
   def activate(token: UUID) = silhouette.UnsecuredAction.async { implicit request =>
     authTokenService.validate(token).flatMap {
-      case Some(authToken) => userService.retrieve(authToken.userID).flatMap {
-        case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
-          userService.save(user.copy(activated = true)).map { _ =>
-            Redirect(routes.SignInController.view()).flashing("success" -> Messages("account.activated"))
+      case Some(authToken) => userService.retrieve(authToken.userId).flatMap {
+        case Some(user) => {
+          user.loginInfo.flatMap {
+            case Some(loginInfo) => {
+              if (loginInfo.providerID == CredentialsProvider.ID) {
+                userService.update(user.copy(activated = true)).map { _ =>
+                  Redirect(routes.SignInController.view()).flashing("success" -> Messages("account.activated"))
+                }
+              } else {
+                Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.activation.link")))
+              }
+            }
+            case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
           }
+        }
         case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.activation.link")))
       }
-      case None => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.activation.link")))
+      case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.activation.link")))
     }
   }
 }

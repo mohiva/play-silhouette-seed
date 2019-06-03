@@ -15,7 +15,7 @@
         @helper.form(action = controllers.routes.TotpRecoveryController.submit()) {
             @helper.CSRF.formField
             @b3.text(totpRecoveryForm("recoveryCode"), '_hiddenLabel -> messages("recovery.code"), 'placeholder -> messages("recovery.code"), 'autocomplete -> "off", 'class -> "form-control input-lg")
-            @b3.hidden(totpRecoveryForm("userID"))
+            @b3.hidden(totpRecoveryForm("userId"))
             @b3.hidden(totpRecoveryForm("sharedKey"))
             @b3.hidden(totpRecoveryForm("rememberMe"))
             <div class="form-group">
