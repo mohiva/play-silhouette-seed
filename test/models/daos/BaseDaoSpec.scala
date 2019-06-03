@@ -29,7 +29,6 @@ trait BaseDaoSpec extends PlaySpecification with Mockito {
   trait BaseContext extends WithApplication with AwaitUtil {
 
     val userDao: UserDao = daoContext.userDao
-
     val testLoginInfo = com.mohiva.play.silhouette.api.LoginInfo("testProviderID", "testProviderKey")
 
     val testUser = UserRow(

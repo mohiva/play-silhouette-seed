@@ -4,6 +4,7 @@ import models.generated.Tables._
 import javax.inject._
 import models.daos.generic.GenericDaoAutoIncImpl
 import com.mohiva.play.silhouette.api.{ LoginInfo => ExtLoginInfo }
+import constants.SecurityRoleKeys
 
 import scala.concurrent.{ ExecutionContext, Future }
 import play.api.db.slick.DatabaseConfigProvider
@@ -42,6 +43,9 @@ class UserDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigProvi
     val insertion = (for {
       user <- (User returning User.map(_.id) into ((row, id) => row.copy(id = id)) += user)
       _ <- (LoginInfo += LoginInfoRow(user.id, extLoginInfo.providerID, extLoginInfo.providerKey))
+      // default user role
+      securityRoleId <- SecurityRole.filter(_.name === SecurityRoleKeys.default.toString).result.head.map(_.id)
+      _ <- (UserSecurityRole += UserSecurityRoleRow(user.id, securityRoleId))
     } yield user).transactionally
 
     db.run(insertion)

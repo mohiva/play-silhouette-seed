@@ -6,6 +6,9 @@ import com.mohiva.play.silhouette.api.{ LoginInfo => ExtLoginInfo }
 
 import scala.concurrent.Future
 
+/**
+ * Concrete Dao definition for [[LoginInfo]]
+ */
 trait LoginInfoDao extends GenericDao[LoginInfo, LoginInfoRow, Long] {
   /**
    * Returns the `LoginInfo` found by provider id and key, None otherwise.

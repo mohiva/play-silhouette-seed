@@ -9,6 +9,15 @@ import models.services.UserService
 
 import scala.concurrent.ExecutionContext
 
+/**
+ * Concrete [[Authorization]] implementation that let's the user access certain sensitive
+ * end-points like: billing information, security pages, etc. It checks whether the user
+ * was authenticated using credentials and if not, then asks the user to re-authenticate.
+ *
+ * @param userService the [[UserService]] instance.
+ * @param ec the [[ExecutionContext]] instance.
+ * @tparam A The actual [[Authenticator]] type.
+ */
 case class WithSudoAccess[A <: Authenticator]()(implicit userService: UserService, ec: ExecutionContext) extends Authorization[UserRow, A] {
   import UserService._
 

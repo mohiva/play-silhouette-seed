@@ -35,12 +35,10 @@ class UserDaoSpec extends BaseDaoSpec {
     }
 
     "create an user correctly" in new Context {
-      val result: (UserRow, Seq[UserRow]) = for {
+      val (user, all): (UserRow, Seq[UserRow]) = for {
         user <- userDao.createAndFetch(testUser)
         all <- userDao.findAll()
       } yield (user, all)
-
-      val (user, all) = result
 
       user.firstName should beEqualTo(testUser.firstName)
       user.lastName should beEqualTo(testUser.lastName)
@@ -55,15 +53,13 @@ class UserDaoSpec extends BaseDaoSpec {
     }
 
     "create an user with LoginInfo correctly" in new Context {
-      val result: (Option[UserRow], Option[UserRow], Seq[UserRow]) = for {
+      val (userOpt, nonExistingUserOpt, all): (Option[UserRow], Option[UserRow], Seq[UserRow]) = for {
         _ <- userDao.create(testUser, testLoginInfo)
         _ <- userDao.create(testUser2, testLoginInfo2)
         existingUser <- userDao.find(testLoginInfo)
         nonExistingUser <- userDao.find(testLoginInfo3)
         all <- userDao.findAll()
       } yield (existingUser, nonExistingUser, all)
-
-      val (userOpt, nonExistingUserOpt, all) = result
 
       nonExistingUserOpt should be(None)
 
@@ -82,7 +78,7 @@ class UserDaoSpec extends BaseDaoSpec {
     }
 
     "delete an user correctly" in new Context {
-      val result: (Option[UserRow], Option[UserRow]) = for {
+      val (nonExists, exists): (Option[UserRow], Option[UserRow]) = for {
         _ <- userDao.create(testUser, testLoginInfo)
         _ <- userDao.create(testUser2, testLoginInfo2)
         user <- userDao.find(testLoginInfo)
@@ -90,9 +86,6 @@ class UserDaoSpec extends BaseDaoSpec {
         nonExists <- userDao.find(testLoginInfo)
         exists <- userDao.find(testLoginInfo2)
       } yield (nonExists, exists)
-
-      val nonExists: Option[UserRow] = result._1
-      val exists: Option[UserRow] = result._2
 
       nonExists should be(None)
 

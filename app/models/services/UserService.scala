@@ -3,7 +3,8 @@ package models.services
 import com.mohiva.play.silhouette.api.{ LoginInfo => ExtLoginInfo }
 import com.mohiva.play.silhouette.api.services.IdentityService
 import com.mohiva.play.silhouette.impl.providers.CommonSocialProfile
-import models.generated.Tables.{ LoginInfoRow, UserRow }
+import models.generated.Tables.{ LoginInfoRow, SecurityRoleRow, UserRow }
+import constants.SecurityRoleKeys
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -47,6 +48,13 @@ trait UserService extends IdentityService[UserRow] {
   def loginInfo(user: UserRow): Future[Option[LoginInfoRow]]
 
   /**
+   * Returns a sequence of roles this user has.
+   *
+   * @return a sequence of roles this user has.
+   */
+  def roles(user: UserRow): Future[Seq[SecurityRoleRow]]
+
+  /**
    * Returns the updated user.
    *
    * @param user the user to update
@@ -63,15 +71,28 @@ object UserService {
    * Provides implicit extensions to the UserRow e.g. looking up and attaching the
    * corresponding LoginInfo
    *
-   * @param user the `UserRow` instance
+   * @param user the [[UserRow]] instance
    * @param userService the implicit `UserService` instance.
    * @param ec the implicit `ExecutionContext` instance.
    */
   implicit class withExtensions(user: UserRow)(implicit userService: UserService, ec: ExecutionContext) {
     def loginInfo: Future[Option[ExtLoginInfo]] = {
-      userService.loginInfo(user).map(_.map { loginInfoRow =>
-        ExtLoginInfo(loginInfoRow.providerId, loginInfoRow.providerKey)
+      userService.loginInfo(user).map(_.map { row =>
+        ExtLoginInfo(row.providerId, row.providerKey)
       })
+    }
+
+    def roles: Future[Seq[SecurityRoleKeys.Type]] = {
+      userService.roles(user).map(_.map { row =>
+        SecurityRoleKeys.withName(row.name)
+      })
+    }
+
+    def hasRole(role: SecurityRoleKeys.Type): Future[Boolean] = {
+      userService.roles(user).map(_.filter { row =>
+        row.name == role.toString
+      }.size == 1
+      )
     }
   }
 }
