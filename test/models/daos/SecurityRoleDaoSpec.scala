@@ -24,7 +24,7 @@ class SecurityRoleDaoSpec extends BaseDaoSpec {
 
     "correctly grants a security role to an user" in new Context {
       val user = await(userDao.create(testUser, testLoginInfo))
-      val adminRoleOpt = await(securityRoleDao.findAll()).filter(_.name == SecurityRoleKeys.ADMINISTRATOR_ROLE.toString).headOption
+      val adminRoleOpt = await(securityRoleDao.findAll()).filter(_.name == SecurityRoleKeys.ADMINISTRATOR.toString).headOption
 
       adminRoleOpt should not be None
 
@@ -33,7 +33,7 @@ class SecurityRoleDaoSpec extends BaseDaoSpec {
 
       val securityRoles = await(securityRoleDao.find(user))
       securityRoles.size should beEqualTo(2)
-      securityRoles.filter(_.name == SecurityRoleKeys.ADMINISTRATOR_ROLE.toString).size should beEqualTo(1)
+      securityRoles.filter(_.name == SecurityRoleKeys.ADMINISTRATOR.toString).size should beEqualTo(1)
 
     }
   }
