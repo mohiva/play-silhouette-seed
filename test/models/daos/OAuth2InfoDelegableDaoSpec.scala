@@ -81,7 +81,7 @@ class OAuth2InfoDelegableDaoSpec extends BaseDaoSpec {
    */
   trait Context extends BaseContext {
 
-    val authInfoDelegableDao: DelegableAuthInfoDAO[OAuth2Info] = daoContext.authInfoDelegableDao
+    val authInfoDelegableDao: DelegableAuthInfoDAO[OAuth2Info] = daoContext.oAuth2InfoDelegableDao
 
     // ensure repeatability of the test
     await(userDao.deleteAll)

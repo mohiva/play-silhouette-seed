@@ -11,7 +11,7 @@ class DaoContext @Inject() (
   val authTokenDao: AuthTokenDao,
   val loginInfoDao: LoginInfoDao,
   val oAuth2InfoDao: AuthInfoDAO[OAuth2Info],
-  val authInfoDelegableDao: DelegableAuthInfoDAO[OAuth2Info],
+  val oAuth2InfoDelegableDao: DelegableAuthInfoDAO[OAuth2Info],
   val passwordInfoDao: AuthInfoDAO[PasswordInfo],
   val passwordInfoDelegableDao: DelegableAuthInfoDAO[PasswordInfo],
   val scratchCodeDao: ScratchCodeDao,
