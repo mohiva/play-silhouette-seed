@@ -11,9 +11,7 @@ import scala.language.implicitConversions
  * Blocks until the future is done, implicitly
  */
 trait AwaitUtil {
-  //------------------------------------------------------------------------
-  // public
-  //------------------------------------------------------------------------
+
   /**
    * Returns the result of executing the action and retrieving the Future result
    * @param action The action to be executed
@@ -24,7 +22,6 @@ trait AwaitUtil {
   implicit def await[E](action: DBIOAction[E, NoStream, _])(implicit dbConfigProvider: DatabaseConfigProvider) =
     Await.result(dbConfigProvider.get.db.run(action), Duration.Inf)
 
-  //------------------------------------------------------------------------
   /**
    * Returns the result of executing and waiting the given Future
    * @param f Future to execute and wait for

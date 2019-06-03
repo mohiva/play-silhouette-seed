@@ -2,7 +2,6 @@ package models.daos
 
 import com.mohiva.play.silhouette.impl.providers.{ TotpInfo => ExtTotpInfo }
 import com.mohiva.play.silhouette.api.{ LoginInfo => ExtLoginInfo }
-import com.mohiva.play.silhouette.api.util.{ PasswordInfo => ExtPasswordInfo }
 import com.mohiva.play.silhouette.persistence.daos.AuthInfoDAO
 import javax.inject._
 import models.daos.generic.GenericDaoImpl
@@ -10,12 +9,13 @@ import models.generated.Tables._
 import models.generated.Tables.profile.api._
 import play.api.db.slick.DatabaseConfigProvider
 import slick.dbio.DBIOAction
+import utils.DaoUtil
 
 import scala.concurrent._
 
 @Singleton
 class TotpInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext)
-  extends GenericDaoImpl[TotpInfo, TotpInfoRow, Long](dbConfigProvider, TotpInfo) with AuthInfoDAO[ExtTotpInfo] {
+  extends GenericDaoImpl[TotpInfo, TotpInfoRow, Long](dbConfigProvider, TotpInfo) with AuthInfoDAO[ExtTotpInfo] with DaoUtil {
 
   /**
    * Finds the auth info which is linked with the specified login info.
@@ -28,17 +28,9 @@ class TotpInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigP
       (loginInfo, scratchCode) <- LoginInfo.filter { loginInfo => loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey }.joinLeft(ScratchCode).on(_.userId === _.userId)
       totpInfo <- TotpInfo if totpInfo.userId === loginInfo.userId
     } yield (totpInfo, scratchCode)).result
-    db.run(action).map {
-      case results => {
-        val scratchCodes = results.map(_._2).map {
-          case Some(scratchCode) => Some(ExtPasswordInfo(scratchCode.hasher, scratchCode.password, scratchCode.salt))
-          case _ => None.asInstanceOf[Option[ExtPasswordInfo]]
-        }.filterNot(_.isEmpty).map(_.get)
-
-        results.headOption.map {
-          case (totpInfo, _) => ExtTotpInfo(totpInfo.sharedKey, scratchCodes)
-        }
-      }
+    simplify(db.run(action)).map {
+      case Some((totpInfoRow, scratchCodes)) => Some(totpInfoRow.toExt(scratchCodes.map(_.toExt)))
+      case _ => None
     }
   }
 

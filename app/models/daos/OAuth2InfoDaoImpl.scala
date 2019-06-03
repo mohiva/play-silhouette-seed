@@ -8,8 +8,8 @@ import models.daos.generic.GenericDaoImpl
 import models.generated.Tables._
 import models.generated.Tables.profile.api._
 import play.api.db.slick.DatabaseConfigProvider
-import slick.basic.StaticDatabaseConfig
 import slick.dbio.DBIOAction
+import utils.DaoUtil
 
 import scala.concurrent._
 
@@ -21,7 +21,7 @@ import scala.concurrent._
  */
 @Singleton
 class OAuth2InfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext)
-  extends GenericDaoImpl[OAuth2Info, OAuth2InfoRow, Long](dbConfigProvider, OAuth2Info) with AuthInfoDAO[ExtOAuth2Info] {
+  extends GenericDaoImpl[OAuth2Info, OAuth2InfoRow, Long](dbConfigProvider, OAuth2Info) with AuthInfoDAO[ExtOAuth2Info] with DaoUtil {
 
   /**
    * Returns the matching Silhouette [[ExtOAuth2Info]] used for social
@@ -37,20 +37,9 @@ class OAuth2InfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfi
       (loginInfo, oauth2InfoParam) <- LoginInfo.filter { loginInfo => loginInfo.providerId === extLoginInfo.providerID && loginInfo.providerKey === extLoginInfo.providerKey }.joinLeft(OAuth2InfoParam).on(_.userId === _.userId)
       oauth2Info <- OAuth2Info.filter(_.userId === loginInfo.userId)
     } yield (oauth2Info, oauth2InfoParam)).result
-    db.run(action).map {
-      case results => {
-        val params = results.map(_._2).map {
-          case Some(param) => Some(param.key -> param.value)
-          case _ => None.asInstanceOf[Option[(String, String)]]
-        }.filterNot(_.isEmpty).map(_.get) match {
-          case seq if (seq.nonEmpty) => Some(seq.toMap)
-          case _ => None
-        }
-
-        results.headOption.map {
-          case (oauth2Info, _) => oauth2Info.toExt(params)
-        }
-      }
+    simplify(db.run(action)).map {
+      case Some((oauth2InfoRow, params)) => Some(oauth2InfoRow.toExt(Some(params.map { param => (param.key -> param.value) }.toMap)))
+      case _ => None
     }
   }
 

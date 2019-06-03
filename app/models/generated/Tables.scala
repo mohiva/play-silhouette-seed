@@ -305,7 +305,10 @@ trait Tables {
    *  @param sharedKey Database column shared_key SqlType(CHAR), Length(36,false)
    *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
-  case class TotpInfoRow(userId: Long, sharedKey: String, modified: Option[org.joda.time.DateTime] = None) extends Entity[Long] { override def id = userId }
+  case class TotpInfoRow(userId: Long, sharedKey: String, modified: Option[org.joda.time.DateTime] = None) extends Entity[Long] {
+    override def id = userId
+    def toExt(scratchCodes: Seq[com.mohiva.play.silhouette.api.util.PasswordInfo]) = com.mohiva.play.silhouette.impl.providers.TotpInfo(sharedKey, scratchCodes)
+  }
   /** GetResult implicit for fetching TotpInfoRow objects using plain SQL queries */
   implicit def GetResultTotpInfoRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[org.joda.time.DateTime]]): GR[TotpInfoRow] = GR {
     prs =>

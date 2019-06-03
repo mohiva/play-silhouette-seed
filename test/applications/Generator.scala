@@ -112,7 +112,10 @@ object Generator extends App {
                 "  override def id = userId\n" +
                 "  def toExt = com.mohiva.play.silhouette.api.util.PasswordInfo(hasher, password, salt) \n" +
                 "}"
-              case "TotpInfoRow" => "{ override def id = userId }"
+              case "TotpInfoRow" => "{\n" +
+                "  override def id = userId\n" +
+                "  def toExt(scratchCodes: Seq[com.mohiva.play.silhouette.api.util.PasswordInfo]) = com.mohiva.play.silhouette.impl.providers.TotpInfo(sharedKey, scratchCodes)\n" +
+                "}"
               case "ScratchCodeRow" => "{\n" +
                 "  override def id = userId\n" +
                 "  def toExt = com.mohiva.play.silhouette.api.util.PasswordInfo(hasher, password, salt) \n" +
