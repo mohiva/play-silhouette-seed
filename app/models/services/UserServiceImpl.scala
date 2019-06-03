@@ -15,8 +15,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param ex The execution context.
  */
 class UserServiceImpl @Inject() (
-  daoContext: DaoContext,
-  loginInfoDao: LoginInfoDao
+  daoContext: DaoContext
 )(
   implicit
   ex: ExecutionContext
@@ -86,7 +85,7 @@ class UserServiceImpl @Inject() (
    * @return the LoginInfo that corresponds to the user.
    */
   override def loginInfo(user: UserRow): Future[Option[LoginInfoRow]] = {
-    loginInfoDao.findById(user.id)
+    daoContext.loginInfoDao.findById(user.id)
   }
 
   /**

@@ -76,7 +76,7 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
     implicit val ec = scala.concurrent.ExecutionContext.global
     implicit val env: Environment[DefaultEnv] = new FakeEnvironment[DefaultEnv](Seq(testLoginInfo.toExt -> testUser))
 
-    class FakeUserService extends UserServiceImpl(null, null) {
+    class FakeUserService extends UserServiceImpl(null) {
       override def loginInfo(user: UserRow): Future[Option[LoginInfoRow]] = {
         Future.successful(if (user == testUser) Some(testLoginInfo) else None)
       }
