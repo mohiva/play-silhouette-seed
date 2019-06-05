@@ -4,13 +4,14 @@ import com.mohiva.play.silhouette.impl.providers.TotpInfo
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
 import models.generated.Tables._
 import org.joda.time.DateTime
+import play.api.test.WithApplication
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Test suite for the [[ScratchCodeDao]]
  */
-class ScratchCodeDaoSpec extends BaseDaoSpec {
+class ScratchCodeDaoSpec extends DaoSpecLike {
   sequential
 
   "The scratch code dao" should {
@@ -58,7 +59,7 @@ class ScratchCodeDaoSpec extends BaseDaoSpec {
   /**
    * Context reused by all tests
    */
-  trait Context extends BaseContext {
+  trait Context extends WithApplication with DaoSpecScope {
 
     val loginInfoDao: LoginInfoDao = daoContext.loginInfoDao
     val totpInfoDelegableDao: DelegableAuthInfoDAO[TotpInfo] = daoContext.totpInfoDelegableDao

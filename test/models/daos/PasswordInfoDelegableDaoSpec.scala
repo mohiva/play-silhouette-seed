@@ -2,13 +2,14 @@ package models.daos
 
 import com.mohiva.play.silhouette.api.util.PasswordInfo
 import com.mohiva.play.silhouette.persistence.daos.AuthInfoDAO
+import play.api.test.WithApplication
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Test suite for the [[PasswordInfoDelegableDao]]
  */
-class PasswordInfoDelegableDaoSpec extends BaseDaoSpec {
+class PasswordInfoDelegableDaoSpec extends DaoSpecLike {
   sequential
 
   "The password info delegable dao" should {
@@ -79,7 +80,7 @@ class PasswordInfoDelegableDaoSpec extends BaseDaoSpec {
   /**
    * Context reused by all tests
    */
-  trait Context extends BaseContext {
+  trait Context extends WithApplication with DaoSpecScope {
     val passwordInfoDelegableDao: AuthInfoDAO[PasswordInfo] = daoContext.passwordInfoDelegableDao
 
     // ensure repeatability of the test

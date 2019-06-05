@@ -2,13 +2,14 @@ package models.daos
 
 import com.mohiva.play.silhouette.impl.providers.OAuth2Info
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
+import play.api.test.WithApplication
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Test suite for the [[OAuth2InfoDelegableDao]]
  */
-class OAuth2InfoDelegableDaoSpec extends BaseDaoSpec {
+class OAuth2InfoDelegableDaoSpec extends DaoSpecLike {
   sequential
 
   "The oauth info delegable dao" should {
@@ -79,7 +80,7 @@ class OAuth2InfoDelegableDaoSpec extends BaseDaoSpec {
   /**
    * Context reused by all tests
    */
-  trait Context extends BaseContext {
+  trait Context extends WithApplication with DaoSpecScope {
 
     val authInfoDelegableDao: DelegableAuthInfoDAO[OAuth2Info] = daoContext.oAuth2InfoDelegableDao
 

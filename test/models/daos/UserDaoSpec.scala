@@ -4,13 +4,14 @@ import java.time.LocalDate
 
 import models.generated.Tables._
 import org.joda.time.DateTime
+import play.api.test.WithApplication
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Test suite for the [[UserDaoImpl]]
  */
-class UserDaoSpec extends BaseDaoSpec {
+class UserDaoSpec extends DaoSpecLike {
   sequential
 
   "The user dao" should {
@@ -105,7 +106,7 @@ class UserDaoSpec extends BaseDaoSpec {
   /**
    * Context reused by all tests
    */
-  trait Context extends BaseContext {
+  trait Context extends WithApplication with DaoSpecScope {
 
     val testUser2 = UserRow(
       id = 0L,

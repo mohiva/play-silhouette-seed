@@ -23,9 +23,9 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
 
   "The `index` action" should {
     "redirect to login page if user is unauthorized" in new Context {
-      new WithApplication(application) {
+      new WithApplication(app) {
         val Some(redirectResult) = route(app, FakeRequest(routes.ApplicationController.index())
-          .withAuthenticator[DefaultEnv](LoginInfo("invalid", "invalid"))
+          .withAuthenticator[DefaultEnv](testInvalidLoginInfo)
         )
 
         status(redirectResult) must be equalTo SEE_OTHER
@@ -42,9 +42,9 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
     }
 
     "return 200 if user is authorized" in new Context {
-      new WithApplication(application) {
+      new WithApplication(app) {
         val Some(result) = route(app, addCSRFToken(FakeRequest(routes.ApplicationController.index())
-          .withAuthenticator[DefaultEnv](testLoginInfo.toExt))
+          .withAuthenticator[DefaultEnv](testLoginInfo))
         )
 
         status(result) must beEqualTo(OK)
@@ -59,7 +59,7 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
     /**
      * An identity.
      */
-    val testUser = UserRow(
+    val testUserRow = UserRow(
       id = 0L,
       firstName = None,
       lastName = None,
@@ -68,17 +68,19 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
       activated = true
     )
 
-    val testLoginInfo = LoginInfoRow(0L, "facebook", "user@facebook.com")
+    val testLoginInfoRow = LoginInfoRow(0L, "facebook", "user@facebook.com")
+    val testLoginInfo = testLoginInfoRow.toExt
+    val testInvalidLoginInfo = LoginInfo("invalid", "invalid")
 
     /**
      * A Silhouette fake environment.
      */
     implicit val ec = scala.concurrent.ExecutionContext.global
-    implicit val env: Environment[DefaultEnv] = new FakeEnvironment[DefaultEnv](Seq(testLoginInfo.toExt -> testUser))
+    implicit val env: Environment[DefaultEnv] = new FakeEnvironment[DefaultEnv](Seq(testLoginInfo -> testUserRow))
 
     class FakeUserService extends UserServiceImpl(null) {
       override def loginInfo(user: UserRow): Future[Option[LoginInfoRow]] = {
-        Future.successful(if (user == testUser) Some(testLoginInfo) else None)
+        Future.successful(if (user == testUserRow) Some(testLoginInfoRow) else None)
       }
     }
 
@@ -95,7 +97,7 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
     /**
      * The application.
      */
-    lazy val application = new GuiceApplicationBuilder()
+    lazy val app = new GuiceApplicationBuilder()
       .overrides(new FakeModule)
       .build()
   }

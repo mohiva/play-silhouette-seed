@@ -5,13 +5,14 @@ import java.util.UUID
 import models.generated.Tables
 import models.generated.Tables._
 import org.joda.time.DateTime
+import play.api.test.WithApplication
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Test suite for the [[AuthTokenDaoImpl]]
  */
-class AuthTokenDaoSpec extends BaseDaoSpec {
+class AuthTokenDaoSpec extends DaoSpecLike {
   sequential
 
   "The auth token dao" should {
@@ -72,7 +73,7 @@ class AuthTokenDaoSpec extends BaseDaoSpec {
   /**
    * Context reused by all tests
    */
-  trait Context extends BaseContext {
+  trait Context extends WithApplication with DaoSpecScope {
 
     val authTokenDao: AuthTokenDao = daoContext.authTokenDao
 

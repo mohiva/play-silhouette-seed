@@ -2,13 +2,14 @@ package models.daos
 
 import constants.SecurityRoleKeys
 import models.generated.Tables._
+import play.api.test.WithApplication
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Test suite for the [[SecurityRoleDaoImpl]]
  */
-class SecurityRoleDaoSpec extends BaseDaoSpec {
+class SecurityRoleDaoSpec extends DaoSpecLike {
   sequential
 
   "The security role dao" should {
@@ -41,7 +42,7 @@ class SecurityRoleDaoSpec extends BaseDaoSpec {
   /**
    * Context reused by all tests
    */
-  trait Context extends BaseContext {
+  trait Context extends WithApplication with DaoSpecScope {
     val securityRoleDao: SecurityRoleDao = daoContext.securityRoleDao
 
     // ensure repeatability of the test

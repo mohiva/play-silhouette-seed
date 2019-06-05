@@ -3,13 +3,14 @@ package models.daos
 import com.mohiva.play.silhouette.api
 import models.generated.Tables
 import models.generated.Tables._
+import play.api.test.WithApplication
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Test suite for the [[LoginInfoDaoImpl]]
  */
-class LoginInfoDaoSpec extends BaseDaoSpec {
+class LoginInfoDaoSpec extends DaoSpecLike {
   sequential
 
   "The LoginInfoDao should" should {
@@ -56,7 +57,7 @@ class LoginInfoDaoSpec extends BaseDaoSpec {
   /**
    * Context reused by all tests
    */
-  trait Context extends BaseContext {
+  trait Context extends WithApplication with DaoSpecScope {
 
     val loginInfoDao: LoginInfoDao = daoContext.loginInfoDao
 

@@ -5,18 +5,18 @@ import java.time.LocalDate
 import com.mohiva.play.silhouette.impl.providers.OAuth2Info
 import com.mohiva.play.silhouette.api.util.PasswordInfo
 import com.mohiva.play.silhouette.impl.providers.TotpInfo
-import models.generated.Tables.ScratchCode
 import models.generated.Tables._
 import org.joda.time.DateTime
+import org.specs2.specification.Scope
 import org.specs2.mock.Mockito
 import play.api.Application
-import play.api.test.{ PlaySpecification, WithApplication }
+import play.api.test.PlaySpecification
 import utils.AwaitUtil
 
 /**
  * Base trait for all tests that need dao access via Specs2
  */
-trait BaseDaoSpec extends PlaySpecification with Mockito {
+trait DaoSpecLike extends PlaySpecification with Mockito {
   /**
    * Returns Dao context instance containing accessible daos.
    * @param app The application instance in context.
@@ -26,7 +26,8 @@ trait BaseDaoSpec extends PlaySpecification with Mockito {
     Application.instanceCache[DaoContext].apply(app)
   }
 
-  trait BaseContext extends WithApplication with AwaitUtil {
+  trait DaoSpecScope extends Scope with AwaitUtil {
+    implicit val app: Application
 
     val userDao: UserDao = daoContext.userDao
     val testLoginInfo = com.mohiva.play.silhouette.api.LoginInfo("testProviderID", "testProviderKey")
