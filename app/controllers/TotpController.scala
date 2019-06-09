@@ -66,7 +66,7 @@ class TotpController @Inject() (
     request.identity.loginInfo.flatMap {
       case Some(loginInfo) => {
         authInfoRepository.find[TotpInfo](loginInfo).map { totpInfoOpt =>
-          Ok(views.html.home(user, loginInfo, totpInfoOpt, Some((formData, credentials))))
+          Ok(views.html.index(user, loginInfo, totpInfoOpt, Some((formData, credentials))))
         }
       }
       case _ => Future.failed(new IdentityNotFoundException("User doesn't have a LoginInfo attached"))
@@ -101,7 +101,7 @@ class TotpController @Inject() (
       case Some(loginInfo) => {
         TotpSetupForm.form.bindFromRequest.fold(
           form => authInfoRepository.find[TotpInfo](loginInfo).map { totpInfoOpt =>
-            BadRequest(views.html.home(user, loginInfo, totpInfoOpt))
+            BadRequest(views.html.index(user, loginInfo, totpInfoOpt))
           },
           data => {
             totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {

@@ -35,6 +35,7 @@ libraryDependencies ++= Seq(
   "com.github.tototoshi" %% "slick-joda-mapper" % "2.4.0",
   "joda-time" % "joda-time" % "2.10.1",
   "org.joda" % "joda-convert" % "1.9.2",
+  "com.github.tototoshi" %% "play-joda-routes-binder" % "1.3.1-SNAPSHOT",
   "mysql" % "mysql-connector-java" % "8.0.16",
   "com.mohiva" %% "play-silhouette-testkit" % "6.0.1-SNAPSHOT" % "test",
   specs2 % Test,
@@ -46,7 +47,10 @@ libraryDependencies ++= Seq(
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-routesImport += "utils.route.Binders._"
+routesImport ++= Seq(
+  "utils.route.Binders._",
+  "utils.route.MyJodaRoutes.myJodaRoutes._"
+)
 
 // https://github.com/playframework/twirl/issues/105
 TwirlKeys.templateImports := Seq()

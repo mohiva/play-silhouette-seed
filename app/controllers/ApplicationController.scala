@@ -43,7 +43,7 @@ class ApplicationController @Inject() (
     request.identity.loginInfo.flatMap {
       case Some(loginInfo) => {
         authInfoRepository.find[TotpInfo](loginInfo).map { totpInfoOpt =>
-          Ok(views.html.home(request.identity, loginInfo, totpInfoOpt))
+          Ok(views.html.index(request.identity, loginInfo, totpInfoOpt))
         }
       }
       case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))
