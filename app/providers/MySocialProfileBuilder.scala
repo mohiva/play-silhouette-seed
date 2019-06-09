@@ -26,8 +26,8 @@ case class MySocialProfile(
   firstName: Option[String] = None,
   lastName: Option[String] = None,
   fullName: Option[String] = None,
-  birthDate: Option[LocalDate],
-  gender: Option[String],
+  birthDate: Option[LocalDate] = None,
+  gender: Option[String] = None,
   email: Option[String] = None,
   avatarURL: Option[String] = None) extends SocialProfile
 
