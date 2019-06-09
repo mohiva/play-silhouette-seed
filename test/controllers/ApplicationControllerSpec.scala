@@ -6,6 +6,7 @@ import com.mohiva.play.silhouette.test._
 import models.generated.Tables._
 import models.services.{ UserService, UserServiceImpl }
 import net.codingwell.scalaguice.ScalaModule
+import org.joda.time.LocalDate
 import org.specs2.mock.Mockito
 import org.specs2.specification.Scope
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -61,9 +62,12 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
      */
     val testUserRow = UserRow(
       id = 0L,
-      firstName = None,
-      lastName = None,
-      email = None,
+      firstName = "First",
+      lastName = "Last",
+      birthDate = new LocalDate(),
+      gender = "male",
+      email = "someone@somewhere",
+      phoneNumber = Some("(012)-3456-789"),
       avatarUrl = None,
       activated = true
     )

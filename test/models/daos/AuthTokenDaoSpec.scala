@@ -18,11 +18,15 @@ class AuthTokenDaoSpec extends DaoSpecLike {
   "The auth token dao" should {
     "should find token by ID" in new Context {
       // create Fixture
-      await(
-        userDao.createAndFetch(testUser)
-          .flatMap(u => authTokenDao.create(testToken.copy(userId = u.id)))
-      )
+      val userOpt: Option[UserRow] = for {
+        _ <- userDao.create(testUser, testLoginInfo)
+        userOpt <- userDao.find(testLoginInfo)
+      } yield userOpt
+      userOpt must not beEmpty
 
+      await(authTokenDao.create(testToken.copy(userId = userOpt.get.id)))
+
+      // now the actual test
       val result: (Option[AuthTokenRow], Seq[AuthTokenRow]) = for {
         token <- authTokenDao.find(testToken.tokenUuId)
         expiredTokens <- authTokenDao.findExpired(DateTime.now())
@@ -39,15 +43,15 @@ class AuthTokenDaoSpec extends DaoSpecLike {
 
     "should find expired token" in new Context {
       // create Fixture
-      await(
-        userDao.createAndFetch(testUser)
-          .flatMap(u => authTokenDao.create(
-            testToken.copy(
-              userId = u.id,
-              expiry = testToken.expiry.minusDays(2)
-            )))
-      )
+      val userOpt: Option[UserRow] = for {
+        _ <- userDao.create(testUser, testLoginInfo)
+        userOpt <- userDao.find(testLoginInfo)
+      } yield userOpt
+      userOpt must not beEmpty
 
+      await(authTokenDao.create(testToken.copy(userId = userOpt.get.id, expiry = testToken.expiry.minusDays(2))))
+
+      // now the actual test
       val expiredTokens: Seq[AuthTokenRow] = for {
         expiredTokens <- authTokenDao.findExpired(DateTime.now())
       } yield expiredTokens
@@ -59,9 +63,16 @@ class AuthTokenDaoSpec extends DaoSpecLike {
     }
 
     "delete a token correctly" in new Context {
+      // create Fixture
+      val userOpt: Option[UserRow] = for {
+        _ <- userDao.create(testUser, testLoginInfo)
+        userOpt <- userDao.find(testLoginInfo)
+      } yield userOpt
+      userOpt must not beEmpty
+
+      // now the actual test
       val authTokenInfoOpt: Option[Tables.AuthTokenRow] = for {
-        user <- userDao.createAndFetch(testUser)
-        _ <- authTokenDao.create(testToken.copy(userId = user.id))
+        _ <- authTokenDao.create(testToken.copy(userId = userOpt.get.id))
         _ <- authTokenDao.remove(testToken.tokenUuId)
         authTokenInfo <- authTokenDao.find(testToken.tokenUuId)
       } yield authTokenInfo
@@ -85,6 +96,5 @@ class AuthTokenDaoSpec extends DaoSpecLike {
 
     // ensure repeatability of the test
     await(userDao.deleteAll)
-    await(authTokenDao.deleteAll)
   }
 }

@@ -75,6 +75,5 @@ class ScratchCodeDaoSpec extends DaoSpecLike {
 
     // ensure repeatability of the test
     await(userDao.deleteAll)
-    await(scratchCodeDao.deleteAll)
   }
 }

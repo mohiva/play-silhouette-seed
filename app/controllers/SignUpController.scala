@@ -1,7 +1,5 @@
 package controllers
 
-import java.util.UUID
-
 import javax.inject.Inject
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
@@ -16,7 +14,7 @@ import models.services.{ AuthTokenService, UserService }
 import org.webjars.play.WebJarsUtil
 import play.api.i18n.{ I18nSupport, Messages }
 import play.api.libs.mailer.{ Email, MailerClient }
-import play.api.mvc.{ AbstractController, AnyContent, ControllerComponents, Request }
+import play.api.mvc.{ AbstractController, ControllerComponents }
 import utils.auth.DefaultEnv
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -92,9 +90,12 @@ class SignUpController @Inject() (
             val authInfo = passwordHasherRegistry.current.hash(data.password)
             val user = UserRow(
               id = 0L,
-              firstName = Some(data.firstName),
-              lastName = Some(data.lastName),
-              email = Some(data.email),
+              firstName = data.firstName,
+              lastName = data.lastName,
+              birthDate = data.birthDate,
+              gender = data.gender,
+              email = data.email,
+              phoneNumber = data.phoneNumber,
               avatarUrl = None,
               activated = false
             )

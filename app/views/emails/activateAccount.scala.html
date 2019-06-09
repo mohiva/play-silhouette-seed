@@ -6,7 +6,7 @@
 
 <html>
     <body>
-        <p>@messages("email.activate.account.hello", user.fullName.getOrElse("user"))</p>
+        <p>@messages("email.activate.account.hello", user.fullName)</p>
         <p>@Html(messages("email.activate.account.html.text", url))</p>
     </body>
 </html>

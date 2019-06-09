@@ -35,6 +35,7 @@ import play.api.Configuration
 import play.api.libs.openid.OpenIdClient
 import play.api.libs.ws.WSClient
 import play.api.mvc.{ Cookie, CookieHeaderEncoding }
+import providers.MyFacebookProvider
 import utils.auth.{ CustomSecuredErrorHandler, CustomUnsecuredErrorHandler, DefaultEnv }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -138,7 +139,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    */
   @Provides
   def provideSocialProviderRegistry(
-    facebookProvider: FacebookProvider,
+    facebookProvider: MyFacebookProvider,
     googleProvider: GoogleProvider,
     vkProvider: VKProvider,
     twitterProvider: TwitterProvider,
@@ -389,9 +390,9 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   def provideFacebookProvider(
     httpLayer: HTTPLayer,
     socialStateHandler: SocialStateHandler,
-    configuration: Configuration): FacebookProvider = {
+    configuration: Configuration): MyFacebookProvider = {
 
-    new FacebookProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.facebook"))
+    new MyFacebookProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.facebook"))
   }
 
   /**

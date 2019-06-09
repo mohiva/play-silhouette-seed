@@ -28,16 +28,22 @@
         <div class="row data">
             <div class="col-md-12">
                 <div class="row">
-                    <p class="col-md-6"><strong>@messages("first.name"):</strong></p><p class="col-md-6">@user.firstName.getOrElse("None")</p>
+                    <p class="col-md-6"><strong>@messages("full.name"):</strong></p><p class="col-md-6">@user.fullName</p>
                 </div>
                 <div class="row">
-                    <p class="col-md-6"><strong>@messages("last.name"):</strong></p><p class="col-md-6">@user.lastName.getOrElse("None")</p>
+                    <p class="col-md-6"><strong>@messages("first.name"):</strong></p><p class="col-md-6">@user.firstName</p>
                 </div>
                 <div class="row">
-                    <p class="col-md-6"><strong>@messages("full.name"):</strong></p><p class="col-md-6">@user.fullName.getOrElse("None")</p>
+                    <p class="col-md-6"><strong>@messages("last.name"):</strong></p><p class="col-md-6">@user.lastName</p>
                 </div>
                 <div class="row">
-                    <p class="col-md-6"><strong>@messages("email"):</strong></p><p class="col-md-6">@user.email.getOrElse("None")</p>
+                    <p class="col-md-6"><strong>@messages("email"):</strong></p><p class="col-md-6">@user.email</p>
+                </div>
+                <div class="row">
+                    <p class="col-md-6"><strong>@messages("gender"):</strong></p><p class="col-md-6">@user.gender</p>
+                </div>
+                <div class="row">
+                    <p class="col-md-6"><strong>@messages("birth.date"):</strong></p><p class="col-md-6">@user.birthDate</p>
                 </div>
             </div>
         </div>

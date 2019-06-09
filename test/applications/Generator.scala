@@ -48,6 +48,7 @@ object Generator extends App {
       override def Column = new Column(_) {
         override def rawType = model.tpe match {
           case "java.sql.Timestamp" => "org.joda.time.DateTime" // kill java.sql.Timestamp
+          case "java.sql.Date" => "org.joda.time.LocalDate" // kill java.sql.Date
           case _ => {
             super.rawType
           }
@@ -91,14 +92,7 @@ object Generator extends App {
             val prns = (newParents.take(1).map(" extends " + _) ++ newParents.drop(1).map(" with " + _)).mkString("")
             val newBody = name match {
               case "UserRow" => "{\n" +
-                "  def fullName = {\n" +
-                "    (firstName -> lastName) match {\n" +
-                "      case (Some(f), Some(l)) => Some(f + \" \" + l)\n" +
-                "      case (Some(f), None) => Some(f)\n" +
-                "      case (None, Some(l)) => Some(l)\n" +
-                "      case _ => None\n" +
-                "    }\n" +
-                "  }\n" +
+                "  def fullName = s\"$firstName $lastName\"\n" +
                 "}"
               case "LoginInfoRow" => "{\n" +
                 "  override def id = userId\n" +

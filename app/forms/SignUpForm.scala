@@ -1,7 +1,9 @@
 package forms
 
+import org.joda.time.LocalDate
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.data.JodaForms._
 import play.api.i18n.Messages
 
 object SignUpForm {
@@ -12,7 +14,10 @@ object SignUpForm {
     mapping(
       "firstName" -> nonEmptyText,
       "lastName" -> nonEmptyText,
+      "birthDate" -> jodaLocalDate,
+      "gender" -> nonEmptyText,
       "email" -> email,
+      "phoneNumber" -> optional(nonEmptyText),
       "password" -> nonEmptyText(minLength = 5),
       "repeatPassword" -> nonEmptyText(minLength = 5)
     )(Data.apply)(Data.unapply).
@@ -32,7 +37,10 @@ object SignUpForm {
   case class Data(
     firstName: String,
     lastName: String,
+    birthDate: LocalDate,
+    gender: String,
     email: String,
+    phoneNumber: Option[String],
     password: String,
     repeatPassword: String)
 }

@@ -2,9 +2,9 @@ package models.services
 
 import javax.inject.Inject
 import com.mohiva.play.silhouette.api.{ LoginInfo => ExtLoginInfo }
-import com.mohiva.play.silhouette.impl.providers.CommonSocialProfile
 import models.daos._
 import models.generated.Tables._
+import providers.MySocialProfile
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -56,13 +56,17 @@ class UserServiceImpl @Inject() (
    * @param profile The social profile to save.
    * @return The user for whom the profile was saved.
    */
-  override def create(profile: CommonSocialProfile): Future[UserRow] = {
+  // TODO: extend OAuth2FacebookProvider and provide correct values
+  override def create(profile: MySocialProfile): Future[UserRow] = {
     daoContext.userDao.find(profile.loginInfo).flatMap {
       case Some(user) => { // update user with profile
         val updated = user.copy(
-          firstName = profile.firstName,
-          lastName = profile.lastName,
-          email = profile.email,
+          firstName = profile.firstName.get,
+          lastName = profile.lastName.get,
+          birthDate = profile.birthDate.get,
+          gender = profile.gender.get,
+          email = profile.email.get,
+          phoneNumber = None,
           avatarUrl = profile.avatarURL
         )
         daoContext.userDao.update(updated).map(affected => if (affected == 1) updated else None.asInstanceOf[UserRow])
@@ -70,9 +74,12 @@ class UserServiceImpl @Inject() (
       case None => // insert a new user
         daoContext.userDao.create(UserRow(
           0L,
-          firstName = profile.firstName,
-          lastName = profile.lastName,
-          email = profile.email,
+          firstName = profile.firstName.get,
+          lastName = profile.lastName.get,
+          birthDate = profile.birthDate.get,
+          gender = profile.gender.get,
+          email = profile.email.get,
+          phoneNumber = None,
           avatarUrl = profile.avatarURL,
           activated = true
         ), profile.loginInfo)

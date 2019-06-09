@@ -1,12 +1,10 @@
 package models.daos
 
-import java.time.LocalDate
-
 import com.mohiva.play.silhouette.impl.providers.OAuth2Info
 import com.mohiva.play.silhouette.api.util.PasswordInfo
 import com.mohiva.play.silhouette.impl.providers.TotpInfo
 import models.generated.Tables._
-import org.joda.time.DateTime
+import org.joda.time._
 import org.specs2.specification.Scope
 import org.specs2.mock.Mockito
 import play.api.Application
@@ -34,10 +32,12 @@ trait DaoSpecLike extends PlaySpecification with Mockito {
 
     val testUser = UserRow(
       id = 0L,
-      firstName = Some("John"),
-      lastName = Some("Wick"),
-      dateOfBirth = Some(java.sql.Date.valueOf(LocalDate.now())),
-      email = Some("test@test.test"),
+      firstName = "John",
+      lastName = "Wick",
+      birthDate = new LocalDate(),
+      gender = "male",
+      email = "test@test.test",
+      phoneNumber = Some("(012)-3456-789"),
       avatarUrl = Some("avatar.com"),
       activated = true,
       lastLogin = Some(DateTime.now()),

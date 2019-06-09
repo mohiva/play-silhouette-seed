@@ -52,8 +52,8 @@ trait Tables {
     /** Database column expiry SqlType(TIMESTAMP) */
     val expiry: Rep[org.joda.time.DateTime] = column[org.joda.time.DateTime]("expiry")
 
-    /** Foreign key referencing User (database name auth_token_ibfk_1) */
-    lazy val userFk = foreignKey("auth_token_ibfk_1", userId, User)(r => r.id, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
+    /** Foreign key referencing LoginInfo (database name auth_token_ibfk_1) */
+    lazy val loginInfoFk = foreignKey("auth_token_ibfk_1", userId, LoginInfo)(r => r.userId, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
 
     /** Index over (tokenId) (database name idx_token_id) */
     val index1 = index("idx_token_id", tokenId)
@@ -224,8 +224,8 @@ trait Tables {
     /** Database column modified SqlType(TIMESTAMP), Default(None) */
     val modified: Rep[Option[org.joda.time.DateTime]] = column[Option[org.joda.time.DateTime]]("modified", O.Default(None))
 
-    /** Foreign key referencing User (database name password_info_ibfk_1) */
-    lazy val userFk = foreignKey("password_info_ibfk_1", userId, User)(r => r.id, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
+    /** Foreign key referencing LoginInfo (database name password_info_ibfk_1) */
+    lazy val loginInfoFk = foreignKey("password_info_ibfk_1", userId, LoginInfo)(r => r.userId, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
   }
   /** Collection-like TableQuery object for table PasswordInfo */
   lazy val PasswordInfo = new TableQuery(tag => new PasswordInfo(tag))
@@ -339,47 +339,46 @@ trait Tables {
   /**
    * Entity class storing rows of table User
    *  @param id Database column id SqlType(BIGINT UNSIGNED), AutoInc, PrimaryKey
-   *  @param firstName Database column first_name SqlType(VARCHAR), Length(50,true), Default(None)
-   *  @param lastName Database column last_name SqlType(VARCHAR), Length(50,true), Default(None)
-   *  @param dateOfBirth Database column date_of_birth SqlType(DATE), Default(None)
-   *  @param email Database column email SqlType(VARCHAR), Length(100,true), Default(None)
+   *  @param firstName Database column first_name SqlType(VARCHAR), Length(50,true)
+   *  @param lastName Database column last_name SqlType(VARCHAR), Length(50,true)
+   *  @param birthDate Database column birth_date SqlType(DATE)
+   *  @param gender Database column gender SqlType(ENUM), Length(6,false)
+   *  @param email Database column email SqlType(VARCHAR), Length(100,true)
+   *  @param phoneNumber Database column phone_number SqlType(VARCHAR), Length(20,true), Default(None)
    *  @param avatarUrl Database column avatar_url SqlType(VARCHAR), Length(200,true), Default(None)
    *  @param activated Database column activated SqlType(BIT), Default(false)
    *  @param lastLogin Database column last_login SqlType(TIMESTAMP), Default(None)
    *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
-  case class UserRow(id: Long, firstName: Option[String] = None, lastName: Option[String] = None, dateOfBirth: Option[java.sql.Date] = None, email: Option[String] = None, avatarUrl: Option[String] = None, activated: Boolean = false, lastLogin: Option[org.joda.time.DateTime] = None, modified: Option[org.joda.time.DateTime] = None) extends EntityAutoInc[Long, UserRow] with com.mohiva.play.silhouette.api.Identity {
-    def fullName = {
-      (firstName -> lastName) match {
-        case (Some(f), Some(l)) => Some(f + " " + l)
-        case (Some(f), None) => Some(f)
-        case (None, Some(l)) => Some(l)
-        case _ => None
-      }
-    }
+  case class UserRow(id: Long, firstName: String, lastName: String, birthDate: org.joda.time.LocalDate, gender: String, email: String, phoneNumber: Option[String] = None, avatarUrl: Option[String] = None, activated: Boolean = false, lastLogin: Option[org.joda.time.DateTime] = None, modified: Option[org.joda.time.DateTime] = None) extends EntityAutoInc[Long, UserRow] with com.mohiva.play.silhouette.api.Identity {
+    def fullName = s"$firstName $lastName"
   }
   /** GetResult implicit for fetching UserRow objects using plain SQL queries */
-  implicit def GetResultUserRow(implicit e0: GR[Long], e1: GR[Option[String]], e2: GR[Option[java.sql.Date]], e3: GR[Boolean], e4: GR[Option[org.joda.time.DateTime]]): GR[UserRow] = GR {
+  implicit def GetResultUserRow(implicit e0: GR[Long], e1: GR[String], e2: GR[org.joda.time.LocalDate], e3: GR[Option[String]], e4: GR[Boolean], e5: GR[Option[org.joda.time.DateTime]]): GR[UserRow] = GR {
     prs =>
       import prs._
-      UserRow.tupled((<<[Long], <<?[String], <<?[String], <<?[java.sql.Date], <<?[String], <<?[String], <<[Boolean], <<?[org.joda.time.DateTime], <<?[org.joda.time.DateTime]))
+      UserRow.tupled((<<[Long], <<[String], <<[String], <<[org.joda.time.LocalDate], <<[String], <<[String], <<?[String], <<?[String], <<[Boolean], <<?[org.joda.time.DateTime], <<?[org.joda.time.DateTime]))
   }
   /** Table description of table user. Objects of this class serve as prototypes for rows in queries. */
   class User(_tableTag: Tag) extends profile.api.Table[UserRow](_tableTag, schemaName, "user") with IdentifyableTable[Long] {
-    def * = (id, firstName, lastName, dateOfBirth, email, avatarUrl, activated, lastLogin, modified) <> (UserRow.tupled, UserRow.unapply)
+    def * = (id, firstName, lastName, birthDate, gender, email, phoneNumber, avatarUrl, activated, lastLogin, modified) <> (UserRow.tupled, UserRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = ((Rep.Some(id), firstName, lastName, dateOfBirth, email, avatarUrl, Rep.Some(activated), lastLogin, modified)).shaped.<>({ r => import r._; _1.map(_ => UserRow.tupled((_1.get, _2, _3, _4, _5, _6, _7.get, _8, _9))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+    def ? = ((Rep.Some(id), Rep.Some(firstName), Rep.Some(lastName), Rep.Some(birthDate), Rep.Some(gender), Rep.Some(email), phoneNumber, avatarUrl, Rep.Some(activated), lastLogin, modified)).shaped.<>({ r => import r._; _1.map(_ => UserRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7, _8, _9.get, _10, _11))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(BIGINT UNSIGNED), AutoInc, PrimaryKey */
     val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column first_name SqlType(VARCHAR), Length(50,true), Default(None) */
-    val firstName: Rep[Option[String]] = column[Option[String]]("first_name", O.Length(50, varying = true), O.Default(None))
-    /** Database column last_name SqlType(VARCHAR), Length(50,true), Default(None) */
-    val lastName: Rep[Option[String]] = column[Option[String]]("last_name", O.Length(50, varying = true), O.Default(None))
-    /** Database column date_of_birth SqlType(DATE), Default(None) */
-    val dateOfBirth: Rep[Option[java.sql.Date]] = column[Option[java.sql.Date]]("date_of_birth", O.Default(None))
-    /** Database column email SqlType(VARCHAR), Length(100,true), Default(None) */
-    val email: Rep[Option[String]] = column[Option[String]]("email", O.Length(100, varying = true), O.Default(None))
+    /** Database column first_name SqlType(VARCHAR), Length(50,true) */
+    val firstName: Rep[String] = column[String]("first_name", O.Length(50, varying = true))
+    /** Database column last_name SqlType(VARCHAR), Length(50,true) */
+    val lastName: Rep[String] = column[String]("last_name", O.Length(50, varying = true))
+    /** Database column birth_date SqlType(DATE) */
+    val birthDate: Rep[org.joda.time.LocalDate] = column[org.joda.time.LocalDate]("birth_date")
+    /** Database column gender SqlType(ENUM), Length(6,false) */
+    val gender: Rep[String] = column[String]("gender", O.Length(6, varying = false))
+    /** Database column email SqlType(VARCHAR), Length(100,true) */
+    val email: Rep[String] = column[String]("email", O.Length(100, varying = true))
+    /** Database column phone_number SqlType(VARCHAR), Length(20,true), Default(None) */
+    val phoneNumber: Rep[Option[String]] = column[Option[String]]("phone_number", O.Length(20, varying = true), O.Default(None))
     /** Database column avatar_url SqlType(VARCHAR), Length(200,true), Default(None) */
     val avatarUrl: Rep[Option[String]] = column[Option[String]]("avatar_url", O.Length(200, varying = true), O.Default(None))
     /** Database column activated SqlType(BIT), Default(false) */

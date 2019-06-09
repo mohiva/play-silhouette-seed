@@ -60,7 +60,7 @@ class TotpController @Inject() (
    */
   def enableTotp = silhouette.SecuredAction.async { implicit request =>
     val user = request.identity
-    val credentials = totpProvider.createCredentials(user.email.get)
+    val credentials = totpProvider.createCredentials(user.email)
     val totpInfo = credentials.totpInfo
     val formData = TotpSetupForm.form.fill(TotpSetupForm.Data(totpInfo.sharedKey, totpInfo.scratchCodes, credentials.scratchCodesPlain))
     request.identity.loginInfo.flatMap {

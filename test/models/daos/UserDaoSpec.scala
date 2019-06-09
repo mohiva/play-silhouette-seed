@@ -1,9 +1,7 @@
 package models.daos
 
-import java.time.LocalDate
-
 import models.generated.Tables._
-import org.joda.time.DateTime
+import org.joda.time._
 import play.api.test.WithApplication
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,7 +17,7 @@ class UserDaoSpec extends DaoSpecLike {
       val userOpt: Option[UserRow] = for {
         _ <- userDao.create(testUser, testLoginInfo)
         u <- userDao.find(testLoginInfo)
-        _ <- userDao.update(u.get.copy(firstName = Some("Harry"), lastName = Some("Potter")))
+        _ <- userDao.update(u.get.copy(firstName = "Harry", lastName = "Potter"))
         user <- userDao.findById(u.get.id)
       } yield user
 
@@ -27,7 +25,7 @@ class UserDaoSpec extends DaoSpecLike {
       val updated: UserRow = userOpt.get
       updated.firstName should beSome("Harry")
       updated.lastName should beSome("Potter")
-      updated.dateOfBirth should not be None
+      updated.birthDate should beEqualTo(testUser.birthDate)
       updated.email should beEqualTo(testUser.email)
       updated.avatarUrl should beEqualTo(testUser.avatarUrl)
       updated.activated should beTrue
@@ -43,7 +41,7 @@ class UserDaoSpec extends DaoSpecLike {
 
       user.firstName should beEqualTo(testUser.firstName)
       user.lastName should beEqualTo(testUser.lastName)
-      user.dateOfBirth should not be None
+      user.birthDate should beEqualTo(testUser.birthDate)
       user.email should beEqualTo(testUser.email)
       user.avatarUrl should beEqualTo(testUser.avatarUrl)
       user.activated should beTrue
@@ -68,7 +66,7 @@ class UserDaoSpec extends DaoSpecLike {
       val user: UserRow = userOpt.get
       user.firstName should beEqualTo(testUser.firstName)
       user.lastName should beEqualTo(testUser.lastName)
-      user.dateOfBirth should not be None
+      user.birthDate should beEqualTo(testUser.birthDate)
       user.email should beEqualTo(testUser.email)
       user.avatarUrl should beEqualTo(testUser.avatarUrl)
       user.activated should beTrue
@@ -94,7 +92,7 @@ class UserDaoSpec extends DaoSpecLike {
       val user: UserRow = exists.get
       user.firstName should beEqualTo(testUser2.firstName)
       user.lastName should beEqualTo(testUser2.lastName)
-      user.dateOfBirth should not be None
+      user.birthDate should beEqualTo(testUser2.birthDate)
       user.email should beEqualTo(testUser2.email)
       user.avatarUrl should beEqualTo(testUser2.avatarUrl)
       user.activated should beTrue
@@ -110,10 +108,12 @@ class UserDaoSpec extends DaoSpecLike {
 
     val testUser2 = UserRow(
       id = 0L,
-      firstName = Some("John"),
-      lastName = Some("McClane"),
-      dateOfBirth = Some(java.sql.Date.valueOf(LocalDate.now())),
-      email = Some("test2@test.test"),
+      firstName = "John",
+      lastName = "McClane",
+      birthDate = new LocalDate(),
+      gender = "male",
+      email = "test2@test.test",
+      phoneNumber = Some("(012)-3456-789"),
       avatarUrl = Some("avatar2.com"),
       activated = true,
       lastLogin = Some(DateTime.now()),

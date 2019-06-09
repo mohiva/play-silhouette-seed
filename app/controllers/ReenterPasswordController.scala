@@ -52,7 +52,7 @@ class ReenterPasswordController @Inject() (
    * @return The result to display.
    */
   def view = silhouette.SecuredAction.async { implicit request =>
-    val data = Data(email = request.identity.email.getOrElse(""), password = "")
+    val data = Data(email = request.identity.email, password = "")
     request.identity.loginInfo.flatMap {
       case Some(loginInfo) => Future.successful(Ok(views.html.reenterPassword(ReenterPasswordForm.form.fill(data), request.identity, loginInfo)))
       case _ => Future.failed(new IllegalStateException(Messages("internal.error.user.without.logininfo")))

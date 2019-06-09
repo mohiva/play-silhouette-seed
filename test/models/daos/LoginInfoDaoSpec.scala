@@ -63,6 +63,5 @@ class LoginInfoDaoSpec extends DaoSpecLike {
 
     // ensure repeatability of the test
     await(userDao.deleteAll)
-    await(loginInfoDao.deleteAll)
   }
 }

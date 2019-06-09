@@ -39,6 +39,7 @@ libraryDependencies ++= Seq(
   "com.mohiva" %% "play-silhouette-testkit" % "6.0.1-SNAPSHOT" % "test",
   specs2 % Test,
   ehcache,
+  jodaForms,
   guice,
   filters
 )
