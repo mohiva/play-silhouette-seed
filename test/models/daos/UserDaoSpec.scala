@@ -113,7 +113,7 @@ class UserDaoSpec extends DaoSpecLike {
       birthDate = new LocalDate(),
       gender = "male",
       email = "test2@test.test",
-      phoneNumber = Some("(012)-3456-789"),
+      mobilePhone = Some("(012)-3456-789"),
       avatarUrl = Some("avatar2.com"),
       activated = true,
       lastLogin = Some(DateTime.now()),

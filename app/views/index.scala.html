@@ -45,6 +45,9 @@
                 <div class="row">
                     <p class="col-md-6"><strong>@messages("birth.date"):</strong></p><p class="col-md-6">@user.birthDate</p>
                 </div>
+                <div class="row">
+                    <p class="col-md-6"><strong>@messages("mobile.phone"):</strong></p><p class="col-md-6">@user.mobilePhone.getOrElse("")</p>
+                </div>
             </div>
         </div>
         @if(loginInfo.providerID == CredentialsProvider.ID) {

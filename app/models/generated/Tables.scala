@@ -344,13 +344,13 @@ trait Tables {
    *  @param birthDate Database column birth_date SqlType(DATE)
    *  @param gender Database column gender SqlType(ENUM), Length(6,false)
    *  @param email Database column email SqlType(VARCHAR), Length(100,true)
-   *  @param phoneNumber Database column phone_number SqlType(VARCHAR), Length(20,true), Default(None)
+   *  @param mobilePhone Database column mobile_phone SqlType(VARCHAR), Length(20,true), Default(None)
    *  @param avatarUrl Database column avatar_url SqlType(VARCHAR), Length(200,true), Default(None)
    *  @param activated Database column activated SqlType(BIT), Default(false)
    *  @param lastLogin Database column last_login SqlType(TIMESTAMP), Default(None)
    *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
-  case class UserRow(id: Long, firstName: String, lastName: String, birthDate: org.joda.time.LocalDate, gender: String, email: String, phoneNumber: Option[String] = None, avatarUrl: Option[String] = None, activated: Boolean = false, lastLogin: Option[org.joda.time.DateTime] = None, modified: Option[org.joda.time.DateTime] = None) extends EntityAutoInc[Long, UserRow] with com.mohiva.play.silhouette.api.Identity {
+  case class UserRow(id: Long, firstName: String, lastName: String, birthDate: org.joda.time.LocalDate, gender: String, email: String, mobilePhone: Option[String] = None, avatarUrl: Option[String] = None, activated: Boolean = false, lastLogin: Option[org.joda.time.DateTime] = None, modified: Option[org.joda.time.DateTime] = None) extends EntityAutoInc[Long, UserRow] with com.mohiva.play.silhouette.api.Identity {
     def fullName = s"$firstName $lastName"
   }
   /** GetResult implicit for fetching UserRow objects using plain SQL queries */
@@ -361,9 +361,9 @@ trait Tables {
   }
   /** Table description of table user. Objects of this class serve as prototypes for rows in queries. */
   class User(_tableTag: Tag) extends profile.api.Table[UserRow](_tableTag, schemaName, "user") with IdentifyableTable[Long] {
-    def * = (id, firstName, lastName, birthDate, gender, email, phoneNumber, avatarUrl, activated, lastLogin, modified) <> (UserRow.tupled, UserRow.unapply)
+    def * = (id, firstName, lastName, birthDate, gender, email, mobilePhone, avatarUrl, activated, lastLogin, modified) <> (UserRow.tupled, UserRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = ((Rep.Some(id), Rep.Some(firstName), Rep.Some(lastName), Rep.Some(birthDate), Rep.Some(gender), Rep.Some(email), phoneNumber, avatarUrl, Rep.Some(activated), lastLogin, modified)).shaped.<>({ r => import r._; _1.map(_ => UserRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7, _8, _9.get, _10, _11))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+    def ? = ((Rep.Some(id), Rep.Some(firstName), Rep.Some(lastName), Rep.Some(birthDate), Rep.Some(gender), Rep.Some(email), mobilePhone, avatarUrl, Rep.Some(activated), lastLogin, modified)).shaped.<>({ r => import r._; _1.map(_ => UserRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7, _8, _9.get, _10, _11))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(BIGINT UNSIGNED), AutoInc, PrimaryKey */
     val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
@@ -377,8 +377,8 @@ trait Tables {
     val gender: Rep[String] = column[String]("gender", O.Length(6, varying = false))
     /** Database column email SqlType(VARCHAR), Length(100,true) */
     val email: Rep[String] = column[String]("email", O.Length(100, varying = true))
-    /** Database column phone_number SqlType(VARCHAR), Length(20,true), Default(None) */
-    val phoneNumber: Rep[Option[String]] = column[Option[String]]("phone_number", O.Length(20, varying = true), O.Default(None))
+    /** Database column mobile_phone SqlType(VARCHAR), Length(20,true), Default(None) */
+    val mobilePhone: Rep[Option[String]] = column[Option[String]]("mobile_phone", O.Length(20, varying = true), O.Default(None))
     /** Database column avatar_url SqlType(VARCHAR), Length(200,true), Default(None) */
     val avatarUrl: Rep[Option[String]] = column[Option[String]]("avatar_url", O.Length(200, varying = true), O.Default(None))
     /** Database column activated SqlType(BIT), Default(false) */

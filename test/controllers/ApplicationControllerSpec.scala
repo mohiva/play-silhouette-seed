@@ -67,7 +67,7 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
       birthDate = new LocalDate(),
       gender = "male",
       email = "someone@somewhere",
-      phoneNumber = Some("(012)-3456-789"),
+      mobilePhone = Some("(012)-3456-789"),
       avatarUrl = None,
       activated = true
     )

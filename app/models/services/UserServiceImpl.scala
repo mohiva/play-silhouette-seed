@@ -66,7 +66,7 @@ class UserServiceImpl @Inject() (
           birthDate = profile.birthDate.get,
           gender = profile.gender.get,
           email = profile.email.get,
-          phoneNumber = None,
+          mobilePhone = None,
           avatarUrl = profile.avatarURL
         )
         daoContext.userDao.update(updated).map(affected => if (affected == 1) updated else None.asInstanceOf[UserRow])
@@ -79,7 +79,7 @@ class UserServiceImpl @Inject() (
           birthDate = profile.birthDate.get,
           gender = profile.gender.get,
           email = profile.email.get,
-          phoneNumber = None,
+          mobilePhone = None,
           avatarUrl = profile.avatarURL,
           activated = true
         ), profile.loginInfo)

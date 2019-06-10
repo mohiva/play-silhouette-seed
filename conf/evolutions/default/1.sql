@@ -9,7 +9,7 @@ CREATE TABLE `user` (
     birth_date DATE NOT NULL,
     gender ENUM('female', 'male') NOT NULL,
     email VARCHAR(100) NOT NULL,
-    phone_number VARCHAR(20) NULL DEFAULT NULL,
+    mobile_phone VARCHAR(20) NULL DEFAULT NULL,
     avatar_url VARCHAR(200) NULL DEFAULT NULL,
     activated BOOLEAN NOT NULL DEFAULT FALSE,
     last_login TIMESTAMP NULL DEFAULT NULL,

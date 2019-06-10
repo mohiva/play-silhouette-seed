@@ -37,7 +37,7 @@ trait DaoSpecLike extends PlaySpecification with Mockito {
       birthDate = new LocalDate(),
       gender = "male",
       email = "test@test.test",
-      phoneNumber = Some("(012)-3456-789"),
+      mobilePhone = Some("(012)-3456-789"),
       avatarUrl = Some("avatar.com"),
       activated = true,
       lastLogin = Some(DateTime.now()),

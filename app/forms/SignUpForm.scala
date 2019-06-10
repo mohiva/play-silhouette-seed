@@ -17,7 +17,7 @@ object SignUpForm {
       "birthDate" -> jodaLocalDate,
       "gender" -> nonEmptyText,
       "email" -> email,
-      "phoneNumber" -> optional(nonEmptyText),
+      "mobilePhone" -> optional(nonEmptyText),
       "password" -> nonEmptyText(minLength = 5),
       "repeatPassword" -> nonEmptyText(minLength = 5)
     )(Data.apply)(Data.unapply).
@@ -40,7 +40,7 @@ object SignUpForm {
     birthDate: LocalDate,
     gender: String,
     email: String,
-    phoneNumber: Option[String],
+    mobilePhone: Option[String],
     password: String,
     repeatPassword: String)
 }
