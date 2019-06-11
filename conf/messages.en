@@ -21,13 +21,13 @@ welcome.signed.in = Welcome, you are now signed in!
 
 totp.enable = Enable two-factor authentication
 totp.disable = Disable two-factor authentication
-totp.enabling.title = 2 factor auth enabling
-totp.disabled.title = 2 factor auth is not enabled
-totp.enabled.title = 2 factor auth is enabled
+totp.enabling.title = Enabling two-factor authentication
+totp.disabled.title = Two-factor authentication disabled
+totp.enabled.title = Two-factor authentication enabled
 totp.shared.key.title = Shared key:
 totp.recovery.tokens.title = Recovery tokens:
-totp.enabling.info = 2 factor auth enabled successfully!
-totp.disabling.info = 2 factor auth disabled successfully!
+totp.enabling.info = Two-factor authentication enabled successfully!
+totp.disabling.info = Two-factor authentication disabled successfully!
 
 sign.up.account = Sign up for a new account
 sign.in.credentials = Sign in with your credentials

@@ -21,7 +21,7 @@ welcome.signed.in = ¡Bienvenido, ya has iniciado la sesión!
 
 totp.enable = Activar autenticación doble factor
 totp.disable = Desactivar autenticación doble factor
-totp.enabling.title = Autenticación de doble factor activada
+totp.enabling.title = Activando autenticación de doble factor
 totp.disabled.title = Autenticación de doble factor desactivada
 totp.enabled.title = Autenticación de doble factor activada
 totp.shared.key.title = Llave compartida:
