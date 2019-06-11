@@ -95,7 +95,7 @@ class SignUpController @Inject() (
               birthDate = data.birthDate,
               gender = data.gender,
               email = data.email,
-              mobilePhone = data.mobilePhone,
+              mobilePhone = Some(data.mobilePhone),
               avatarUrl = None,
               activated = false
             )

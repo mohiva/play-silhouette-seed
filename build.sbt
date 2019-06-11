@@ -4,7 +4,7 @@ import scalariform.formatter.preferences._
 
 name := "play-silhouette-seed"
 
-version := "6.0.0"
+version := "6.0.1-SNAPSHOT"
 
 scalaVersion := "2.12.8"
 
@@ -25,7 +25,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-mailer" % "7.0.0",
   "com.typesafe.play" %% "play-mailer-guice" % "7.0.0",
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.1-akka-2.5.x",
-  "com.adrianhurt" %% "play-bootstrap" % "1.4-P26-B3-SNAPSHOT",
+  "com.adrianhurt" %% "play-bootstrap" % "1.5-P27-B3-SNAPSHOT",
   "com.nappin" %% "play-recaptcha" % "2.3",
   "com.chuusai" %% "shapeless" % "2.3.3",
   "com.typesafe.play" %% "play-slick" % "4.0.1",

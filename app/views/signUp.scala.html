@@ -25,7 +25,7 @@
             @b3.date(signUpForm("birthDate"), '_hiddenLabel -> messages("birth.date"), 'placeholder -> messages("birth.date"), 'class -> "form-control input-lg")
             @b3.radio(signUpForm("gender"), options = Seq("female" -> Html("Female <i class=\"fa fa-female\"></i>"), "male" -> Html("Male <i class=\"fa fa-male\"></i>")), '_hiddenLabel -> messages("gender"), 'placeholder -> messages("gender"), 'class -> "form-control input-lg")
             @b3.text(signUpForm("email"), '_hiddenLabel -> messages("email"), 'placeholder -> messages("email"), 'class -> "form-control input-lg")
-            @b3.text(signUpForm("phoneNumber"), '_hiddenLabel -> messages("phone.number"), 'placeholder -> messages("phone.number"), 'class -> "form-control input-lg")
+            @b3.text(signUpForm("mobilePhone"), '_hiddenLabel -> messages("mobile.phone"), 'placeholder -> messages("mobile.phone"), 'class -> "form-control input-lg")
             @_passwordStrengthPartial(signUpForm("password"), '_hiddenLabel -> messages("password"), 'placeholder -> messages("password"), 'class -> "form-control input-lg")(Option(signUpForm("repeatPassword")), '_hiddenLabel -> messages("repeat.password"), 'placeholder -> messages("repeat.password"), 'class -> "form-control input-lg")
             @_recaptchaFieldPartial(form=signUpForm, recaptchaWidget=recaptchaWidget, fieldName="signup.captcha")(widgetHelper, request.asInstanceOf[Request[AnyContent]], messages)
             <div class="form-group">
