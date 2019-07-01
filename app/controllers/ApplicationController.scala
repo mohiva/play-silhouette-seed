@@ -1,15 +1,16 @@
 package controllers
 
-import javax.inject.Inject
-
 import com.mohiva.play.silhouette.api.actions.SecuredRequest
+import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
+import com.mohiva.play.silhouette.impl.providers.GoogleTotpInfo
+import javax.inject.Inject
 import org.webjars.play.WebJarsUtil
 import play.api.i18n.I18nSupport
 import play.api.mvc.{ AbstractController, AnyContent, ControllerComponents }
 import utils.auth.DefaultEnv
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 
 /**
  * The basic application controller.
@@ -21,11 +22,13 @@ import scala.concurrent.Future
  */
 class ApplicationController @Inject() (
   components: ControllerComponents,
-  silhouette: Silhouette[DefaultEnv]
+  silhouette: Silhouette[DefaultEnv],
+  authInfoRepository: AuthInfoRepository
 )(
   implicit
   webJarsUtil: WebJarsUtil,
-  assets: AssetsFinder
+  assets: AssetsFinder,
+  ex: ExecutionContext
 ) extends AbstractController(components) with I18nSupport {
 
   /**
@@ -34,7 +37,9 @@ class ApplicationController @Inject() (
    * @return The result to display.
    */
   def index = silhouette.SecuredAction.async { implicit request: SecuredRequest[DefaultEnv, AnyContent] =>
-    Future.successful(Ok(views.html.home(request.identity)))
+    authInfoRepository.find[GoogleTotpInfo](request.identity.loginInfo).map { totpInfoOpt =>
+      Ok(views.html.home(request.identity, totpInfoOpt))
+    }
   }
 
   /**
