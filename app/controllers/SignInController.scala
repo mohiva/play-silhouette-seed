@@ -75,7 +75,7 @@ class SignInController @Inject() (
             case Some(user) => {
               user.loginInfo.flatMap {
                 case Some(loginInfo) =>
-                  authInfoRepository.find[TotpInfo](loginInfo).flatMap {
+                  authInfoRepository.find[GoogleTotpInfo](loginInfo).flatMap {
                     case Some(totpInfo) => Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(
                       user.id, totpInfo.sharedKey, data.rememberMe)))))
                     case _ => authenticateUser(user, data.rememberMe)

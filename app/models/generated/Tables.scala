@@ -17,7 +17,7 @@ trait Tables {
   import slick.jdbc.{ GetResult => GR }
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Array(AuthToken.schema, LoginInfo.schema, OAuth2Info.schema, OAuth2InfoParam.schema, PasswordInfo.schema, ScratchCode.schema, SecurityRole.schema, TotpInfo.schema, User.schema, UserSecurityRole.schema).reduceLeft(_ ++ _)
+  lazy val schema: profile.SchemaDescription = Array(AuthToken.schema, LoginInfo.schema, OAuth2Info.schema, OAuth2InfoParam.schema, PasswordInfo.schema, ScratchCode.schema, SecurityRole.schema, GoogleTotpInfo.schema, User.schema, UserSecurityRole.schema).reduceLeft(_ ++ _)
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -267,8 +267,8 @@ trait Tables {
     /** Database column modified SqlType(TIMESTAMP), Default(None) */
     val modified: Rep[Option[org.joda.time.DateTime]] = column[Option[org.joda.time.DateTime]]("modified", O.Default(None))
 
-    /** Foreign key referencing TotpInfo (database name scratch_code_ibfk_1) */
-    lazy val totpInfoFk = foreignKey("scratch_code_ibfk_1", userId, TotpInfo)(r => r.userId, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
+    /** Foreign key referencing GoogleTotpInfo (database name scratch_code_ibfk_1) */
+    lazy val totpInfoFk = foreignKey("scratch_code_ibfk_1", userId, GoogleTotpInfo)(r => r.userId, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
   }
   /** Collection-like TableQuery object for table ScratchCode */
   lazy val ScratchCode = new TableQuery(tag => new ScratchCode(tag))
@@ -300,28 +300,28 @@ trait Tables {
   lazy val SecurityRole = new TableQuery(tag => new SecurityRole(tag))
 
   /**
-   * Entity class storing rows of table TotpInfo
+   * Entity class storing rows of table GoogleTotpInfo
    *  @param userId Database column user_id SqlType(BIGINT UNSIGNED), PrimaryKey
    *  @param sharedKey Database column shared_key SqlType(CHAR), Length(36,false)
    *  @param modified Database column modified SqlType(TIMESTAMP), Default(None)
    */
-  case class TotpInfoRow(userId: Long, sharedKey: String, modified: Option[org.joda.time.DateTime] = None) extends Entity[Long] {
+  case class GoogleTotpInfoRow(userId: Long, sharedKey: String, modified: Option[org.joda.time.DateTime] = None) extends Entity[Long] {
     override def id = userId
-    def toExt(scratchCodes: Seq[com.mohiva.play.silhouette.api.util.PasswordInfo]) = com.mohiva.play.silhouette.impl.providers.TotpInfo(sharedKey, scratchCodes)
+    def toExt(scratchCodes: Seq[com.mohiva.play.silhouette.api.util.PasswordInfo]) = com.mohiva.play.silhouette.impl.providers.GoogleTotpInfo(sharedKey, scratchCodes)
   }
-  /** GetResult implicit for fetching TotpInfoRow objects using plain SQL queries */
-  implicit def GetResultTotpInfoRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[org.joda.time.DateTime]]): GR[TotpInfoRow] = GR {
+  /** GetResult implicit for fetching GoogleTotpInfoRow objects using plain SQL queries */
+  implicit def GetResultGoogleTotpInfoRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[org.joda.time.DateTime]]): GR[GoogleTotpInfoRow] = GR {
     prs =>
       import prs._
-      TotpInfoRow.tupled((<<[Long], <<[String], <<?[org.joda.time.DateTime]))
+      GoogleTotpInfoRow.tupled((<<[Long], <<[String], <<?[org.joda.time.DateTime]))
   }
   /** Table description of table totp_info. Objects of this class serve as prototypes for rows in queries. */
-  class TotpInfo(_tableTag: Tag) extends profile.api.Table[TotpInfoRow](_tableTag, schemaName, "totp_info") with IdentifyableTable[Long] {
+  class GoogleTotpInfo(_tableTag: Tag) extends profile.api.Table[GoogleTotpInfoRow](_tableTag, schemaName, "totp_info") with IdentifyableTable[Long] {
     override def id = userId
 
-    def * = (userId, sharedKey, modified) <> (TotpInfoRow.tupled, TotpInfoRow.unapply)
+    def * = (userId, sharedKey, modified) <> (GoogleTotpInfoRow.tupled, GoogleTotpInfoRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = ((Rep.Some(userId), Rep.Some(sharedKey), modified)).shaped.<>({ r => import r._; _1.map(_ => TotpInfoRow.tupled((_1.get, _2.get, _3))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+    def ? = ((Rep.Some(userId), Rep.Some(sharedKey), modified)).shaped.<>({ r => import r._; _1.map(_ => GoogleTotpInfoRow.tupled((_1.get, _2.get, _3))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column user_id SqlType(BIGINT UNSIGNED), PrimaryKey */
     val userId: Rep[Long] = column[Long]("user_id", O.PrimaryKey)
@@ -333,8 +333,8 @@ trait Tables {
     /** Foreign key referencing LoginInfo (database name totp_info_ibfk_1) */
     lazy val loginInfoFk = foreignKey("totp_info_ibfk_1", userId, LoginInfo)(r => r.userId, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.Cascade)
   }
-  /** Collection-like TableQuery object for table TotpInfo */
-  lazy val TotpInfo = new TableQuery(tag => new TotpInfo(tag))
+  /** Collection-like TableQuery object for table GoogleTotpInfo */
+  lazy val GoogleTotpInfo = new TableQuery(tag => new GoogleTotpInfo(tag))
 
   /**
    * Entity class storing rows of table User

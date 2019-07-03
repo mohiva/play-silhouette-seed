@@ -4,13 +4,13 @@
 @import controllers.AssetsFinder
 @import play.api.data._
 @import forms.TotpSetupForm.Data
-@import com.mohiva.play.silhouette.impl.providers.TotpCredentials
-@import com.mohiva.play.silhouette.impl.providers.TotpInfo
+@import com.mohiva.play.silhouette.impl.providers.GoogleTotpCredentials
+@import com.mohiva.play.silhouette.impl.providers.GoogleTotpInfo
 @import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 @import models.generated.Tables.UserRow
 @import com.mohiva.play.silhouette.api.LoginInfo
 
-@(user: UserRow, loginInfo: LoginInfo, totpInfoOpt: Option[TotpInfo], totpDataOpt: Option[(Form[Data], TotpCredentials)] = None)(implicit request: RequestHeader,
+@(user: UserRow, loginInfo: LoginInfo, totpInfoOpt: Option[GoogleTotpInfo], totpDataOpt: Option[(Form[Data], GoogleTotpCredentials)] = None)(implicit request: RequestHeader,
         messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
 
 @implicitFieldConstructor = @{ b3.vertical.fieldConstructor() }

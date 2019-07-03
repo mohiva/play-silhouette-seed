@@ -1,7 +1,7 @@
 package models.daos
 
 import com.mohiva.play.silhouette.api.{ LoginInfo => ExtLoginInfo }
-import com.mohiva.play.silhouette.persistence.daos.AuthInfoDAO
+import com.mohiva.play.silhouette.persistence.daos.{ AuthInfoDAO, DelegableAuthInfoDAO }
 import com.mohiva.play.silhouette.api.util.{ PasswordInfo => ExtPasswordInfo }
 import javax.inject._
 import models.daos.generic.GenericDaoImpl
@@ -12,9 +12,13 @@ import play.api.db.slick.DatabaseConfigProvider
 import profile.api._
 import slick.sql.FixedSqlAction
 
+import scala.reflect.ClassTag
+
 @Singleton
 class PasswordInfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext)
-  extends GenericDaoImpl[PasswordInfo, PasswordInfoRow, Long](dbConfigProvider, PasswordInfo) with AuthInfoDAO[ExtPasswordInfo] {
+  extends GenericDaoImpl[PasswordInfo, PasswordInfoRow, Long](dbConfigProvider, PasswordInfo) with DelegableAuthInfoDAO[ExtPasswordInfo] {
+
+  override val classTag = scala.reflect.classTag[ExtPasswordInfo]
 
   /**
    * Finds the auth info which is linked with the specified login info.

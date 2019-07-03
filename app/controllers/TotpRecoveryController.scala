@@ -32,7 +32,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  */
 class TotpRecoveryController @Inject() (
   silhouette: Silhouette[DefaultEnv],
-  totpProvider: TotpProvider,
+  totpProvider: GoogleTotpProvider,
   configuration: Configuration,
   clock: Clock,
   scratchCodeService: ScratchCodeService
@@ -71,12 +71,12 @@ class TotpRecoveryController @Inject() (
           case Some(user) => {
             user.loginInfo.flatMap {
               case Some(loginInfo) => {
-                authInfoRepository.find[TotpInfo](loginInfo).flatMap {
+                authInfoRepository.find[GoogleTotpInfo](loginInfo).flatMap {
                   case Some(totpInfo) =>
                     totpProvider.authenticate(totpInfo, data.recoveryCode).flatMap {
                       case Some((deleted, updated)) => {
-                        authInfoRepository.update[TotpInfo](loginInfo, updated)
-                        // TODO: clean this up by finding scratch code differences within the `TotpInfoDaoImpl`
+                        authInfoRepository.update[GoogleTotpInfo](loginInfo, updated)
+                        // TODO: clean this up by finding scratch code differences within the `GoogleTotpInfoDaoImpl`
                         scratchCodeService.delete(user.id, deleted)
                         authenticateUser(user, data.rememberMe)
                       }

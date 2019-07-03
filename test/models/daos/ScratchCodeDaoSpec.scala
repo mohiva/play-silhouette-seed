@@ -1,6 +1,6 @@
 package models.daos
 
-import com.mohiva.play.silhouette.impl.providers.TotpInfo
+import com.mohiva.play.silhouette.impl.providers.GoogleTotpInfo
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
 import models.generated.Tables._
 import org.joda.time.DateTime
@@ -16,10 +16,10 @@ class ScratchCodeDaoSpec extends DaoSpecLike {
 
   "The scratch code dao" should {
     "should create code correctly" in new Context {
-      val (user, totpInfoOpt): (UserRow, Option[TotpInfo]) = for {
+      val (user, totpInfoOpt): (UserRow, Option[GoogleTotpInfo]) = for {
         user <- userDao.createAndFetch(testUser)
         _ <- loginInfoDao.create(user.id, testLoginInfo)
-        _ <- totpInfoDelegableDao.add(testLoginInfo, testTotpInfo.copy(scratchCodes = Seq(testScratchCode.copy(userId = user.id).toExt)))
+        _ <- totpInfoDelegableDao.add(testLoginInfo, testGoogleTotpInfo.copy(scratchCodes = Seq(testScratchCode.copy(userId = user.id).toExt)))
         totpInfo <- totpInfoDelegableDao.find(testLoginInfo)
       } yield (user, totpInfo)
 
@@ -35,10 +35,10 @@ class ScratchCodeDaoSpec extends DaoSpecLike {
     }
 
     "should remove code correctly" in new Context {
-      val (user, totpInfoOpt): (UserRow, Option[TotpInfo]) = for {
+      val (user, totpInfoOpt): (UserRow, Option[GoogleTotpInfo]) = for {
         user <- userDao.createAndFetch(testUser)
         _ <- loginInfoDao.create(user.id, testLoginInfo)
-        _ <- totpInfoDelegableDao.add(testLoginInfo, testTotpInfo.copy(scratchCodes = Seq(testScratchCode.copy(userId = user.id).toExt)))
+        _ <- totpInfoDelegableDao.add(testLoginInfo, testGoogleTotpInfo.copy(scratchCodes = Seq(testScratchCode.copy(userId = user.id).toExt)))
         totpInfo <- totpInfoDelegableDao.find(testLoginInfo)
       } yield (user, totpInfo)
 
@@ -62,7 +62,7 @@ class ScratchCodeDaoSpec extends DaoSpecLike {
   trait Context extends WithApplication with DaoSpecScope {
 
     val loginInfoDao: LoginInfoDao = daoContext.loginInfoDao
-    val totpInfoDelegableDao: DelegableAuthInfoDAO[TotpInfo] = daoContext.totpInfoDelegableDao
+    val totpInfoDelegableDao: DelegableAuthInfoDAO[GoogleTotpInfo] = daoContext.totpInfoDelegableDao
     val scratchCodeDao: ScratchCodeDao = daoContext.scratchCodeDao
 
     val testScratchCode = ScratchCodeRow(

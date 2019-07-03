@@ -18,7 +18,7 @@ import com.mohiva.play.silhouette.impl.providers.oauth2._
 import com.mohiva.play.silhouette.impl.providers.openid.YahooProvider
 import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDService
 import com.mohiva.play.silhouette.impl.providers.state.{ CsrfStateItemHandler, CsrfStateSettings }
-import com.mohiva.play.silhouette.impl.providers.totp.GoogleTotpProvider
+import com.mohiva.play.silhouette.impl.providers.GoogleTotpProvider
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
 import com.mohiva.play.silhouette.password.{ BCryptPasswordHasher, BCryptSha256PasswordHasher }
@@ -76,11 +76,11 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[LoginInfoDao].to[LoginInfoDaoImpl]
     bind[LoginInfoService].to[LoginInfoServiceImpl]
     bind[AuthInfoDAO[PasswordInfo]].to[PasswordInfoDaoImpl]
-    bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDelegableDao]
-    bind[AuthInfoDAO[TotpInfo]].to[TotpInfoDaoImpl]
-    bind[DelegableAuthInfoDAO[TotpInfo]].to[TotpInfoDelegableDao]
+    bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDaoImpl]
+    bind[AuthInfoDAO[GoogleTotpInfo]].to[GoogleTotpInfoDaoImpl]
+    bind[DelegableAuthInfoDAO[GoogleTotpInfo]].to[GoogleTotpInfoDaoImpl]
     bind[AuthInfoDAO[OAuth2Info]].to[OAuth2InfoDaoImpl]
-    bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDelegableDao]
+    bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDaoImpl]
     bind[ScratchCodeDao].to[ScratchCodeDaoImpl]
     bind[ScratchCodeService].to[ScratchCodeServiceImpl]
 
@@ -246,7 +246,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    */
   @Provides
   def provideAuthInfoRepository(
-    totpInfoDAO: DelegableAuthInfoDAO[TotpInfo],
+    totpInfoDAO: DelegableAuthInfoDAO[GoogleTotpInfo],
     passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
@@ -374,7 +374,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    * @return The credentials provider.
    */
   @Provides
-  def provideTotpProvider(passwordHasherRegistry: PasswordHasherRegistry): TotpProvider = {
+  def provideTotpProvider(passwordHasherRegistry: PasswordHasherRegistry): GoogleTotpProvider = {
     new GoogleTotpProvider(passwordHasherRegistry)
   }
 
