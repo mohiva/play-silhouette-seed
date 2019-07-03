@@ -315,8 +315,8 @@ trait Tables {
       import prs._
       GoogleTotpInfoRow.tupled((<<[Long], <<[String], <<?[org.joda.time.DateTime]))
   }
-  /** Table description of table totp_info. Objects of this class serve as prototypes for rows in queries. */
-  class GoogleTotpInfo(_tableTag: Tag) extends profile.api.Table[GoogleTotpInfoRow](_tableTag, schemaName, "totp_info") with IdentifyableTable[Long] {
+  /** Table description of table google_totp_info. Objects of this class serve as prototypes for rows in queries. */
+  class GoogleTotpInfo(_tableTag: Tag) extends profile.api.Table[GoogleTotpInfoRow](_tableTag, schemaName, "google_totp_info") with IdentifyableTable[Long] {
     override def id = userId
 
     def * = (userId, sharedKey, modified) <> (GoogleTotpInfoRow.tupled, GoogleTotpInfoRow.unapply)

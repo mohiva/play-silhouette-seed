@@ -26,7 +26,7 @@ object Generator extends App {
     "login_info",
     "auth_token",
     "password_info",
-    "totp_info",
+    "google_totp_info",
     "scratch_code",
     "o_auth2_info",
     "o_auth2_info_param",
