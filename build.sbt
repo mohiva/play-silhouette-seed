@@ -13,11 +13,11 @@ resolvers += Resolver.jcenterRepo
 resolvers += "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
 libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % "6.0.1",
-  "com.mohiva" %% "play-silhouette-password-bcrypt" % "6.0.1",
-  "com.mohiva" %% "play-silhouette-persistence" % "6.0.1",
-  "com.mohiva" %% "play-silhouette-crypto-jca" % "6.0.1",
-  "com.mohiva" %% "play-silhouette-totp" % "6.0.1",
+  "com.mohiva" %% "play-silhouette" % "6.1.0",
+  "com.mohiva" %% "play-silhouette-password-bcrypt" % "6.1.0",
+  "com.mohiva" %% "play-silhouette-persistence" % "6.1.0",
+  "com.mohiva" %% "play-silhouette-crypto-jca" % "6.1.0",
+  "com.mohiva" %% "play-silhouette-totp" % "6.1.0",
   "org.webjars" %% "webjars-play" % "2.7.0",
   "org.webjars" % "bootstrap" % "3.3.7-1" exclude("org.webjars", "jquery"),
   "org.webjars" % "jquery" % "3.2.1",
@@ -27,7 +27,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-mailer-guice" % "7.0.0",
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.1-akka-2.5.x",
   "com.adrianhurt" %% "play-bootstrap" % "1.5-P27-B3-SNAPSHOT",
-  "com.mohiva" %% "play-silhouette-testkit" % "6.0.1" % "test",
+  "com.mohiva" %% "play-silhouette-testkit" % "6.1.0" % "test",
   specs2 % Test,
   ehcache,
   guice,
