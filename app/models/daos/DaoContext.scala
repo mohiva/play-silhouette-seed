@@ -1,7 +1,7 @@
 package models.daos
 
 import com.mohiva.play.silhouette.api.util.PasswordInfo
-import com.mohiva.play.silhouette.impl.providers.{OAuth2Info, TotpInfo}
+import com.mohiva.play.silhouette.impl.providers.{OAuth2Info, GoogleTotpInfo}
 import com.mohiva.play.silhouette.persistence.daos.{AuthInfoDAO, DelegableAuthInfoDAO}
 import javax.inject._
 
@@ -31,6 +31,6 @@ class DaoContext @Inject() (
   val passwordInfoDao: AuthInfoDAO[PasswordInfo],
   val passwordInfoDelegableDao: DelegableAuthInfoDAO[PasswordInfo],
   val scratchCodeDao: ScratchCodeDao,
-  val totpInfoDao: AuthInfoDAO[TotpInfo],
-  val totpInfoDelegableDao: DelegableAuthInfoDAO[TotpInfo],
+  val totpInfoDao: AuthInfoDAO[GoogleTotpInfo],
+  val totpInfoDelegableDao: DelegableAuthInfoDAO[GoogleTotpInfo],
 )

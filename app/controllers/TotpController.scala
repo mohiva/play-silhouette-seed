@@ -32,7 +32,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  */
 class TotpController @Inject() (
   silhouette: Silhouette[DefaultEnv],
-  totpProvider: TotpProvider,
+  totpProvider: GoogleTotpProvider,
   configuration: Configuration,
   clock: Clock,
   loginInfoService: LoginInfoService
@@ -50,8 +50,8 @@ class TotpController @Inject() (
    * Views the `TOTP` page.
    * @return The result to display.
    */
-  def view = silhouette.UnsecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.totp(TotpForm.form)))
+  def view(userId: Long, sharedKey: String, rememberMe: Boolean) = silhouette.UnsecuredAction.async { implicit request =>
+    Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(userId, sharedKey, rememberMe)))))
   }
 
   /**
@@ -65,7 +65,7 @@ class TotpController @Inject() (
     val formData = TotpSetupForm.form.fill(TotpSetupForm.Data(totpInfo.sharedKey, totpInfo.scratchCodes, credentials.scratchCodesPlain))
     request.identity.loginInfo.flatMap {
       case Some(loginInfo) => {
-        authInfoRepository.find[TotpInfo](loginInfo).map { totpInfoOpt =>
+        authInfoRepository.find[GoogleTotpInfo](loginInfo).map { totpInfoOpt =>
           Ok(views.html.index(user, loginInfo, totpInfoOpt, Some((formData, credentials))))
         }
       }
@@ -81,8 +81,8 @@ class TotpController @Inject() (
     val user = request.identity
     user.loginInfo.flatMap {
       case Some(loginInfo) => {
-        authInfoRepository.remove[TotpInfo](loginInfo).flatMap { _ =>
-          loginInfoService.delete(user.id, TotpProvider.ID).flatMap { _ =>
+        authInfoRepository.remove[GoogleTotpInfo](loginInfo).flatMap { _ =>
+          loginInfoService.delete(user.id, GoogleTotpProvider.ID).flatMap { _ =>
             Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.disabling.info")))
           }
         }
@@ -100,21 +100,21 @@ class TotpController @Inject() (
     user.loginInfo.flatMap {
       case Some(loginInfo) => {
         TotpSetupForm.form.bindFromRequest.fold(
-          form => authInfoRepository.find[TotpInfo](loginInfo).map { totpInfoOpt =>
+          form => authInfoRepository.find[GoogleTotpInfo](loginInfo).map { totpInfoOpt =>
             BadRequest(views.html.index(user, loginInfo, totpInfoOpt))
           },
           data => {
             totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
               case Some(loginInfo: LoginInfo) => {
                 loginInfoService.create(user.id, loginInfo).flatMap { _ =>
-                  authInfoRepository.add[TotpInfo](loginInfo, TotpInfo(data.sharedKey, data.scratchCodes))
+                  authInfoRepository.add[GoogleTotpInfo](loginInfo, GoogleTotpInfo(data.sharedKey, data.scratchCodes))
                   Future(Redirect(routes.ApplicationController.index()).flashing("success" -> Messages("totp.enabling.info")))
                 }
               }
               case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verification.code")))
             }.recover {
               case _: ProviderException =>
-                Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
+                Redirect(routes.TotpController.view(user.id, data.sharedKey, request.authenticator.cookieMaxAge.isDefined)).flashing("error" -> Messages("invalid.unexpected.totp"))
             }
           }
         )
@@ -131,14 +131,15 @@ class TotpController @Inject() (
     TotpForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.totp(form))),
       data => {
+        val totpControllerRoute = routes.TotpController.view(data.userId, data.sharedKey, data.rememberMe)
         userService.retrieve(data.userId).flatMap {
           case Some(user) =>
             totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
               case Some(_) => authenticateUser(user, data.rememberMe)
-              case _ => Future.successful(Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.verification.code")))
+              case _ => Future.successful(Redirect(totpControllerRoute).flashing("error" -> Messages("invalid.verification.code")))
             }.recover {
               case _: ProviderException =>
-                Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
+                Redirect(totpControllerRoute).flashing("error" -> Messages("invalid.unexpected.totp"))
             }
           case None => Future.failed(new IdentityNotFoundException(Messages("internal.error.no.user.found")))
         }

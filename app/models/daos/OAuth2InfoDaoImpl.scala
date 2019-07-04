@@ -2,7 +2,7 @@ package models.daos
 
 import com.mohiva.play.silhouette.api.{ LoginInfo => ExtLoginInfo }
 import com.mohiva.play.silhouette.impl.providers.{ OAuth2Info => ExtOAuth2Info }
-import com.mohiva.play.silhouette.persistence.daos.AuthInfoDAO
+import com.mohiva.play.silhouette.persistence.daos.{ AuthInfoDAO, DelegableAuthInfoDAO }
 import javax.inject._
 import models.daos.generic.GenericDaoImpl
 import models.generated.Tables._
@@ -21,7 +21,9 @@ import scala.concurrent._
  */
 @Singleton
 class OAuth2InfoDaoImpl @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext)
-  extends GenericDaoImpl[OAuth2Info, OAuth2InfoRow, Long](dbConfigProvider, OAuth2Info) with AuthInfoDAO[ExtOAuth2Info] with DaoUtil {
+  extends GenericDaoImpl[OAuth2Info, OAuth2InfoRow, Long](dbConfigProvider, OAuth2Info) with DelegableAuthInfoDAO[ExtOAuth2Info] with DaoUtil {
+
+  override val classTag = scala.reflect.classTag[ExtOAuth2Info]
 
   /**
    * Returns the matching Silhouette [[ExtOAuth2Info]] used for social

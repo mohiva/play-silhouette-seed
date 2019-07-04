@@ -3,7 +3,7 @@ package controllers
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import javax.inject.Inject
 import com.mohiva.play.silhouette.api.{LogoutEvent, Silhouette}
-import com.mohiva.play.silhouette.impl.providers.TotpInfo
+import com.mohiva.play.silhouette.impl.providers.GoogleTotpInfo
 import models.services.UserService
 import org.webjars.play.WebJarsUtil
 import play.api.i18n.{I18nSupport, Lang, Messages}
@@ -42,7 +42,7 @@ class ApplicationController @Inject() (
   def index = silhouette.SecuredAction.async { implicit request =>
     request.identity.loginInfo.flatMap {
       case Some(loginInfo) => {
-        authInfoRepository.find[TotpInfo](loginInfo).map { totpInfoOpt =>
+        authInfoRepository.find[GoogleTotpInfo](loginInfo).map { totpInfoOpt =>
           Ok(views.html.index(request.identity, loginInfo, totpInfoOpt))
         }
       }

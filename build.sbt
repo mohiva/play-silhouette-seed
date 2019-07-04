@@ -4,7 +4,9 @@ import scalariform.formatter.preferences._
 
 name := "play-silhouette-seed"
 
-version := "6.0.1-SNAPSHOT"
+version := "1.0.0-SNAPSHOT"
+
+val silhouetteVersion = "6.0.1"
 
 scalaVersion := "2.12.8"
 
@@ -13,17 +15,18 @@ resolvers += Resolver.jcenterRepo
 resolvers += "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
 libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % "6.0.1-SNAPSHOT",
-  "com.mohiva" %% "play-silhouette-password-bcrypt" % "6.0.1-SNAPSHOT",
-  "com.mohiva" %% "play-silhouette-persistence" % "6.0.1-SNAPSHOT",
-  "com.mohiva" %% "play-silhouette-crypto-jca" % "6.0.1-SNAPSHOT",
-  "org.webjars" %% "webjars-play" % "2.7.0",
+  "com.mohiva" %% "play-silhouette" % silhouetteVersion,
+  "com.mohiva" %% "play-silhouette-password-bcrypt" % silhouetteVersion,
+  "com.mohiva" %% "play-silhouette-persistence" % silhouetteVersion,
+  "com.mohiva" %% "play-silhouette-crypto-jca" % silhouetteVersion,
+  "com.mohiva" %% "play-silhouette-totp" % silhouetteVersion,
+  "org.webjars" %% "webjars-play" % "2.7.3",
   "org.webjars" % "bootstrap" % "3.3.7-1" exclude("org.webjars", "jquery"),
   "org.webjars" % "jquery" % "3.2.1",
   "net.codingwell" %% "scala-guice" % "4.1.0",
-  "com.iheart" %% "ficus" % "1.4.3",
-  "com.typesafe.play" %% "play-mailer" % "7.0.0",
-  "com.typesafe.play" %% "play-mailer-guice" % "7.0.0",
+  "com.iheart" %% "ficus" % "1.4.7",
+  "com.typesafe.play" %% "play-mailer" % "7.0.1",
+  "com.typesafe.play" %% "play-mailer-guice" % "7.0.1",
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.1-akka-2.5.x",
   "com.adrianhurt" %% "play-bootstrap" % "1.5-P27-B3-SNAPSHOT",
   "com.nappin" %% "play-recaptcha" % "2.3",
@@ -37,7 +40,7 @@ libraryDependencies ++= Seq(
   "org.joda" % "joda-convert" % "1.9.2",
   "com.github.tototoshi" %% "play-joda-routes-binder" % "1.3.1-SNAPSHOT",
   "mysql" % "mysql-connector-java" % "8.0.16",
-  "com.mohiva" %% "play-silhouette-testkit" % "6.0.1-SNAPSHOT" % "test",
+  "com.mohiva" %% "play-silhouette-testkit" % silhouetteVersion % "test",
   specs2 % Test,
   ehcache,
   jodaForms,

@@ -1,73 +1,73 @@
 package models.daos
 
-import com.mohiva.play.silhouette.impl.providers.TotpInfo
+import com.mohiva.play.silhouette.impl.providers.GoogleTotpInfo
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
 import play.api.test.WithApplication
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
- * Test suite for the [[TotpInfoDelegableDao]]
+ * Test suite for the [[GoogleTotpInfoDelegableDao]]
  */
-class TotpInfoDelegableDaoSpec extends DaoSpecLike {
+class GoogleTotpInfoDelegableDaoSpec extends DaoSpecLike {
   sequential
 
   "The totp info delegable dao" should {
-    "should add and find TotpInfo" in new Context {
-      val totpInfoOpt: Option[TotpInfo] = for {
+    "should add and find GoogleTotpInfo" in new Context {
+      val totpInfoOpt: Option[GoogleTotpInfo] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- totpInfoDelegableDao.add(testLoginInfo, testTotpInfo)
+        _ <- totpInfoDelegableDao.add(testLoginInfo, testGoogleTotpInfo)
         totpInfo <- totpInfoDelegableDao.find(testLoginInfo)
       } yield totpInfo
 
       totpInfoOpt should not be None
 
-      val totpInfo: TotpInfo = totpInfoOpt.get
-      totpInfo.sharedKey should beEqualTo(testTotpInfo.sharedKey)
-      totpInfo.scratchCodes should beEqualTo(testTotpInfo.scratchCodes)
+      val totpInfo: GoogleTotpInfo = totpInfoOpt.get
+      totpInfo.sharedKey should beEqualTo(testGoogleTotpInfo.sharedKey)
+      totpInfo.scratchCodes should beEqualTo(testGoogleTotpInfo.scratchCodes)
     }
 
-    "should save (insert or update) and find TotpInfo" in new Context {
-      val totpInfoOpt: Option[TotpInfo] = for {
+    "should save (insert or update) and find GoogleTotpInfo" in new Context {
+      val totpInfoOpt: Option[GoogleTotpInfo] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- totpInfoDelegableDao.save(testLoginInfo, testTotpInfo)
+        _ <- totpInfoDelegableDao.save(testLoginInfo, testGoogleTotpInfo)
         totpInfo <- totpInfoDelegableDao.find(testLoginInfo)
       } yield totpInfo
 
       totpInfoOpt should not be None
 
-      val totpInfo: TotpInfo = totpInfoOpt.get
-      totpInfo.sharedKey should beEqualTo(testTotpInfo.sharedKey)
-      totpInfo.scratchCodes should beEqualTo(testTotpInfo.scratchCodes)
+      val totpInfo: GoogleTotpInfo = totpInfoOpt.get
+      totpInfo.sharedKey should beEqualTo(testGoogleTotpInfo.sharedKey)
+      totpInfo.scratchCodes should beEqualTo(testGoogleTotpInfo.scratchCodes)
     }
 
     /*
     // TODO: re-enable once the #update method is properly implemented
-    "should update TotpInfo" in new Context {
-      val totpInfoOpt: Option[TotpInfo] = for {
+    "should update GoogleTotpInfo" in new Context {
+      val totpInfoOpt: Option[GoogleTotpInfo] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- totpInfoDelegableDao.save(testLoginInfo, testTotpInfo)
-        _ <- totpInfoDelegableDao.save(testLoginInfo, testTotpInfo2)
+        _ <- totpInfoDelegableDao.save(testLoginInfo, testGoogleTotpInfo)
+        _ <- totpInfoDelegableDao.save(testLoginInfo, testGoogleTotpInfo2)
         totpInfo <- totpInfoDelegableDao.find(testLoginInfo)
       } yield totpInfo
 
       totpInfoOpt should not be None
-      val totpInfo: TotpInfo = totpInfoOpt.get
-      totpInfo.sharedKey should beEqualTo(testTotpInfo2.sharedKey)
-      totpInfo.scratchCodes should beEqualTo(testTotpInfo2.scratchCodes)
+      val totpInfo: GoogleTotpInfo = totpInfoOpt.get
+      totpInfo.sharedKey should beEqualTo(testGoogleTotpInfo2.sharedKey)
+      totpInfo.scratchCodes should beEqualTo(testGoogleTotpInfo2.scratchCodes)
     }
 */
 
-    "should remove TotpInfo" in new Context {
-      val totpInfoOpt: Option[TotpInfo] = for {
+    "should remove GoogleTotpInfo" in new Context {
+      val totpInfoOpt: Option[GoogleTotpInfo] = for {
         _ <- userDao.create(testUser, testLoginInfo)
-        _ <- totpInfoDelegableDao.save(testLoginInfo, testTotpInfo)
+        _ <- totpInfoDelegableDao.save(testLoginInfo, testGoogleTotpInfo)
         totpInfo <- totpInfoDelegableDao.find(testLoginInfo)
       } yield totpInfo
 
       totpInfoOpt should not be None
 
-      val emptyOAuth2InfoOpt: Option[TotpInfo] = for {
+      val emptyOAuth2InfoOpt: Option[GoogleTotpInfo] = for {
         _ <- totpInfoDelegableDao.remove(testLoginInfo)
         totpInfo <- totpInfoDelegableDao.find(testLoginInfo)
       } yield totpInfo
@@ -80,7 +80,7 @@ class TotpInfoDelegableDaoSpec extends DaoSpecLike {
    * Context reused by all tests
    */
   trait Context extends WithApplication with DaoSpecScope {
-    val totpInfoDelegableDao: DelegableAuthInfoDAO[TotpInfo] = daoContext.totpInfoDelegableDao
+    val totpInfoDelegableDao: DelegableAuthInfoDAO[GoogleTotpInfo] = daoContext.totpInfoDelegableDao
 
     // ensure repeatability of the test
     await(userDao.deleteAll)

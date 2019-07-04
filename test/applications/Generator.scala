@@ -26,7 +26,7 @@ object Generator extends App {
     "login_info",
     "auth_token",
     "password_info",
-    "totp_info",
+    "google_totp_info",
     "scratch_code",
     "o_auth2_info",
     "o_auth2_info_param",
@@ -77,7 +77,7 @@ object Generator extends App {
               case "LoginInfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "AuthTokenRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "PasswordInfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
-              case "TotpInfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
+              case "GoogleTotpInfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "ScratchCodeRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "OAuth2InfoRow" => parents ++ Seq("Entity[%s]".format(pkType))
               case "OAuth2InfoParamRow" => parents ++ Seq("Entity[%s]".format(pkType))
@@ -106,9 +106,9 @@ object Generator extends App {
                 "  override def id = userId\n" +
                 "  def toExt = com.mohiva.play.silhouette.api.util.PasswordInfo(hasher, password, salt) \n" +
                 "}"
-              case "TotpInfoRow" => "{\n" +
+              case "GoogleTotpInfoRow" => "{\n" +
                 "  override def id = userId\n" +
-                "  def toExt(scratchCodes: Seq[com.mohiva.play.silhouette.api.util.PasswordInfo]) = com.mohiva.play.silhouette.impl.providers.TotpInfo(sharedKey, scratchCodes)\n" +
+                "  def toExt(scratchCodes: Seq[com.mohiva.play.silhouette.api.util.PasswordInfo]) = com.mohiva.play.silhouette.impl.providers.GoogleTotpInfo(sharedKey, scratchCodes)\n" +
                 "}"
               case "ScratchCodeRow" => "{\n" +
                 "  override def id = userId\n" +
@@ -146,7 +146,7 @@ object Generator extends App {
             case "LoginInfo" => parents :+ s"IdentifyableTable[$pkType]"
             case "AuthToken" => parents :+ s"IdentifyableTable[$pkType]"
             case "PasswordInfo" => parents :+ s"IdentifyableTable[$pkType]"
-            case "TotpInfo" => parents :+ s"IdentifyableTable[$pkType]"
+            case "GoogleTotpInfo" => parents :+ s"IdentifyableTable[$pkType]"
             case "ScratchCode" => parents :+ s"IdentifyableTable[$pkType]"
             case "OAuth2Info" => parents :+ s"IdentifyableTable[$pkType]"
             case "OAuth2InfoParam" => parents :+ s"IdentifyableTable[$pkType]"
@@ -161,7 +161,7 @@ object Generator extends App {
             case "LoginInfo" => Seq("override def id = userId") +: body
             case "AuthToken" => Seq("override def id = userId") +: body
             case "PasswordInfo" => Seq("override def id = userId") +: body
-            case "TotpInfo" => Seq("override def id = userId") +: body
+            case "GoogleTotpInfo" => Seq("override def id = userId") +: body
             case "ScratchCode" => Seq("override def id = userId") +: body
             case "OAuth2Info" => Seq("override def id = userId") +: body
             case "OAuth2InfoParam" => Seq("override def id = userId") +: body

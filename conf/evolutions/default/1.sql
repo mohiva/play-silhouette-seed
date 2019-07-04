@@ -42,7 +42,7 @@ CREATE TABLE password_info (
     FOREIGN KEY (user_id) REFERENCES login_info(user_id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE totp_info (
+CREATE TABLE google_totp_info (
     user_id BIGINT UNSIGNED PRIMARY KEY,
     shared_key CHAR(36) NOT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE scratch_code (
     password VARCHAR(100) NOT NULL,
     salt VARCHAR(50) NULL DEFAULT NULL,
     modified TIMESTAMP NULL DEFAULT NULL,
-    FOREIGN KEY (user_id) REFERENCES totp_info(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES google_totp_info(user_id) ON DELETE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE o_auth2_info (
@@ -101,8 +101,8 @@ CREATE TRIGGER login_info_trigger_before_update BEFORE UPDATE ON login_info FOR 
 CREATE TRIGGER password_info_trigger_before_insert BEFORE INSERT ON password_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
 CREATE TRIGGER password_info_trigger_before_update BEFORE UPDATE ON password_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
 
-CREATE TRIGGER totp_info_trigger_before_insert BEFORE INSERT ON totp_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
-CREATE TRIGGER totp_info_trigger_before_update BEFORE UPDATE ON totp_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
+CREATE TRIGGER google_totp_info_trigger_before_insert BEFORE INSERT ON google_totp_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
+CREATE TRIGGER google_totp_info_trigger_before_update BEFORE UPDATE ON google_totp_info FOR EACH ROW SET NEW.modified := CURRENT_TIME;
 
 CREATE TRIGGER scratch_code_trigger_before_insert BEFORE INSERT ON scratch_code FOR EACH ROW SET NEW.modified := CURRENT_TIME;
 CREATE TRIGGER scratch_code_trigger_before_update BEFORE UPDATE ON scratch_code FOR EACH ROW SET NEW.modified := CURRENT_TIME;
@@ -122,7 +122,7 @@ DROP TABLE o_auth2_info CASCADE;
 
 DROP TABLE scratch_code CASCADE;
 
-DROP TABLE totp_info CASCADE;
+DROP TABLE google_totp_info CASCADE;
 
 DROP TABLE password_info CASCADE;
 

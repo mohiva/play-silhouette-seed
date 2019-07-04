@@ -2,7 +2,7 @@ package models.daos
 
 import com.mohiva.play.silhouette.impl.providers.OAuth2Info
 import com.mohiva.play.silhouette.api.util.PasswordInfo
-import com.mohiva.play.silhouette.impl.providers.TotpInfo
+import com.mohiva.play.silhouette.impl.providers.GoogleTotpInfo
 import models.generated.Tables._
 import org.joda.time._
 import org.specs2.specification.Scope
@@ -70,12 +70,12 @@ trait DaoSpecLike extends PlaySpecification with Mockito {
       salt = Some("salt2")
     )
 
-    val testTotpInfo = TotpInfo(
+    val testGoogleTotpInfo = GoogleTotpInfo(
       sharedKey = "sharedKey",
       scratchCodes = Seq(testPasswordInfo)
     )
 
-    val testTotpInfo2 = TotpInfo(
+    val testGoogleTotpInfo2 = GoogleTotpInfo(
       sharedKey = "sharedKey2",
       scratchCodes = Seq(testPasswordInfo2)
     )
