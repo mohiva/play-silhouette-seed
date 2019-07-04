@@ -19,7 +19,7 @@ POST        /reenterPassword                 controllers.ReenterPasswordControll
 GET         /signIn                          controllers.SignInController.view
 POST        /signIn                          controllers.SignInController.submit
 
-GET         /totp                            controllers.TotpController.view
+GET         /totp                            controllers.TotpController.view(userId: Long, sharedKey: String, rememberMe: Boolean)
 GET         /enableTotp                      controllers.TotpController.enableTotp
 GET         /disableTotp                     controllers.TotpController.disableTotp
 POST        /totpSubmit                      controllers.TotpController.submit

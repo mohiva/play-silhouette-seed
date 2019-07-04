@@ -50,8 +50,8 @@ class TotpController @Inject() (
    * Views the `TOTP` page.
    * @return The result to display.
    */
-  def view = silhouette.UnsecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.totp(TotpForm.form)))
+  def view(userId: Long, sharedKey: String, rememberMe: Boolean) = silhouette.UnsecuredAction.async { implicit request =>
+    Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(userId, sharedKey, rememberMe)))))
   }
 
   /**
@@ -114,7 +114,7 @@ class TotpController @Inject() (
               case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verification.code")))
             }.recover {
               case _: ProviderException =>
-                Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
+                Redirect(routes.TotpController.view(user.id, data.sharedKey, request.authenticator.cookieMaxAge.isDefined)).flashing("error" -> Messages("invalid.unexpected.totp"))
             }
           }
         )
@@ -131,14 +131,15 @@ class TotpController @Inject() (
     TotpForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.totp(form))),
       data => {
+        val totpControllerRoute = routes.TotpController.view(data.userId, data.sharedKey, data.rememberMe)
         userService.retrieve(data.userId).flatMap {
           case Some(user) =>
             totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
               case Some(_) => authenticateUser(user, data.rememberMe)
-              case _ => Future.successful(Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.verification.code")))
+              case _ => Future.successful(Redirect(totpControllerRoute).flashing("error" -> Messages("invalid.verification.code")))
             }.recover {
               case _: ProviderException =>
-                Redirect(routes.TotpController.view()).flashing("error" -> Messages("invalid.unexpected.totp"))
+                Redirect(totpControllerRoute).flashing("error" -> Messages("invalid.unexpected.totp"))
             }
           case None => Future.failed(new IdentityNotFoundException(Messages("internal.error.no.user.found")))
         }
