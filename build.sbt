@@ -6,7 +6,7 @@ name := "play-silhouette-seed"
 
 version := "1.0.0-SNAPSHOT"
 
-val silhouetteVersion = "6.0.1"
+val silhouetteVersion = "6.1.0"
 
 scalaVersion := "2.12.8"
 
