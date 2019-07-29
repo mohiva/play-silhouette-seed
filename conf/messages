@@ -1,12 +1,16 @@
 error.email = Valid email required
 error.required = This field is required
 invalid.credentials = Invalid credentials!
+invalid.unexpected.totp = Unexpected TOTP exception!
+invalid.verification.code = Invalid verification code!
+invalid.recovery.code = Invalid recovery code!
 access.denied = Access denied!
 could.not.authenticate = Could not authenticate with social provider! Please try again!
 
 home.title = Silhouette - Home
 sign.up.title = Silhouette - Sign Up
 sign.in.title = Silhouette - Sign In
+totp.title = Silhouette - TOTP
 forgot.password.title = Silhouette - Forgot Password
 reset.password.title = Silhouette - Reset Password
 change.password.title = Silhouette - Change Password
@@ -15,8 +19,28 @@ activate.account.title = Silhouette - Activate Account
 toggle.navigation = Toggle navigation
 welcome.signed.in = Welcome, you are now signed in!
 
+totp.enable = Enable two-factor authentication
+totp.disable = Disable two-factor authentication
+totp.enabling.title = 2 factor auth enabling
+totp.disabled.title = 2 factor auth is not enabled
+totp.enabled.title = 2 factor auth is enabled
+totp.shared.key.title = Shared key:
+totp.recovery.tokens.title = Recovery tokens:
+totp.enabling.info = 2 factor auth enabled successfully!
+totp.disabling.info = 2 factor auth disabled successfully!
+totp.recovery.code = Recovery code
+totp.verification.code = Verification Code
+totp.verify = Verify
+totp.open.the.app.for.2fa = Open the two-factor authentication app on your device to view your authentication code and verify your identity.
+totp.dont.have.your.phone = Don't have your phone?
+totp.use.recovery.code = Enter a two-factor recovery code
+totp.lost.your.recovery.codes = Lost your recovery codes?
+totp.contact.support = Contact support
+
 sign.up.account = Sign up for a new account
 sign.in.credentials = Sign in with your credentials
+sign.in.totp = Two-factor authentication
+sign.in.totp.recovery = Two-factor authentication using recovery code
 
 error = Error!
 info = Info!
