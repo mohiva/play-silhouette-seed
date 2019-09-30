@@ -6,27 +6,12 @@
 GET         /                                controllers.ApplicationController.index
 GET         /signOut                         controllers.ApplicationController.signOut
 GET         /authenticate/:provider          controllers.SocialAuthController.authenticate(provider)
-GET         /lang/$lang<(en|es)>             controllers.ApplicationController.selectLang(lang: String)
-
-GET         /restrictedSudoAccess            controllers.SudoAccessController.restrictedSudoAccess
 
 GET         /signUp                          controllers.SignUpController.view
 POST        /signUp                          controllers.SignUpController.submit
 
-GET         /reenterPassword                 controllers.ReenterPasswordController.view
-POST        /reenterPassword                 controllers.ReenterPasswordController.submit
-
 GET         /signIn                          controllers.SignInController.view
 POST        /signIn                          controllers.SignInController.submit
-
-GET         /totp                            controllers.TotpController.view(userId: Long, sharedKey: String, rememberMe: Boolean)
-GET         /enableTotp                      controllers.TotpController.enableTotp
-GET         /disableTotp                     controllers.TotpController.disableTotp
-POST        /totpSubmit                      controllers.TotpController.submit
-POST        /enableTotpSubmit                controllers.TotpController.enableTotpSubmit
-
-GET         /totpRecovery                    controllers.TotpRecoveryController.view(userId: Long, sharedKey: String, rememberMe: Boolean)
-POST        /totpRecoverySubmit              controllers.TotpRecoveryController.submit
 
 GET         /password/forgot                 controllers.ForgotPasswordController.view
 POST        /password/forgot                 controllers.ForgotPasswordController.submit

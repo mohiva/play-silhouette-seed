@@ -2,12 +2,12 @@ package utils.auth
 
 import com.mohiva.play.silhouette.api.Env
 import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
-import models.generated.Tables.UserRow
+import models.User
 
 /**
  * The default env.
  */
 trait DefaultEnv extends Env {
-  type I = UserRow
+  type I = User
   type A = CookieAuthenticator
 }

@@ -1,25 +1,22 @@
 package models.services
 
+import java.util.UUID
 import javax.inject.Inject
-import com.mohiva.play.silhouette.api.{ LoginInfo => ExtLoginInfo }
-import models.daos._
-import models.generated.Tables._
-import providers.MySocialProfile
+
+import com.mohiva.play.silhouette.api.LoginInfo
+import com.mohiva.play.silhouette.impl.providers.CommonSocialProfile
+import models.User
+import models.daos.UserDAO
 
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * Handles actions to users.
  *
- * @param daoContext The dao context to have access to all daos.
- * @param ex The execution context.
+ * @param userDAO The user DAO implementation.
+ * @param ex      The execution context.
  */
-class UserServiceImpl @Inject() (
-  daoContext: DaoContext
-)(
-  implicit
-  ex: ExecutionContext
-) extends UserService {
+class UserServiceImpl @Inject() (userDAO: UserDAO)(implicit ex: ExecutionContext) extends UserService {
 
   /**
    * Retrieves a user that matches the specified ID.
@@ -27,26 +24,23 @@ class UserServiceImpl @Inject() (
    * @param id The ID to retrieve a user.
    * @return The retrieved user or None if no user could be retrieved for the given ID.
    */
-  override def retrieve(id: Long): Future[Option[UserRow]] = daoContext.userDao.findById(id)
+  def retrieve(id: UUID) = userDAO.find(id)
 
   /**
    * Retrieves a user that matches the specified login info.
    *
-   * @param extLoginInfo The login info to retrieve a user.
+   * @param loginInfo The login info to retrieve a user.
    * @return The retrieved user or None if no user could be retrieved for the given login info.
    */
-  override def retrieve(extLoginInfo: ExtLoginInfo): Future[Option[UserRow]] = {
-    daoContext.userDao.find(extLoginInfo)
-  }
+  def retrieve(loginInfo: LoginInfo): Future[Option[User]] = userDAO.find(loginInfo)
 
   /**
-   * Creates a new user.
+   * Saves a user.
    *
    * @param user The user to save.
-   * @param extLoginInfo The Silhouette LoginInfo instance
    * @return The saved user.
    */
-  override def create(user: UserRow, extLoginInfo: ExtLoginInfo): Future[UserRow] = daoContext.userDao.create(user, extLoginInfo)
+  def save(user: User) = userDAO.save(user)
 
   /**
    * Saves the social profile for a user.
@@ -56,61 +50,27 @@ class UserServiceImpl @Inject() (
    * @param profile The social profile to save.
    * @return The user for whom the profile was saved.
    */
-  // TODO: extend OAuth2FacebookProvider and provide correct values
-  override def create(profile: MySocialProfile): Future[UserRow] = {
-    daoContext.userDao.find(profile.loginInfo).flatMap {
-      case Some(user) => { // update user with profile
-        val updated = user.copy(
-          firstName = profile.firstName.get,
-          lastName = profile.lastName.get,
-          birthDate = profile.birthDate.get,
-          gender = profile.gender.get,
-          email = profile.email.get,
-          mobilePhone = None,
-          avatarUrl = profile.avatarURL
-        )
-        daoContext.userDao.update(updated).map(affected => if (affected == 1) updated else None.asInstanceOf[UserRow])
-      }
-      case None => // insert a new user
-        daoContext.userDao.create(UserRow(
-          0L,
-          firstName = profile.firstName.get,
-          lastName = profile.lastName.get,
-          birthDate = profile.birthDate.get,
-          gender = profile.gender.get,
-          email = profile.email.get,
-          mobilePhone = None,
-          avatarUrl = profile.avatarURL,
+  def save(profile: CommonSocialProfile) = {
+    userDAO.find(profile.loginInfo).flatMap {
+      case Some(user) => // Update user with profile
+        userDAO.save(user.copy(
+          firstName = profile.firstName,
+          lastName = profile.lastName,
+          fullName = profile.fullName,
+          email = profile.email,
+          avatarURL = profile.avatarURL
+        ))
+      case None => // Insert a new user
+        userDAO.save(User(
+          userID = UUID.randomUUID(),
+          loginInfo = profile.loginInfo,
+          firstName = profile.firstName,
+          lastName = profile.lastName,
+          fullName = profile.fullName,
+          email = profile.email,
+          avatarURL = profile.avatarURL,
           activated = true
-        ), profile.loginInfo)
+        ))
     }
-  }
-
-  /**
-   * Returns the LoginInfo that corresponds to the user.
-   *
-   * @return the LoginInfo that corresponds to the user.
-   */
-  override def loginInfo(user: UserRow): Future[Option[LoginInfoRow]] = {
-    daoContext.loginInfoDao.findById(user.id)
-  }
-
-  /**
-   * Returns sequence of roles this user has.
-   *
-   * @return sequence of roles this user has.
-   */
-  override def roles(user: UserRow): Future[Seq[SecurityRoleRow]] = {
-    daoContext.securityRoleDao.find(user)
-  }
-
-  /**
-   * Returns the number of affected rows, one if succeeded, zero otherwise.
-   *
-   * @param user the user to update
-   * @return the number of affected rows, one if succeeded, zero otherwise.
-   */
-  override def update(user: UserRow): Future[UserRow] = {
-    daoContext.userDao.update(user).map(affected => if (affected == 1) user else None.asInstanceOf[UserRow])
   }
 }

@@ -3,10 +3,8 @@
 @import play.twirl.api.Html
 @import org.webjars.play.WebJarsUtil
 @import controllers.AssetsFinder
-@import models.generated.Tables.UserRow
-@import com.mohiva.play.silhouette.api.LoginInfo
 
-@(title: String, user: Option[(UserRow, LoginInfo)] = None)(content: Html)(implicit request: RequestHeader, messages: Messages, assets: AssetsFinder, webJarsUtil: WebJarsUtil)
+@(title: String, user: Option[models.User] = None)(content: Html)(implicit request: RequestHeader, messages: Messages, assets: AssetsFinder, webJarsUtil: WebJarsUtil)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -42,20 +40,12 @@
                 <nav class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
                         <li><a href="@controllers.routes.ApplicationController.index">@messages("home")</a></li>
-                        <li><a href="https://github.com/bravegag/play-silhouette-seed">GitHub</a></li>
+                        <li><a href="https://github.com/mohiva/play-silhouette-seed">GitHub</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <ul class="nav navbar-nav">
-                            @if(messages.lang.code == "en") {
-                            <li><a href="@controllers.routes.ApplicationController.selectLang("es")">Español</a></li>
-                            } else {
-                            <li><a href="@controllers.routes.ApplicationController.selectLang("en")">English</a></li>
-                            }
-                        </ul>
-                        @user.map { case (u, loginInfo) =>
-                            <li><a href="@controllers.routes.ApplicationController.index">@u.fullName</a></li>
-                            <li><a href="@controllers.routes.SudoAccessController.restrictedSudoAccess">@messages("restricted.sudo.access")</a></li>
-                            @if(loginInfo.providerID == com.mohiva.play.silhouette.impl.providers.CredentialsProvider.ID) {
+                        @user.map { u =>
+                            <li><a href="@controllers.routes.ApplicationController.index">@u.name</a></li>
+                            @if(u.loginInfo.providerID == com.mohiva.play.silhouette.impl.providers.CredentialsProvider.ID) {
                                 <li><a href="@controllers.routes.ChangePasswordController.view">@messages("change.password")</a></li>
                             }
                             <li><a href="@controllers.routes.ApplicationController.signOut">@messages("sign.out")</a></li>

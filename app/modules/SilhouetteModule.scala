@@ -18,15 +18,14 @@ import com.mohiva.play.silhouette.impl.providers.oauth2._
 import com.mohiva.play.silhouette.impl.providers.openid.YahooProvider
 import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDService
 import com.mohiva.play.silhouette.impl.providers.state.{ CsrfStateItemHandler, CsrfStateSettings }
-import com.mohiva.play.silhouette.impl.providers.GoogleTotpProvider
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
 import com.mohiva.play.silhouette.password.{ BCryptPasswordHasher, BCryptSha256PasswordHasher }
-import com.mohiva.play.silhouette.persistence.daos.{ AuthInfoDAO, DelegableAuthInfoDAO, InMemoryAuthInfoDAO }
+import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, InMemoryAuthInfoDAO }
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
 import com.typesafe.config.Config
 import models.daos._
-import models.services._
+import models.services.{ UserService, UserServiceImpl }
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 import net.ceedubs.ficus.readers.ValueReader
@@ -35,7 +34,6 @@ import play.api.Configuration
 import play.api.libs.openid.OpenIdClient
 import play.api.libs.ws.WSClient
 import play.api.mvc.{ Cookie, CookieHeaderEncoding }
-import providers.MyFacebookProvider
 import utils.auth.{ CustomSecuredErrorHandler, CustomUnsecuredErrorHandler, DefaultEnv }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -44,6 +42,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * The Guice module which wires all Silhouette dependencies.
  */
 class SilhouetteModule extends AbstractModule with ScalaModule {
+
   /**
    * A very nested optional reader, to support these cases:
    * Not set, set None, will use default ('Lax')
@@ -71,27 +70,17 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[UnsecuredErrorHandler].to[CustomUnsecuredErrorHandler]
     bind[SecuredErrorHandler].to[CustomSecuredErrorHandler]
     bind[UserService].to[UserServiceImpl]
-    bind[UserDao].to[UserDaoImpl]
-    bind[SecurityRoleDao].to[SecurityRoleDaoImpl]
-    bind[LoginInfoDao].to[LoginInfoDaoImpl]
-    bind[LoginInfoService].to[LoginInfoServiceImpl]
-    bind[AuthInfoDAO[PasswordInfo]].to[PasswordInfoDaoImpl]
-    bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDaoImpl]
-    bind[AuthInfoDAO[GoogleTotpInfo]].to[GoogleTotpInfoDaoImpl]
-    bind[DelegableAuthInfoDAO[GoogleTotpInfo]].to[GoogleTotpInfoDaoImpl]
-    bind[AuthInfoDAO[OAuth2Info]].to[OAuth2InfoDaoImpl]
-    bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDaoImpl]
-    bind[ScratchCodeDao].to[ScratchCodeDaoImpl]
-    bind[ScratchCodeService].to[ScratchCodeServiceImpl]
-
+    bind[UserDAO].to[UserDAOImpl]
     bind[CacheLayer].to[PlayCacheLayer]
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
     bind[FingerprintGenerator].toInstance(new DefaultFingerprintGenerator(false))
     bind[EventBus].toInstance(EventBus())
     bind[Clock].toInstance(Clock())
 
-    // replace this with the bindings to your concrete DAOs
+    // Replace this with the bindings to your concrete DAOs
+    bind[DelegableAuthInfoDAO[PasswordInfo]].toInstance(new InMemoryAuthInfoDAO[PasswordInfo])
     bind[DelegableAuthInfoDAO[OAuth1Info]].toInstance(new InMemoryAuthInfoDAO[OAuth1Info])
+    bind[DelegableAuthInfoDAO[OAuth2Info]].toInstance(new InMemoryAuthInfoDAO[OAuth2Info])
     bind[DelegableAuthInfoDAO[OpenIDInfo]].toInstance(new InMemoryAuthInfoDAO[OpenIDInfo])
   }
 
@@ -139,7 +128,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    */
   @Provides
   def provideSocialProviderRegistry(
-    facebookProvider: MyFacebookProvider,
+    facebookProvider: FacebookProvider,
     googleProvider: GoogleProvider,
     vkProvider: VKProvider,
     twitterProvider: TwitterProvider,
@@ -237,7 +226,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   /**
    * Provides the auth info repository.
    *
-   * @param totpInfoDAO The implementation of the delegable totp auth info DAO.
    * @param passwordInfoDAO The implementation of the delegable password auth info DAO.
    * @param oauth1InfoDAO The implementation of the delegable OAuth1 auth info DAO.
    * @param oauth2InfoDAO The implementation of the delegable OAuth2 auth info DAO.
@@ -246,13 +234,12 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    */
   @Provides
   def provideAuthInfoRepository(
-    totpInfoDAO: DelegableAuthInfoDAO[GoogleTotpInfo],
     passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
     openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoRepository = {
 
-    new DelegableAuthInfoRepository(totpInfoDAO, passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
+    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
   }
 
   /**
@@ -369,16 +356,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   }
 
   /**
-   * Provides the TOTP provider.
-   *
-   * @return The credentials provider.
-   */
-  @Provides
-  def provideTotpProvider(passwordHasherRegistry: PasswordHasherRegistry): GoogleTotpProvider = {
-    new GoogleTotpProvider(passwordHasherRegistry)
-  }
-
-  /**
    * Provides the Facebook provider.
    *
    * @param httpLayer The HTTP layer implementation.
@@ -390,9 +367,9 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   def provideFacebookProvider(
     httpLayer: HTTPLayer,
     socialStateHandler: SocialStateHandler,
-    configuration: Configuration): MyFacebookProvider = {
+    configuration: Configuration): FacebookProvider = {
 
-    new MyFacebookProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.facebook"))
+    new FacebookProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.facebook"))
   }
 
   /**

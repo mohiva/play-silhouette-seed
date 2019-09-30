@@ -1,33 +1,23 @@
 @import play.api.data.Form
-@import play.api.i18n._
-@import play.api.mvc._
+@import play.api.i18n.Messages
+@import play.api.mvc.RequestHeader
 @import org.webjars.play.WebJarsUtil
 @import controllers.AssetsFinder
 @import forms.SignUpForm.Data
-@import com.nappin.play.recaptcha.{RecaptchaVerifier, RecaptchaErrorCode, WidgetHelper}
-@import play.twirl.api.Html
 
-@(signUpForm: Form[Data], recaptchaWidget: recaptcha.recaptchaWidget, widgetHelper: WidgetHelper)(implicit request: RequestHeader,
-  messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+@(signUpForm: Form[Data])(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
 
 @implicitFieldConstructor = @{ b3.vertical.fieldConstructor() }
 
 @main(messages("sign.up.title")) {
-    @if(signUpForm.hasGlobalErrors) {
-        <p class="alert alert-danger">@signUpForm.globalError.get.message</p>
-    }
     <fieldset class="col-md-6 col-md-offset-3">
         <legend>@messages("sign.up.account")</legend>
         @helper.form(action = controllers.routes.SignUpController.submit()) {
             @helper.CSRF.formField
             @b3.text(signUpForm("firstName"), '_hiddenLabel -> messages("first.name"), 'placeholder -> messages("first.name"), 'class -> "form-control input-lg")
             @b3.text(signUpForm("lastName"), '_hiddenLabel -> messages("last.name"), 'placeholder -> messages("last.name"), 'class -> "form-control input-lg")
-            @b3.date(signUpForm("birthDate"), '_hiddenLabel -> messages("birth.date"), 'placeholder -> messages("birth.date"), 'class -> "form-control input-lg")
-            @b3.radio(signUpForm("gender"), options = Seq("female" -> Html("Female <i class=\"fa fa-female\"></i>"), "male" -> Html("Male <i class=\"fa fa-male\"></i>")), '_hiddenLabel -> messages("gender"), 'placeholder -> messages("gender"), 'class -> "form-control input-lg")
             @b3.text(signUpForm("email"), '_hiddenLabel -> messages("email"), 'placeholder -> messages("email"), 'class -> "form-control input-lg")
-            @b3.text(signUpForm("mobilePhone"), '_hiddenLabel -> messages("mobile.phone"), 'placeholder -> messages("mobile.phone"), 'class -> "form-control input-lg")
-            @_passwordStrengthPartial(signUpForm("password"), '_hiddenLabel -> messages("password"), 'placeholder -> messages("password"), 'class -> "form-control input-lg")(Option(signUpForm("repeatPassword")), '_hiddenLabel -> messages("repeat.password"), 'placeholder -> messages("repeat.password"), 'class -> "form-control input-lg")
-            @_recaptchaFieldPartial(form=signUpForm, recaptchaWidget=recaptchaWidget, fieldName="signup.captcha")(widgetHelper, request.asInstanceOf[Request[AnyContent]], messages)
+            @passwordStrength(signUpForm("password"), '_hiddenLabel -> messages("password"), 'placeholder -> messages("password"), 'class -> "form-control input-lg")
             <div class="form-group">
                 <div>
                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@messages("sign.up")</button>

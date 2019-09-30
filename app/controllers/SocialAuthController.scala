@@ -1,14 +1,14 @@
 package controllers
 
 import javax.inject.Inject
+
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.impl.providers._
 import models.services.UserService
 import play.api.i18n.{ I18nSupport, Messages }
-import play.api.mvc.{ AbstractController, ControllerComponents }
-import providers.MySocialProfileBuilder
+import play.api.mvc.{ AbstractController, AnyContent, ControllerComponents, Request }
 import utils.auth.DefaultEnv
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -40,14 +40,14 @@ class SocialAuthController @Inject() (
    * @param provider The ID of the provider to authenticate against.
    * @return The result to display.
    */
-  def authenticate(provider: String) = Action.async { implicit request =>
+  def authenticate(provider: String) = Action.async { implicit request: Request[AnyContent] =>
     (socialProviderRegistry.get[SocialProvider](provider) match {
-      case Some(p: SocialProvider with MySocialProfileBuilder) =>
+      case Some(p: SocialProvider with CommonSocialProfileBuilder) =>
         p.authenticate().flatMap {
           case Left(result) => Future.successful(result)
           case Right(authInfo) => for {
             profile <- p.retrieveProfile(authInfo)
-            user <- userService.create(profile)
+            user <- userService.save(profile)
             authInfo <- authInfoRepository.save(profile.loginInfo, authInfo)
             authenticator <- silhouette.env.authenticatorService.create(profile.loginInfo)
             value <- silhouette.env.authenticatorService.init(authenticator)
@@ -57,7 +57,7 @@ class SocialAuthController @Inject() (
             result
           }
         }
-      case _ => Future.failed(new ProviderException(Messages("cannot.authenticate.with.unknown.social.provider", provider)))
+      case _ => Future.failed(new ProviderException(s"Cannot authenticate with unexpected social provider $provider"))
     }).recover {
       case e: ProviderException =>
         logger.error("Unexpected provider error", e)
