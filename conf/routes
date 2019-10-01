@@ -13,7 +13,7 @@ POST        /signUp                          controllers.SignUpController.submit
 GET         /signIn                          controllers.SignInController.view
 POST        /signIn                          controllers.SignInController.submit
 
-GET         /totp                            controllers.TotpController.view
+GET         /totp                            controllers.TotpController.view(userId: java.util.UUID, sharedKey: String, rememberMe: Boolean)
 GET         /enableTotp                      controllers.TotpController.enableTotp
 GET         /disableTotp                     controllers.TotpController.disableTotp
 POST        /totpSubmit                      controllers.TotpController.submit
