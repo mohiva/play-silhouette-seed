@@ -66,7 +66,7 @@
                     </ul>
                     @helper.form(action = controllers.routes.TotpController.enableTotpSubmit()) {
                         @helper.CSRF.formField
-                        @b4.text(totpForm("verificationCode"), '_hiddenLabel -> messages("totp.verification.code    "), 'placeholder -> messages("totp.verification.code"), 'autocomplete -> "off", 'class -> "form-control input-lg")
+                        @b4.text(totpForm("verificationCode"), Symbol("_hiddenLabel") -> messages("totp.verification.code    "), Symbol("placeholder") -> messages("totp.verification.code"), Symbol("autocomplete") -> "off", Symbol("class") -> "form-control input-lg")
                         @b4.hidden(totpForm("sharedKey"))
                         @helper.repeat(totpForm("scratchCodes"), min = 1) { scratchCodeField =>
                             @b4.hidden(scratchCodeField("hasher"))

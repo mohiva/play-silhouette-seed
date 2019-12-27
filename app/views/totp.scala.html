@@ -17,7 +17,7 @@
         <legend>@messages("sign.in.totp")</legend>
         @helper.form(action = controllers.routes.TotpController.submit()) {
             @helper.CSRF.formField
-            @b4.text(totpForm("verificationCode"), '_hiddenLabel -> messages("totp.verification.code"), 'placeholder -> messages("totp.verification.code"), 'autocomplete -> "off", 'class -> "form-control input-lg")
+            @b4.text(totpForm("verificationCode"), Symbol("_hiddenLabel") -> messages("totp.verification.code"), Symbol("placeholder") -> messages("totp.verification.code"), Symbol("autocomplete") -> "off", Symbol("class") -> "form-control input-lg")
             @b4.hidden(totpForm("userID"))
             @b4.hidden(totpForm("sharedKey"))
             @b4.hidden(totpForm("rememberMe"))
