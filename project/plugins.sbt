@@ -1,6 +1,2 @@
-// Comment to get more information during initialization
-logLevel := Level.Warn
-
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.7.2")
-
-addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
+addSbtPlugin("org.foundweekends.giter8" %% "sbt-giter8" % "0.12.0")
+libraryDependencies += { "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value }
