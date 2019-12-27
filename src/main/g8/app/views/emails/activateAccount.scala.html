@@ -1,0 +1,11 @@
+@import play.api.i18n.Messages
+@import play.twirl.api.Html
+
+@(user: models.User, url: String)(implicit messages: Messages)
+
+<html>
+    <body>
+        <p>@messages("email.activate.account.hello", user.name.getOrElse("user"))</p>
+        <p>@Html(messages("email.activate.account.html.text", url))</p>
+    </body>
+</html>

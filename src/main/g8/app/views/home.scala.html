@@ -1,0 +1,93 @@
+@import play.api.i18n.Messages
+@import play.api.mvc.RequestHeader
+@import org.webjars.play.WebJarsUtil
+@import controllers.AssetsFinder
+@import play.api.data._
+@import forms.TotpSetupForm.Data
+@import com.mohiva.play.silhouette.impl.providers.GoogleTotpCredentials
+@import com.mohiva.play.silhouette.impl.providers.GoogleTotpInfo
+
+@(user: models.User, totpInfoOpt: Option[GoogleTotpInfo], totpDataOpt: Option[(Form[Data], GoogleTotpCredentials)] = None)(implicit request: RequestHeader,
+        messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+
+@implicitFieldConstructor = @{
+    b3.vertical.fieldConstructor()
+}
+
+@main(messages("home.title"), Some(user)) {
+    <div class="user col-md-6 col-md-offset-3">
+        <div class="row">
+            <hr class="col-md-12" />
+            <h4 class="col-md-8">@messages("welcome.signed.in")</h4>
+            <div class="col-md-4 text-right">
+                <img src="@user.avatarURL.getOrElse(assets.path("images/silhouette.png"))" height="40px" />
+            </div>
+            <hr class="col-md-12" />
+        </div>
+        <div class="row data">
+            <div class="col-md-12">
+                <div class="row">
+                    <p class="col-md-6"><strong>@messages("first.name")
+                        :</strong></p><p class="col-md-6">@user.firstName.getOrElse("None")</p>
+                </div>
+                <div class="row">
+                    <p class="col-md-6"><strong>@messages("last.name")
+                        :</strong></p><p class="col-md-6">@user.lastName.getOrElse("None")</p>
+                </div>
+                <div class="row">
+                    <p class="col-md-6"><strong>@messages("full.name")
+                        :</strong></p><p class="col-md-6">@user.fullName.getOrElse("None")</p>
+                </div>
+                <div class="row">
+                    <p class="col-md-6"><strong>@messages("email")
+                        :</strong></p><p class="col-md-6">@user.email.getOrElse("None")</p>
+                </div>
+            </div>
+        </div>
+        <div class="row data">
+        @if(totpInfoOpt.nonEmpty) {
+            <h2>@messages("totp.enabled.title")</h2>
+            <a href="@controllers.routes.TotpController.disableTotp">
+                <input type="button" class="btn btn-primary" value='@messages("totp.disable")'/>
+            </a>
+        } else {
+            @totpDataOpt match {
+                case Some((totpForm, credentials)) => {
+                    <h2>@messages("totp.enabling.title")</h2>
+                    <h2>@messages("totp.shared.key.title")</h2>
+                    <img src="@credentials.qrUrl"/>
+                    <h2>@messages("totp.recovery.tokens.title")</h2>
+                    <ul>
+                    @for(scratchCodePlain <- credentials.scratchCodesPlain) {
+                        <li>@{
+                            scratchCodePlain
+                        }</li>
+                    }
+                    </ul>
+                    @helper.form(action = controllers.routes.TotpController.enableTotpSubmit()) {
+                        @helper.CSRF.formField
+                        @b3.text(totpForm("verificationCode"), '_hiddenLabel -> messages("totp.verification.code    "), 'placeholder -> messages("totp.verification.code"), 'autocomplete -> "off", 'class -> "form-control input-lg")
+                        @b3.hidden(totpForm("sharedKey"))
+                        @helper.repeat(totpForm("scratchCodes"), min = 1) { scratchCodeField =>
+                            @b3.hidden(scratchCodeField("hasher"))
+                            @b3.hidden(scratchCodeField("password"))
+                            @b3.hidden(scratchCodeField("salt"))
+                        }
+                        <div class="form-group">
+                            <div>
+                                <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@messages("totp.verify")</button>
+                            </div>
+                        </div>
+                    }
+                }
+                case None => {
+                    <h2>@messages("totp.disabled.title")</h2>
+                    <a href="@controllers.routes.TotpController.enableTotp">
+                        <input type="button" class="btn btn-primary" value='@messages("totp.enable")'/>
+                    </a>
+                }
+            }
+        }
+        </div>
+    </div>
+}

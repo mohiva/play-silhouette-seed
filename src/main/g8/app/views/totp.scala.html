@@ -1,0 +1,35 @@
+@import play.api.data.Form
+@import play.api.i18n.Messages
+@import play.api.mvc.RequestHeader
+@import org.webjars.play.WebJarsUtil
+@import controllers.AssetsFinder
+@import forms.TotpForm.Data
+@import forms.TotpRecoveryForm
+@import java.util.UUID
+
+@(totpForm: Form[Data])(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+
+@implicitFieldConstructor = @{ b3.vertical.fieldConstructor() }
+
+@main(messages("sign.in.title")) {
+    <fieldset class="col-md-6 col-md-offset-3">
+        <legend>@messages("sign.in.totp")</legend>
+        @helper.form(action = controllers.routes.TotpController.submit()) {
+            @helper.CSRF.formField
+            @b3.text(totpForm("verificationCode"), '_hiddenLabel -> messages("totp.verification.code"), 'placeholder -> messages("totp.verification.code"), 'autocomplete -> "off", 'class -> "form-control input-lg")
+            @b3.hidden(totpForm("userID"))
+            @b3.hidden(totpForm("sharedKey"))
+            @b3.hidden(totpForm("rememberMe"))
+            <div class="form-group">
+                <div>
+                    <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@messages("totp.verify")</button>
+                </div>
+            </div>
+        }
+
+        @messages("totp.open.the.app.for.2fa")
+        <div>
+            <p class="enter-recovery-code">@messages("totp.dont.have.your.phone") <a href="@controllers.routes.TotpRecoveryController.view(UUID.fromString(totpForm("userID").value.get), totpForm("sharedKey").value.get, totpForm("rememberMe").value.get.toBoolean)">@messages("totp.use.recovery.code")</a></p>
+        </div>
+    </fieldset>
+}
