@@ -2,66 +2,42 @@ package controllers
 
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
-import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
-import com.mohiva.play.silhouette.api.util.Clock
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
 import forms.{ TotpForm, TotpSetupForm }
 import javax.inject.Inject
-import models.services.UserService
-import org.webjars.play.WebJarsUtil
-import play.api.Configuration
-import play.api.i18n.{ I18nSupport, Messages }
-import utils.auth.DefaultEnv
+import play.api.i18n.Messages
 
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * The `TOTP` controller.
- *
- * @param silhouette The Silhouette stack.
- * @param userService The user service implementation.
- * @param totpProvider The totp provider.
- * @param configuration The Play configuration.
- * @param clock The clock instance.
- * @param webJarsUtil The webjar util.
- * @param assets The Play assets finder.
- * @param ex The execution context.
- * @param authInfoRepository The auth info repository.
  */
 class TotpController @Inject() (
-  silhouette: Silhouette[DefaultEnv],
-  userService: UserService,
-  totpProvider: GoogleTotpProvider,
-  configuration: Configuration,
-  clock: Clock
-)(
-  implicit
-  webJarsUtil: WebJarsUtil,
-  assets: AssetsFinder,
-  ex: ExecutionContext,
-  authInfoRepository: AuthInfoRepository
-) extends AbstractAuthController(silhouette, configuration, clock) with I18nSupport {
+  scc: SilhouetteControllerComponents,
+  totp: views.html.totp,
+  home: views.html.home
+)(implicit ex: ExecutionContext) extends AbstractAuthController(scc) {
 
   /**
    * Views the `TOTP` page.
    * @return The result to display.
    */
-  def view(userId: java.util.UUID, sharedKey: String, rememberMe: Boolean) = silhouette.UnsecuredAction.async { implicit request =>
-    Future.successful(Ok(views.html.totp(TotpForm.form.fill(TotpForm.Data(userId, sharedKey, rememberMe)))))
+  def view(userId: java.util.UUID, sharedKey: String, rememberMe: Boolean) = UnsecuredAction.async { implicit request =>
+    Future.successful(Ok(totp(TotpForm.form.fill(TotpForm.Data(userId, sharedKey, rememberMe)))))
   }
 
   /**
    * Enable TOTP.
    * @return The result to display.
    */
-  def enableTotp = silhouette.SecuredAction.async { implicit request =>
+  def enableTotp = SecuredAction.async { implicit request =>
     val user = request.identity
     val credentials = totpProvider.createCredentials(user.email.get)
     val totpInfo = credentials.totpInfo
     val formData = TotpSetupForm.form.fill(TotpSetupForm.Data(totpInfo.sharedKey, totpInfo.scratchCodes, credentials.scratchCodesPlain))
     authInfoRepository.find[GoogleTotpInfo](request.identity.loginInfo).map { totpInfoOpt =>
-      Ok(views.html.home(user, totpInfoOpt, Some((formData, credentials))))
+      Ok(home(user, totpInfoOpt, Some((formData, credentials))))
     }
   }
 
@@ -69,7 +45,7 @@ class TotpController @Inject() (
    * Disable TOTP.
    * @return The result to display.
    */
-  def disableTotp = silhouette.SecuredAction.async { implicit request =>
+  def disableTotp = SecuredAction.async { implicit request =>
     val user = request.identity
     authInfoRepository.remove[GoogleTotpInfo](user.loginInfo)
     Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.disabling.info")))
@@ -79,11 +55,11 @@ class TotpController @Inject() (
    * Handles the submitted form with TOTP initial data.
    * @return The result to display.
    */
-  def enableTotpSubmit = silhouette.SecuredAction.async { implicit request =>
+  def enableTotpSubmit = SecuredAction.async { implicit request =>
     val user = request.identity
     TotpSetupForm.form.bindFromRequest.fold(
       form => authInfoRepository.find[GoogleTotpInfo](request.identity.loginInfo).map { totpInfoOpt =>
-        BadRequest(views.html.home(user, totpInfoOpt))
+        BadRequest(home(user, totpInfoOpt))
       },
       data => {
         totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
@@ -104,9 +80,9 @@ class TotpController @Inject() (
    * Handles the submitted form with TOTP verification key.
    * @return The result to display.
    */
-  def submit = silhouette.UnsecuredAction.async { implicit request =>
+  def submit = UnsecuredAction.async { implicit request =>
     TotpForm.form.bindFromRequest.fold(
-      form => Future.successful(BadRequest(views.html.totp(form))),
+      form => Future.successful(BadRequest(totp(form))),
       data => {
         val totpControllerRoute = routes.TotpController.view(data.userID, data.sharedKey, data.rememberMe)
         userService.retrieve(data.userID).flatMap {

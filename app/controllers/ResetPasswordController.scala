@@ -1,47 +1,23 @@
 package controllers
 
 import java.util.UUID
-import javax.inject.Inject
 
-import com.mohiva.play.silhouette.api._
-import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
-import com.mohiva.play.silhouette.api.util.{ PasswordHasherRegistry, PasswordInfo }
+import com.mohiva.play.silhouette.api.util.PasswordInfo
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import forms.ResetPasswordForm
-import models.services.{ AuthTokenService, UserService }
-import org.webjars.play.WebJarsUtil
-import play.api.i18n.{ I18nSupport, Messages }
-import play.api.mvc.{ AbstractController, AnyContent, ControllerComponents, Request }
-import utils.auth.DefaultEnv
+import javax.inject.Inject
+import play.api.i18n.Messages
+import play.api.mvc.{ AnyContent, Request }
 
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * The `Reset Password` controller.
- *
- * @param components             The Play controller components.
- * @param silhouette             The Silhouette stack.
- * @param userService            The user service implementation.
- * @param authInfoRepository     The auth info repository.
- * @param passwordHasherRegistry The password hasher registry.
- * @param authTokenService       The auth token service implementation.
- * @param webJarsUtil            The webjar util.
- * @param assets                 The Play assets finder.
- * @param ex                     The execution context.
  */
 class ResetPasswordController @Inject() (
-  components: ControllerComponents,
-  silhouette: Silhouette[DefaultEnv],
-  userService: UserService,
-  authInfoRepository: AuthInfoRepository,
-  passwordHasherRegistry: PasswordHasherRegistry,
-  authTokenService: AuthTokenService
-)(
-  implicit
-  webJarsUtil: WebJarsUtil,
-  assets: AssetsFinder,
-  ex: ExecutionContext
-) extends AbstractController(components) with I18nSupport {
+  scc: SilhouetteControllerComponents,
+  resetPassword: views.html.resetPassword
+)(implicit ex: ExecutionContext) extends SilhouetteController(scc) {
 
   /**
    * Views the `Reset Password` page.
@@ -49,9 +25,9 @@ class ResetPasswordController @Inject() (
    * @param token The token to identify a user.
    * @return The result to display.
    */
-  def view(token: UUID) = silhouette.UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def view(token: UUID) = UnsecuredAction.async { implicit request: Request[AnyContent] =>
     authTokenService.validate(token).map {
-      case Some(_) => Ok(views.html.resetPassword(ResetPasswordForm.form, token))
+      case Some(_) => Ok(resetPassword(ResetPasswordForm.form, token))
       case None => Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.reset.link"))
     }
   }
@@ -62,11 +38,11 @@ class ResetPasswordController @Inject() (
    * @param token The token to identify a user.
    * @return The result to display.
    */
-  def submit(token: UUID) = silhouette.UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def submit(token: UUID) = UnsecuredAction.async { implicit request: Request[AnyContent] =>
     authTokenService.validate(token).flatMap {
       case Some(authToken) =>
         ResetPasswordForm.form.bindFromRequest.fold(
-          form => Future.successful(BadRequest(views.html.resetPassword(form, token))),
+          form => Future.successful(BadRequest(resetPassword(form, token))),
           password => userService.retrieve(authToken.userID).flatMap {
             case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
               val passwordInfo = passwordHasherRegistry.current.hash(password)
