@@ -7,6 +7,7 @@ import javax.inject.Inject
 import play.api.i18n.Messages
 import play.api.libs.mailer.Email
 import play.api.mvc.{ AnyContent, Request }
+import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -40,7 +41,7 @@ class ForgotPasswordController @Inject() (
       form => Future.successful(BadRequest(forgotPassword(form))),
       email => {
         val loginInfo = LoginInfo(CredentialsProvider.ID, email)
-        val result = Redirect(routes.SignInController.view()).flashing("info" -> Messages("reset.email.sent"))
+        val result = Redirect(Calls.signin).flashing("info" -> Messages("reset.email.sent"))
         userService.retrieve(loginInfo).flatMap {
           case Some(user) if user.email.isDefined =>
             authTokenService.create(user.userID).map { authToken =>

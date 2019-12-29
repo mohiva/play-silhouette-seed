@@ -7,6 +7,7 @@ import com.mohiva.play.silhouette.impl.providers._
 import forms.{ TotpForm, TotpSetupForm }
 import javax.inject.Inject
 import play.api.i18n.Messages
+import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -48,7 +49,7 @@ class TotpController @Inject() (
   def disableTotp = SecuredAction.async { implicit request =>
     val user = request.identity
     authInfoRepository.remove[GoogleTotpInfo](user.loginInfo)
-    Future(Redirect(routes.ApplicationController.index()).flashing("info" -> Messages("totp.disabling.info")))
+    Future(Redirect(Calls.home).flashing("info" -> Messages("totp.disabling.info")))
   }
 
   /**
@@ -65,9 +66,9 @@ class TotpController @Inject() (
         totpProvider.authenticate(data.sharedKey, data.verificationCode).flatMap {
           case Some(loginInfo: LoginInfo) => {
             authInfoRepository.add[GoogleTotpInfo](user.loginInfo, GoogleTotpInfo(data.sharedKey, data.scratchCodes))
-            Future(Redirect(routes.ApplicationController.index()).flashing("success" -> Messages("totp.enabling.info")))
+            Future(Redirect(Calls.home).flashing("success" -> Messages("totp.enabling.info")))
           }
-          case _ => Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" -> Messages("invalid.verification.code")))
+          case _ => Future.successful(Redirect(Calls.home).flashing("error" -> Messages("invalid.verification.code")))
         }.recover {
           case _: ProviderException =>
             Redirect(routes.TotpController.view(user.userID, data.sharedKey, request.authenticator.cookieMaxAge.isDefined)).flashing("error" -> Messages("invalid.unexpected.totp"))

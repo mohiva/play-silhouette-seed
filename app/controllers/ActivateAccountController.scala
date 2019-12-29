@@ -9,6 +9,7 @@ import javax.inject.Inject
 import play.api.i18n.Messages
 import play.api.libs.mailer.Email
 import play.api.mvc.{ AnyContent, Request }
+import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -28,7 +29,7 @@ class ActivateAccountController @Inject() (
   def send(email: String) = UnsecuredAction.async { implicit request: Request[AnyContent] =>
     val decodedEmail = URLDecoder.decode(email, "UTF-8")
     val loginInfo = LoginInfo(CredentialsProvider.ID, decodedEmail)
-    val result = Redirect(routes.SignInController.view()).flashing("info" -> Messages("activation.email.sent", decodedEmail))
+    val result = Redirect(Calls.signin).flashing("info" -> Messages("activation.email.sent", decodedEmail))
 
     userService.retrieve(loginInfo).flatMap {
       case Some(user) if !user.activated =>
@@ -59,11 +60,11 @@ class ActivateAccountController @Inject() (
       case Some(authToken) => userService.retrieve(authToken.userID).flatMap {
         case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
           userService.save(user.copy(activated = true)).map { _ =>
-            Redirect(routes.SignInController.view()).flashing("success" -> Messages("account.activated"))
+            Redirect(Calls.signin).flashing("success" -> Messages("account.activated"))
           }
-        case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.activation.link")))
+        case _ => Future.successful(Redirect(Calls.signin).flashing("error" -> Messages("invalid.activation.link")))
       }
-      case None => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.activation.link")))
+      case None => Future.successful(Redirect(Calls.signin).flashing("error" -> Messages("invalid.activation.link")))
     }
   }
 }

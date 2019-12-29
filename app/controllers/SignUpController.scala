@@ -10,6 +10,7 @@ import models.User
 import play.api.i18n.Messages
 import play.api.libs.mailer.Email
 import play.api.mvc.{ AnyContent, Request }
+import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -43,7 +44,7 @@ class SignUpController @Inject() (
         val loginInfo = LoginInfo(CredentialsProvider.ID, data.email)
         userService.retrieve(loginInfo).flatMap {
           case Some(user) =>
-            val url = routes.SignInController.view().absoluteURL()
+            val url = Calls.signin.absoluteURL()
             mailerClient.send(Email(
               subject = Messages("email.already.signed.up.subject"),
               from = Messages("email.from"),

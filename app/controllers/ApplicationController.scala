@@ -5,6 +5,7 @@ import com.mohiva.play.silhouette.api.actions._
 import com.mohiva.play.silhouette.impl.providers.GoogleTotpInfo
 import javax.inject.Inject
 import play.api.mvc._
+import utils.route.Calls
 
 import scala.concurrent.ExecutionContext
 
@@ -33,7 +34,7 @@ class ApplicationController @Inject() (
    * @return The result to display.
    */
   def signOut = SecuredAction.async { implicit request: SecuredRequest[EnvType, AnyContent] =>
-    val result = Redirect(routes.ApplicationController.index())
+    val result = Redirect(Calls.home)
     eventBus.publish(LogoutEvent(request.identity, request))
     authenticatorService.discard(request.authenticator, result)
   }
