@@ -7,7 +7,8 @@
 @import forms.TotpRecoveryForm
 @import java.util.UUID
 
-@(totpForm: Form[Data])(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+@this()(implicit webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+@(totpForm: Form[Data])(implicit request: RequestHeader, messages: Messages)
 
 @implicitFieldConstructor = @{ b3.vertical.fieldConstructor() }
 

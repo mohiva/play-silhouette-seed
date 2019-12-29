@@ -6,7 +6,8 @@
 @import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 @import forms.SignInForm.Data
 
-@(signInForm: Form[Data], socialProviders: SocialProviderRegistry)(implicit request: RequestHeader, messages: Messages, webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+@this()(implicit webJarsUtil: WebJarsUtil, assets: AssetsFinder)
+@(signInForm: Form[Data], socialProviders: SocialProviderRegistry)(implicit request: RequestHeader, messages: Messages)
 
 @implicitFieldConstructor = @{ b3.vertical.fieldConstructor() }
 

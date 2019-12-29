@@ -1,62 +1,33 @@
 package controllers
 
 import java.util.UUID
-import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api._
-import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
-import com.mohiva.play.silhouette.api.services.AvatarService
-import com.mohiva.play.silhouette.api.util.PasswordHasherRegistry
 import com.mohiva.play.silhouette.impl.providers._
 import forms.SignUpForm
+import javax.inject.Inject
 import models.User
-import models.services.{ AuthTokenService, UserService }
-import org.webjars.play.WebJarsUtil
-import play.api.i18n.{ I18nSupport, Messages }
-import play.api.libs.mailer.{ Email, MailerClient }
-import play.api.mvc.{ AbstractController, AnyContent, ControllerComponents, Request }
-import utils.auth.DefaultEnv
+import play.api.i18n.Messages
+import play.api.libs.mailer.Email
+import play.api.mvc.{ AnyContent, Request }
 
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * The `Sign Up` controller.
- *
- * @param components             The Play controller components.
- * @param silhouette             The Silhouette stack.
- * @param userService            The user service implementation.
- * @param authInfoRepository     The auth info repository implementation.
- * @param authTokenService       The auth token service implementation.
- * @param avatarService          The avatar service implementation.
- * @param passwordHasherRegistry The password hasher registry.
- * @param mailerClient           The mailer client.
- * @param webJarsUtil            The webjar util.
- * @param assets                 The Play assets finder.
- * @param ex                     The execution context.
  */
 class SignUpController @Inject() (
-  components: ControllerComponents,
-  silhouette: Silhouette[DefaultEnv],
-  userService: UserService,
-  authInfoRepository: AuthInfoRepository,
-  authTokenService: AuthTokenService,
-  avatarService: AvatarService,
-  passwordHasherRegistry: PasswordHasherRegistry,
-  mailerClient: MailerClient
-)(
-  implicit
-  webJarsUtil: WebJarsUtil,
-  assets: AssetsFinder,
-  ex: ExecutionContext
-) extends AbstractController(components) with I18nSupport {
+  components: SilhouetteControllerComponents,
+  signUp: views.html.signUp
+)(implicit ex: ExecutionContext) extends SilhouetteController(components) {
 
   /**
    * Views the `Sign Up` page.
    *
    * @return The result to display.
    */
-  def view = silhouette.UnsecuredAction.async { implicit request: Request[AnyContent] =>
-    Future.successful(Ok(views.html.signUp(SignUpForm.form)))
+  def view = UnsecuredAction.async { implicit request: Request[AnyContent] =>
+    Future.successful(Ok(signUp(SignUpForm.form)))
   }
 
   /**
@@ -64,9 +35,9 @@ class SignUpController @Inject() (
    *
    * @return The result to display.
    */
-  def submit = silhouette.UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def submit = UnsecuredAction.async { implicit request: Request[AnyContent] =>
     SignUpForm.form.bindFromRequest.fold(
-      form => Future.successful(BadRequest(views.html.signUp(form))),
+      form => Future.successful(BadRequest(signUp(form))),
       data => {
         val result = Redirect(routes.SignUpController.view()).flashing("info" -> Messages("sign.up.email.sent", data.email))
         val loginInfo = LoginInfo(CredentialsProvider.ID, data.email)
@@ -109,7 +80,7 @@ class SignUpController @Inject() (
                 bodyHtml = Some(views.html.emails.signUp(user, url).body)
               ))
 
-              silhouette.env.eventBus.publish(SignUpEvent(user, request))
+              eventBus.publish(SignUpEvent(user, request))
               result
             }
         }

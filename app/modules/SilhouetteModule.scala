@@ -24,6 +24,7 @@ import com.mohiva.play.silhouette.password.{ BCryptPasswordHasher, BCryptSha256P
 import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, InMemoryAuthInfoDAO }
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
 import com.typesafe.config.Config
+import controllers.{ DefaultRememberMeConfig, DefaultSilhouetteControllerComponents, RememberMeConfig, SilhouetteControllerComponents }
 import models.daos._
 import models.services.{ UserService, UserServiceImpl }
 import net.ceedubs.ficus.Ficus._
@@ -37,6 +38,7 @@ import play.api.mvc.{ Cookie, CookieHeaderEncoding }
 import utils.auth.{ CustomSecuredErrorHandler, CustomUnsecuredErrorHandler, DefaultEnv }
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.FiniteDuration
 
 /**
  * The Guice module which wires all Silhouette dependencies.
@@ -471,5 +473,26 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
 
     val settings = configuration.underlying.as[OpenIDSettings]("silhouette.yahoo")
     new YahooProvider(httpLayer, new PlayOpenIDService(client, settings), settings)
+  }
+
+  /**
+   * Provides the remember me configuration.
+   *
+   * @param configuration The Play configuration.
+   * @return The remember me config.
+   */
+  @Provides
+  def providesRememberMeConfig(configuration: Configuration): RememberMeConfig = {
+    val c = configuration.underlying
+    DefaultRememberMeConfig(
+      expiry = c.as[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorExpiry"),
+      idleTimeout = c.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorIdleTimeout"),
+      cookieMaxAge = c.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.cookieMaxAge")
+    )
+  }
+
+  @Provides
+  def providesSilhouetteComponents(components: DefaultSilhouetteControllerComponents): SilhouetteControllerComponents = {
+    components
   }
 }
