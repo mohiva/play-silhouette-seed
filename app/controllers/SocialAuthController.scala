@@ -6,6 +6,7 @@ import com.mohiva.play.silhouette.impl.providers._
 import javax.inject.Inject
 import play.api.i18n.Messages
 import play.api.mvc.{ AnyContent, Request }
+import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -43,7 +44,7 @@ class SocialAuthController @Inject() (
     }).recover {
       case e: ProviderException =>
         logger.error("Unexpected provider error", e)
-        Redirect(routes.SignInController.view()).flashing("error" -> Messages("could.not.authenticate"))
+        Redirect(Calls.signin).flashing("error" -> Messages("could.not.authenticate"))
     }
   }
 }

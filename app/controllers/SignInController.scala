@@ -8,6 +8,7 @@ import forms.{ SignInForm, TotpForm }
 import javax.inject.Inject
 import play.api.i18n.Messages
 import play.api.mvc.{ AnyContent, Request }
+import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -54,7 +55,7 @@ class SignInController @Inject() (
           }
         }.recover {
           case _: ProviderException =>
-            Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.credentials"))
+            Redirect(Calls.signin).flashing("error" -> Messages("invalid.credentials"))
         }
       }
     )
