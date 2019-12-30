@@ -39,7 +39,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 routesImport += "utils.route.Binders._"
 
 // https://github.com/playframework/twirl/issues/105
-TwirlKeys.templateImports := Seq()
+// TwirlKeys.templateImports := Seq("controllers._")
 
 scalacOptions ++= Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.

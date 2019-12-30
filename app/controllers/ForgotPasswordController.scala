@@ -24,7 +24,7 @@ class ForgotPasswordController @Inject() (
    *
    * @return The result to display.
    */
-  def view = UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def view = UnsecuredAction.async { implicit request: MyRequest[AnyContent] =>
     Future.successful(Ok(forgotPassword(ForgotPasswordForm.form)))
   }
 
@@ -36,7 +36,7 @@ class ForgotPasswordController @Inject() (
    *
    * @return The result to display.
    */
-  def submit = UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def submit = SecuredAction.async { implicit request: MyRequest[AnyContent] =>
     ForgotPasswordForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(forgotPassword(form))),
       email => {

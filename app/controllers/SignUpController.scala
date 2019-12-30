@@ -27,7 +27,7 @@ class SignUpController @Inject() (
    *
    * @return The result to display.
    */
-  def view = UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def view = UnsecuredAction.async { implicit request: MyRequest[AnyContent] =>
     Future.successful(Ok(signUp(SignUpForm.form)))
   }
 
@@ -36,7 +36,7 @@ class SignUpController @Inject() (
    *
    * @return The result to display.
    */
-  def submit = UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def submit = UnsecuredAction.async { implicit request: MyRequest[AnyContent] =>
     SignUpForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(signUp(form))),
       data => {

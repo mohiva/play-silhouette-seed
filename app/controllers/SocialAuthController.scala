@@ -23,7 +23,7 @@ class SocialAuthController @Inject() (
    * @param provider The ID of the provider to authenticate against.
    * @return The result to display.
    */
-  def authenticate(provider: String) = Action.async { implicit request: Request[AnyContent] =>
+  def authenticate(provider: String) = UnsecuredAction.async { implicit request: MyRequest[AnyContent] =>
     (socialProviderRegistry.get[SocialProvider](provider) match {
       case Some(p: SocialProvider with CommonSocialProfileBuilder) =>
         p.authenticate().flatMap {

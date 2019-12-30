@@ -1,16 +1,16 @@
 package controllers
 
-import com.mohiva.play.silhouette.api.actions.{ SecuredActionBuilder, UnsecuredActionBuilder }
+import com.mohiva.play.silhouette.api.actions._
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.{ AuthenticatorService, AvatarService }
 import com.mohiva.play.silhouette.api.util.{ Clock, PasswordHasherRegistry }
-import com.mohiva.play.silhouette.api.{ EventBus, Silhouette }
+import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.impl.providers.{ CredentialsProvider, GoogleTotpProvider, SocialProviderRegistry }
 import javax.inject.Inject
 import models.services.{ AuthTokenService, UserService }
 import play.api.Logging
 import play.api.http.FileMimeTypes
-import play.api.i18n.{ I18nSupport, Langs, MessagesApi }
+import play.api.i18n.{ Langs, MessagesApi }
 import play.api.libs.mailer.MailerClient
 import play.api.mvc._
 import utils.auth.DefaultEnv
@@ -18,10 +18,27 @@ import utils.auth.DefaultEnv
 import scala.concurrent.duration.FiniteDuration
 
 abstract class SilhouetteController(override protected val controllerComponents: SilhouetteControllerComponents)
-  extends MessagesAbstractController(controllerComponents) with SilhouetteComponents with I18nSupport with Logging {
+  extends MessagesAbstractController(controllerComponents) with SilhouetteComponents with Logging {
 
-  def SecuredAction: SecuredActionBuilder[EnvType, AnyContent] = controllerComponents.silhouette.SecuredAction
-  def UnsecuredAction: UnsecuredActionBuilder[EnvType, AnyContent] = controllerComponents.silhouette.UnsecuredAction
+  private val myActionTransformer = new MyActionTransformer(controllerComponents)
+  private val mySecuredActionTransformer = new MySecuredActionTransformer(controllerComponents)
+  private val myUserAwareActionTransformer = new MyUserAwareActionTransformer(controllerComponents)
+
+  def UnsecuredAction: ActionBuilder[MyRequest, AnyContent] = controllerComponents.silhouette.UnsecuredAction.andThen(myActionTransformer)
+
+  def SecuredAction: ActionBuilder[MySecuredRequest, AnyContent] = {
+    controllerComponents.silhouette.SecuredAction.andThen(mySecuredActionTransformer)
+  }
+
+  def SecuredAction(errorHandler: SecuredErrorHandler): ActionBuilder[MySecuredRequest, AnyContent] = {
+    controllerComponents.silhouette.SecuredAction(errorHandler).andThen(mySecuredActionTransformer)
+  }
+
+  def SecuredAction(authorization: Authorization[DefaultEnv#I, DefaultEnv#A]): ActionBuilder[MySecuredRequest, AnyContent] = {
+    controllerComponents.silhouette.SecuredAction(authorization).andThen(mySecuredActionTransformer)
+  }
+
+  def UserAwareAction: ActionBuilder[MyUserAwareRequest, AnyContent] = controllerComponents.silhouette.UserAwareAction.andThen(myUserAwareActionTransformer)
 
   def userService: UserService = controllerComponents.userService
   def authInfoRepository: AuthInfoRepository = controllerComponents.authInfoRepository
@@ -35,15 +52,14 @@ abstract class SilhouetteController(override protected val controllerComponents:
   def totpProvider: GoogleTotpProvider = controllerComponents.totpProvider
   def avatarService: AvatarService = controllerComponents.avatarService
 
-  def silhouette: Silhouette[EnvType] = controllerComponents.silhouette
+  def silhouette: Silhouette[DefaultEnv] = controllerComponents.silhouette
   def authenticatorService: AuthenticatorService[AuthType] = silhouette.env.authenticatorService
   def eventBus: EventBus = silhouette.env.eventBus
 }
 
 trait SilhouetteComponents {
-  type EnvType = DefaultEnv
-  type AuthType = EnvType#A
-  type IdentityType = EnvType#I
+  type AuthType = DefaultEnv#A
+  type IdentityType = DefaultEnv#I
 
   def userService: UserService
   def authInfoRepository: AuthInfoRepository
@@ -57,7 +73,7 @@ trait SilhouetteComponents {
   def totpProvider: GoogleTotpProvider
   def avatarService: AvatarService
 
-  def silhouette: Silhouette[EnvType]
+  def silhouette: Silhouette[DefaultEnv]
 }
 
 trait SilhouetteControllerComponents extends MessagesControllerComponents with SilhouetteComponents
