@@ -18,7 +18,6 @@
         <link @{CSPNonce.attr} href="//fonts.googleapis.com/css?family=Roboto|Montserrat:400,700|Open+Sans:400,300,600" rel="stylesheet">
         <link @{CSPNonce.attr} href="//cdnjs.cloudflare.com/ajax/libs/ionicons/1.5.2/css/ionicons.min.css" rel="stylesheet">
         @webJarsUtil.locate("bootstrap.min.css").css(CSPNonce.attrMap)
-        @webJarsUtil.locate("bootstrap-theme.min.css").css(CSPNonce.attrMap)
         <link @{CSPNonce.attr} rel="stylesheet" href="@assets.path("styles/main.css")">
             <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
             <!--[if lt IE 9]>
@@ -27,36 +26,36 @@
             <![endif]-->
     </head>
     <body>
-        <header class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">@messages("toggle.navigation")</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="@controllers.routes.ApplicationController.index">Silhouette Seed Template</a>
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand" href="@controllers.routes.ApplicationController.index">Silhouette Seed Template</a>
+
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav">
+                        <a class="nav-item nav-link" href="@controllers.routes.ApplicationController.index">@messages("home")</a>
+                        <a class="nav-item nav-link" href="https://github.com/mohiva/play-silhouette-seed">GitHub</a>
+                    </div>
                 </div>
-                <nav class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a href="@controllers.routes.ApplicationController.index">@messages("home")</a></li>
-                        <li><a href="https://github.com/mohiva/play-silhouette-seed">GitHub</a></li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
+
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup2">
+                    <div class="navbar-nav">
                         @user.map { u =>
-                            <li><a href="@controllers.routes.ApplicationController.index">@u.name</a></li>
-                            @if(u.loginInfo.providerID == com.mohiva.play.silhouette.impl.providers.CredentialsProvider.ID) {
-                                <li><a href="@controllers.routes.ChangePasswordController.view">@messages("change.password")</a></li>
-                            }
-                            <li><a href="@controllers.routes.ApplicationController.signOut">@messages("sign.out")</a></li>
-                        }.getOrElse {
-                            <li><a href="@controllers.routes.SignInController.view">@messages("sign.in")</a></li>
-                            <li><a href="@controllers.routes.SignUpController.view">@messages("sign.up")</a></li>
+                        <a class="nav-link" href="@controllers.routes.ApplicationController.index">@u.name</a>
+                        @if(u.loginInfo.providerID == com.mohiva.play.silhouette.impl.providers.CredentialsProvider.ID) {
+                        <a class="nav-item nav-link" href="@controllers.routes.ChangePasswordController.view">@messages("change.password")</a>
                         }
-                    </ul>
-                </nav>
-            </div>
+                        <a class="nav-item nav-link" href="@controllers.routes.ApplicationController.signOut">@messages("sign.out")</a>
+                        }.getOrElse {
+                        <a class="nav-item nav-link" href="@controllers.routes.SignInController.view">@messages("sign.in")</a>
+                        <a class="nav-item nav-link" href="@controllers.routes.SignUpController.view">@messages("sign.up")</a>
+                        }
+                    </div>
+                </div>
+
+            </nav>
         </header>
         <main class="container">
             <div class="starter-template row">
