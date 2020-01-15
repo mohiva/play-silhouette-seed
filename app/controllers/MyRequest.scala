@@ -7,8 +7,8 @@ import play.api.i18n.MessagesApi
 import play.api.mvc._
 import utils.auth.DefaultEnv
 
-import scala.language.higherKinds
 import scala.concurrent.{ExecutionContext, Future}
+import scala.language.higherKinds
 
 // XXX should be OOTB
 trait SecuredRequestHeader[E <: Env] {

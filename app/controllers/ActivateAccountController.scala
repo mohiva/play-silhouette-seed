@@ -8,7 +8,7 @@ import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import javax.inject.Inject
 import play.api.i18n.Messages
 import play.api.libs.mailer.Email
-import play.api.mvc.{ AnyContent, Request }
+import play.api.mvc.AnyContent
 import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }

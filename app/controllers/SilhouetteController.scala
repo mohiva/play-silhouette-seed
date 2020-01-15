@@ -1,10 +1,10 @@
 package controllers
 
+import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.actions._
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.{ AuthenticatorService, AvatarService }
 import com.mohiva.play.silhouette.api.util.{ Clock, PasswordHasherRegistry }
-import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.impl.providers.{ CredentialsProvider, GoogleTotpProvider, SocialProviderRegistry }
 import javax.inject.Inject
 import models.services.{ AuthTokenService, UserService }

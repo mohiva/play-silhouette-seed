@@ -1,5 +1,4 @@
 import com.typesafe.sbt.SbtScalariform._
-
 import scalariform.formatter.preferences._
 
 name := "play-silhouette-seed"

@@ -1,7 +1,6 @@
 package controllers
 
 import com.mohiva.play.silhouette.api.LogoutEvent
-import com.mohiva.play.silhouette.api.actions._
 import com.mohiva.play.silhouette.impl.providers.GoogleTotpInfo
 import javax.inject.Inject
 import play.api.mvc._
