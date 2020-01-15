@@ -53,14 +53,11 @@ abstract class SilhouetteController(override protected val controllerComponents:
   def avatarService: AvatarService = controllerComponents.avatarService
 
   def silhouette: Silhouette[DefaultEnv] = controllerComponents.silhouette
-  def authenticatorService: AuthenticatorService[AuthType] = silhouette.env.authenticatorService
+  def authenticatorService: AuthenticatorService[DefaultEnv#A] = silhouette.env.authenticatorService
   def eventBus: EventBus = silhouette.env.eventBus
 }
 
 trait SilhouetteComponents {
-  type AuthType = DefaultEnv#A
-  type IdentityType = DefaultEnv#I
-
   def userService: UserService
   def authInfoRepository: AuthInfoRepository
   def passwordHasherRegistry: PasswordHasherRegistry

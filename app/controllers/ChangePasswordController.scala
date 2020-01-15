@@ -25,7 +25,7 @@ class ChangePasswordController @Inject() (
    *
    * @return The result to display.
    */
-  def view = SecuredAction(WithProvider[AuthType](CredentialsProvider.ID)) {
+  def view = SecuredAction(WithProvider(CredentialsProvider.ID)) {
     implicit request =>
       Ok(changePassword(ChangePasswordForm.form, request.identity))
   }
@@ -35,7 +35,7 @@ class ChangePasswordController @Inject() (
    *
    * @return The result to display.
    */
-  def submit = SecuredAction(WithProvider[AuthType](CredentialsProvider.ID)).async {
+  def submit = SecuredAction(WithProvider(CredentialsProvider.ID)).async {
     implicit request =>
       ChangePasswordForm.form.bindFromRequest.fold(
         form => Future.successful(BadRequest(changePassword(form, request.identity))),
