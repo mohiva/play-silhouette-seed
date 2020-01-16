@@ -1,6 +1,5 @@
 package controllers
 
-import com.mohiva.play.silhouette.api.Env
 import org.slf4j.Marker
 import play.api.MarkerContext
 import play.api.i18n.MessagesApi
@@ -9,18 +8,6 @@ import utils.auth.DefaultEnv
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.higherKinds
-
-// XXX should be OOTB
-trait SecuredRequestHeader[E <: Env] {
-  def identity: E#I
-  def authenticator: E#A
-}
-
-// XXX should be OOTB
-trait UserAwareRequestHeader[E <: Env] {
-  def identity: Option[E#I]
-  def authenticator: Option[E#A]
-}
 
 /**
  * Defines our own request with extended features above and beyond what Silhouette provides.
