@@ -6,7 +6,7 @@ import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import forms.ChangePasswordForm
 import javax.inject.Inject
 import play.api.i18n.Messages
-import utils.auth.WithProvider
+import utils.auth.{ DefaultEnv, WithProvider }
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -14,7 +14,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * The `Change Password` controller.
  */
 class ChangePasswordController @Inject() (
-  scc: SilhouetteControllerComponents,
+  scc: SilhouetteControllerComponents[DefaultEnv],
   changePassword: views.html.changePassword
 )(implicit ex: ExecutionContext) extends SilhouetteController(scc) {
 

@@ -492,7 +492,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   }
 
   @Provides
-  def providesSilhouetteComponents(components: DefaultSilhouetteControllerComponents): SilhouetteControllerComponents = {
+  def providesSilhouetteComponents(components: DefaultSilhouetteControllerComponents[DefaultEnv]): SilhouetteControllerComponents[DefaultEnv] = {
     components
   }
 }

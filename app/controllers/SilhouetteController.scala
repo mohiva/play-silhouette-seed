@@ -13,32 +13,89 @@ import play.api.http.FileMimeTypes
 import play.api.i18n.{ Langs, MessagesApi }
 import play.api.libs.mailer.MailerClient
 import play.api.mvc._
-import utils.auth.DefaultEnv
 
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration.FiniteDuration
 
-abstract class SilhouetteController(override protected val controllerComponents: SilhouetteControllerComponents)
-  extends MessagesAbstractController(controllerComponents) with SilhouetteComponents with Logging {
+import scala.language.higherKinds
 
-  private val myActionTransformer = new MyActionTransformer(controllerComponents)
-  private val mySecuredActionTransformer = new MySecuredActionTransformer(controllerComponents)
-  private val myUserAwareActionTransformer = new MyUserAwareActionTransformer(controllerComponents)
+abstract class SilhouetteController[E <: Env](
+  override protected val controllerComponents: SilhouetteControllerComponents[E])
+  extends MessagesAbstractController(controllerComponents) with SilhouetteComponents[E] with Logging {
 
-  def UnsecuredAction: ActionBuilder[MyRequest, AnyContent] = controllerComponents.silhouette.UnsecuredAction.andThen(myActionTransformer)
+  type SecuredEnvRequest[A] = SecuredRequest[EnvType, A]
+  type AppSecuredEnvRequest[A] = AppSecuredRequest[EnvType, A]
+  type UserAwareEnvRequest[A] = UserAwareRequest[EnvType, A]
+  type AppUserAwareEnvRequest[A] = AppUserAwareRequest[EnvType, A]
 
-  def SecuredAction: ActionBuilder[MySecuredRequest, AnyContent] = {
-    controllerComponents.silhouette.SecuredAction.andThen(mySecuredActionTransformer)
+  /*
+  * Abstract class to stop defining executionContext in every subclass
+  *
+  * @param cc controller components
+    */
+  protected abstract class AbstractActionTransformer[-R[_], +P[_]] extends ActionTransformer[R, P] {
+    override protected def executionContext: ExecutionContext =
+      controllerComponents.executionContext
   }
 
-  def SecuredAction(errorHandler: SecuredErrorHandler): ActionBuilder[MySecuredRequest, AnyContent] = {
-    controllerComponents.silhouette.SecuredAction(errorHandler).andThen(mySecuredActionTransformer)
+  /**
+   * Transforms from a Request into AppRequest.
+   */
+  class AppActionTransformer extends AbstractActionTransformer[Request, AppRequest] {
+    override protected def transform[A](request: Request[A]): Future[AppRequest[A]] = {
+      Future.successful(new AppRequest[A](
+        messagesApi = controllerComponents.messagesApi,
+        request = request
+      ))
+    }
   }
 
-  def SecuredAction(authorization: Authorization[DefaultEnv#I, DefaultEnv#A]): ActionBuilder[MySecuredRequest, AnyContent] = {
-    controllerComponents.silhouette.SecuredAction(authorization).andThen(mySecuredActionTransformer)
+  /**
+   * Transforms from a SecuredRequest into AppSecuredRequest.
+   */
+  class AppSecuredActionTransformer extends AbstractActionTransformer[SecuredEnvRequest, AppSecuredEnvRequest] {
+    override protected def transform[A](request: SecuredEnvRequest[A]): Future[AppSecuredEnvRequest[A]] = {
+      Future.successful(new AppSecuredRequest[EnvType, A](
+        messagesApi = controllerComponents.messagesApi,
+        identity = request.identity,
+        authenticator = request.authenticator,
+        request = request
+      ))
+    }
   }
 
-  def UserAwareAction: ActionBuilder[MyUserAwareRequest, AnyContent] = controllerComponents.silhouette.UserAwareAction.andThen(myUserAwareActionTransformer)
+  /**
+   * Transforms from a UserAwareRequest into AppUserAwareRequest.
+   */
+  class AppUserAwareActionTransformer extends AbstractActionTransformer[UserAwareEnvRequest, AppUserAwareEnvRequest] {
+    override protected def transform[A](request: UserAwareEnvRequest[A]): Future[AppUserAwareEnvRequest[A]] = {
+      Future.successful(new AppUserAwareRequest[EnvType, A](
+        messagesApi = controllerComponents.messagesApi,
+        identity = request.identity,
+        authenticator = request.authenticator,
+        request = request
+      ))
+    }
+  }
+  private val appActionTransformer = new AppActionTransformer
+  private val appSecuredActionTransformer = new AppSecuredActionTransformer
+  private val appUserAwareActionTransformer = new AppUserAwareActionTransformer
+
+  def UnsecuredAction: ActionBuilder[AppRequest, AnyContent] = silhouette.UnsecuredAction.andThen(appActionTransformer)
+
+  def SecuredAction: ActionBuilder[AppSecuredEnvRequest, AnyContent] = {
+    silhouette.SecuredAction.andThen(appSecuredActionTransformer)
+  }
+
+  def SecuredAction(errorHandler: SecuredErrorHandler): ActionBuilder[AppSecuredEnvRequest, AnyContent] = {
+    silhouette.SecuredAction(errorHandler).andThen(appSecuredActionTransformer)
+  }
+
+  def SecuredAction(authorization: Authorization[EnvType#I, EnvType#A]): ActionBuilder[AppSecuredEnvRequest, AnyContent] = {
+    silhouette.SecuredAction(authorization).andThen(appSecuredActionTransformer)
+  }
+
+  def UserAwareAction: ActionBuilder[AppUserAwareEnvRequest, AnyContent] = silhouette.UserAwareAction.andThen(appUserAwareActionTransformer)
 
   def userService: UserService = controllerComponents.userService
   def authInfoRepository: AuthInfoRepository = controllerComponents.authInfoRepository
@@ -52,12 +109,15 @@ abstract class SilhouetteController(override protected val controllerComponents:
   def totpProvider: GoogleTotpProvider = controllerComponents.totpProvider
   def avatarService: AvatarService = controllerComponents.avatarService
 
-  def silhouette: Silhouette[DefaultEnv] = controllerComponents.silhouette
-  def authenticatorService: AuthenticatorService[DefaultEnv#A] = silhouette.env.authenticatorService
+  def silhouette: Silhouette[EnvType] = controllerComponents.silhouette
+  def authenticatorService: AuthenticatorService[EnvType#A] = silhouette.env.authenticatorService
   def eventBus: EventBus = silhouette.env.eventBus
 }
 
-trait SilhouetteComponents {
+trait SilhouetteComponents[E <: Env] {
+  type EnvType = E
+
+  def silhouette: Silhouette[E]
   def userService: UserService
   def authInfoRepository: AuthInfoRepository
   def passwordHasherRegistry: PasswordHasherRegistry
@@ -69,14 +129,13 @@ trait SilhouetteComponents {
   def socialProviderRegistry: SocialProviderRegistry
   def totpProvider: GoogleTotpProvider
   def avatarService: AvatarService
-
-  def silhouette: Silhouette[DefaultEnv]
 }
 
-trait SilhouetteControllerComponents extends MessagesControllerComponents with SilhouetteComponents
+trait SilhouetteControllerComponents[E <: Env] extends MessagesControllerComponents with SilhouetteComponents[E]
 
-final case class DefaultSilhouetteControllerComponents @Inject() (
-  silhouette: Silhouette[DefaultEnv],
+final case class DefaultSilhouetteControllerComponents[E <: Env] @Inject() (
+
+  silhouette: Silhouette[E],
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
   passwordHasherRegistry: PasswordHasherRegistry,
@@ -95,7 +154,7 @@ final case class DefaultSilhouetteControllerComponents @Inject() (
   langs: Langs,
   fileMimeTypes: FileMimeTypes,
   executionContext: scala.concurrent.ExecutionContext
-) extends SilhouetteControllerComponents
+) extends SilhouetteControllerComponents[E]
 
 trait RememberMeConfig {
   def expiry: FiniteDuration

@@ -8,6 +8,7 @@ import forms.ResetPasswordForm
 import javax.inject.Inject
 import play.api.i18n.Messages
 import play.api.mvc.AnyContent
+import utils.auth.DefaultEnv
 import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -16,7 +17,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * The `Reset Password` controller.
  */
 class ResetPasswordController @Inject() (
-  scc: SilhouetteControllerComponents,
+  scc: SilhouetteControllerComponents[DefaultEnv],
   resetPassword: views.html.resetPassword
 )(implicit ex: ExecutionContext) extends SilhouetteController(scc) {
 
@@ -26,7 +27,7 @@ class ResetPasswordController @Inject() (
    * @param token The token to identify a user.
    * @return The result to display.
    */
-  def view(token: UUID) = UnsecuredAction.async { implicit request: MyRequest[AnyContent] =>
+  def view(token: UUID) = UnsecuredAction.async { implicit request: AppRequest[AnyContent] =>
     authTokenService.validate(token).map {
       case Some(_) => Ok(resetPassword(ResetPasswordForm.form, token))
       case None => Redirect(Calls.signin).flashing("error" -> Messages("invalid.reset.link"))
@@ -39,7 +40,7 @@ class ResetPasswordController @Inject() (
    * @param token The token to identify a user.
    * @return The result to display.
    */
-  def submit(token: UUID) = UnsecuredAction.async { implicit request: MyRequest[AnyContent] =>
+  def submit(token: UUID) = UnsecuredAction.async { implicit request: AppRequest[AnyContent] =>
     authTokenService.validate(token).flatMap {
       case Some(authToken) =>
         ResetPasswordForm.form.bindFromRequest.fold(
