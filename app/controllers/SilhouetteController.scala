@@ -23,10 +23,10 @@ abstract class SilhouetteController[E <: Env](
   override protected val controllerComponents: SilhouetteControllerComponents[E])
   extends MessagesAbstractController(controllerComponents) with SilhouetteComponents[E] with Logging {
 
-  type SecuredEnvRequest[A] = SecuredRequest[EnvType, A]
-  type AppSecuredEnvRequest[A] = AppSecuredRequest[EnvType, A]
-  type UserAwareEnvRequest[A] = UserAwareRequest[EnvType, A]
-  type AppUserAwareEnvRequest[A] = AppUserAwareRequest[EnvType, A]
+  type SecuredEnvRequest[A] = SecuredRequest[E, A]
+  type AppSecuredEnvRequest[A] = AppSecuredRequest[E, A]
+  type UserAwareEnvRequest[A] = UserAwareRequest[E, A]
+  type AppUserAwareEnvRequest[A] = AppUserAwareRequest[E, A]
 
   /*
   * Abstract class to stop defining executionContext in every subclass
@@ -55,7 +55,7 @@ abstract class SilhouetteController[E <: Env](
    */
   class AppSecuredActionTransformer extends AbstractActionTransformer[SecuredEnvRequest, AppSecuredEnvRequest] {
     override protected def transform[A](request: SecuredEnvRequest[A]): Future[AppSecuredEnvRequest[A]] = {
-      Future.successful(new AppSecuredRequest[EnvType, A](
+      Future.successful(new AppSecuredRequest[E, A](
         messagesApi = controllerComponents.messagesApi,
         identity = request.identity,
         authenticator = request.authenticator,
@@ -69,7 +69,7 @@ abstract class SilhouetteController[E <: Env](
    */
   class AppUserAwareActionTransformer extends AbstractActionTransformer[UserAwareEnvRequest, AppUserAwareEnvRequest] {
     override protected def transform[A](request: UserAwareEnvRequest[A]): Future[AppUserAwareEnvRequest[A]] = {
-      Future.successful(new AppUserAwareRequest[EnvType, A](
+      Future.successful(new AppUserAwareRequest[E, A](
         messagesApi = controllerComponents.messagesApi,
         identity = request.identity,
         authenticator = request.authenticator,
@@ -91,7 +91,7 @@ abstract class SilhouetteController[E <: Env](
     silhouette.SecuredAction(errorHandler).andThen(appSecuredActionTransformer)
   }
 
-  def SecuredAction(authorization: Authorization[EnvType#I, EnvType#A]): ActionBuilder[AppSecuredEnvRequest, AnyContent] = {
+  def SecuredAction(authorization: Authorization[E#I, E#A]): ActionBuilder[AppSecuredEnvRequest, AnyContent] = {
     silhouette.SecuredAction(authorization).andThen(appSecuredActionTransformer)
   }
 
@@ -109,14 +109,12 @@ abstract class SilhouetteController[E <: Env](
   def totpProvider: GoogleTotpProvider = controllerComponents.totpProvider
   def avatarService: AvatarService = controllerComponents.avatarService
 
-  def silhouette: Silhouette[EnvType] = controllerComponents.silhouette
-  def authenticatorService: AuthenticatorService[EnvType#A] = silhouette.env.authenticatorService
+  def silhouette: Silhouette[E] = controllerComponents.silhouette
+  def authenticatorService: AuthenticatorService[E#A] = silhouette.env.authenticatorService
   def eventBus: EventBus = silhouette.env.eventBus
 }
 
 trait SilhouetteComponents[E <: Env] {
-  type EnvType = E
-
   def silhouette: Silhouette[E]
   def userService: UserService
   def authInfoRepository: AuthInfoRepository
@@ -134,7 +132,6 @@ trait SilhouetteComponents[E <: Env] {
 trait SilhouetteControllerComponents[E <: Env] extends MessagesControllerComponents with SilhouetteComponents[E]
 
 final case class DefaultSilhouetteControllerComponents[E <: Env] @Inject() (
-
   silhouette: Silhouette[E],
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
