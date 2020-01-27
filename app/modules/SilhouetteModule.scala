@@ -133,14 +133,16 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   def provideSocialProviderRegistry(
     facebookProvider: FacebookProvider,
     googleProvider: GoogleProvider,
-    vkProvider: VKProvider,
+    githubProvider: GitHubProvider,
     twitterProvider: TwitterProvider,
+    vkProvider: VKProvider,
     xingProvider: XingProvider,
     yahooProvider: YahooProvider): SocialProviderRegistry = {
 
     SocialProviderRegistry(Seq(
-      googleProvider,
       facebookProvider,
+      googleProvider,
+      githubProvider,
       twitterProvider,
       vkProvider,
       xingProvider,
@@ -229,12 +231,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   /**
    * Provides the auth info repository.
    *
-   * @param totpInfoDAO The implementation of the delegable totp auth info DAO.
-   * @param passwordInfoDAO The implementation of the delegable password auth info DAO.
-   * @param oauth1InfoDAO The implementation of the delegable OAuth1 auth info DAO.
-   * @param oauth2InfoDAO The implementation of the delegable OAuth2 auth info DAO.
-   * @param openIDInfoDAO The implementation of the delegable OpenID auth info DAO.
-   * @return The auth info repository instance.
+   * XXX This should be done the same way as HTTP filters.
    */
   @Provides
   def provideAuthInfoRepository(
@@ -243,7 +240,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
     openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]): AuthInfoRepository = {
-
     new DelegableAuthInfoRepository(totpInfoDAO, passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
   }
 
@@ -402,6 +398,13 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     configuration: Configuration): GoogleProvider = {
 
     new GoogleProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.google"))
+  }
+
+  @Provides
+  def provideGitHubProvider(httpLayer: HTTPLayer,
+                            socialStateHandler: SocialStateHandler,
+                            configuration: Configuration): GitHubProvider = {
+    new GitHubProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.github"))
   }
 
   /**
