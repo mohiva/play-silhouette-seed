@@ -17,7 +17,7 @@
             <legend>@messages("sign.in.totp.recovery")</legend>
             @helper.form(action = controllers.routes.TotpRecoveryController.submit()) {
                 @helper.CSRF.formField
-                @b4.text(totpRecoveryForm("recoveryCode"), '_hiddenLabel -> messages("totp.recovery.code"), 'placeholder -> messages("totp.recovery.code"), 'autocomplete -> "off", 'class -> "form-control input-lg")
+                @b4.text(totpRecoveryForm("recoveryCode"), Symbol("_hiddenLabel") -> messages("totp.recovery.code"), Symbol("placeholder") -> messages("totp.recovery.code"), Symbol("autocomplete") -> "off", Symbol("class") -> "form-control input-lg")
                 @b4.hidden(totpRecoveryForm("userID"))
                 @b4.hidden(totpRecoveryForm("sharedKey"))
                 @b4.hidden(totpRecoveryForm("rememberMe"))
