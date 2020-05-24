@@ -7,7 +7,8 @@ import com.mohiva.play.silhouette.impl.providers._
 import forms.{ SignInForm, TotpForm }
 import javax.inject.Inject
 import play.api.i18n.Messages
-import play.api.mvc.{ AnyContent, Request }
+import play.api.mvc.AnyContent
+import utils.auth.DefaultEnv
 import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -16,7 +17,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * The `Sign In` controller.
  */
 class SignInController @Inject() (
-  scc: SilhouetteControllerComponents,
+  scc: SilhouetteControllerComponents[DefaultEnv],
   signIn: views.html.signIn,
   activateAccount: views.html.activateAccount,
   totp: views.html.totp
@@ -27,7 +28,7 @@ class SignInController @Inject() (
    *
    * @return The result to display.
    */
-  def view = UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def view = UnsecuredAction.async { implicit request: AppRequest[AnyContent] =>
     Future.successful(Ok(signIn(SignInForm.form, socialProviderRegistry)))
   }
 
@@ -36,7 +37,7 @@ class SignInController @Inject() (
    *
    * @return The result to display.
    */
-  def submit = UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def submit = UnsecuredAction.async { implicit request: AppRequest[AnyContent] =>
     SignInForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(signIn(form, socialProviderRegistry))),
       data => {

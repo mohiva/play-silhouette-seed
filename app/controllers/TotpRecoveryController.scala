@@ -8,6 +8,7 @@ import com.mohiva.play.silhouette.impl.providers._
 import forms.TotpRecoveryForm
 import javax.inject.Inject
 import play.api.i18n.Messages
+import utils.auth.DefaultEnv
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -15,7 +16,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * The `TOTP` controller.
  */
 class TotpRecoveryController @Inject() (
-  scc: SilhouetteControllerComponents,
+  scc: SilhouetteControllerComponents[DefaultEnv],
   totpRecovery: views.html.totpRecovery
 )(implicit ex: ExecutionContext) extends AbstractAuthController(scc) {
 

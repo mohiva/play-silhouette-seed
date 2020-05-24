@@ -1,8 +1,8 @@
 package jobs
 
-import javax.inject.Inject
 import akka.actor._
 import com.mohiva.play.silhouette.api.util.Clock
+import javax.inject.Inject
 import jobs.AuthTokenCleaner.Clean
 import models.services.AuthTokenService
 import play.api.Logging

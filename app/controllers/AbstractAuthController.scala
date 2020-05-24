@@ -5,6 +5,7 @@ import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.services.AuthenticatorResult
 import models.User
 import play.api.mvc._
+import utils.auth.DefaultEnv
 import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -16,7 +17,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * @param ex The execution context.
  */
 abstract class AbstractAuthController(
-  scc: SilhouetteControllerComponents
+  scc: SilhouetteControllerComponents[DefaultEnv]
 )(implicit ex: ExecutionContext) extends SilhouetteController(scc) {
 
   /**

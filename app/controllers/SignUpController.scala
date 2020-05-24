@@ -9,7 +9,8 @@ import javax.inject.Inject
 import models.User
 import play.api.i18n.Messages
 import play.api.libs.mailer.Email
-import play.api.mvc.{ AnyContent, Request }
+import play.api.mvc.AnyContent
+import utils.auth.DefaultEnv
 import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -18,7 +19,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * The `Sign Up` controller.
  */
 class SignUpController @Inject() (
-  components: SilhouetteControllerComponents,
+  components: SilhouetteControllerComponents[DefaultEnv],
   signUp: views.html.signUp
 )(implicit ex: ExecutionContext) extends SilhouetteController(components) {
 
@@ -27,7 +28,7 @@ class SignUpController @Inject() (
    *
    * @return The result to display.
    */
-  def view = UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def view = UnsecuredAction.async { implicit request: AppRequest[AnyContent] =>
     Future.successful(Ok(signUp(SignUpForm.form)))
   }
 
@@ -36,7 +37,7 @@ class SignUpController @Inject() (
    *
    * @return The result to display.
    */
-  def submit = UnsecuredAction.async { implicit request: Request[AnyContent] =>
+  def submit = UnsecuredAction.async { implicit request: AppRequest[AnyContent] =>
     SignUpForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(signUp(form))),
       data => {

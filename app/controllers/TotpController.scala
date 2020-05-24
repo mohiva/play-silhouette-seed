@@ -7,6 +7,7 @@ import com.mohiva.play.silhouette.impl.providers._
 import forms.{ TotpForm, TotpSetupForm }
 import javax.inject.Inject
 import play.api.i18n.Messages
+import utils.auth.DefaultEnv
 import utils.route.Calls
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -15,7 +16,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  * The `TOTP` controller.
  */
 class TotpController @Inject() (
-  scc: SilhouetteControllerComponents,
+  scc: SilhouetteControllerComponents[DefaultEnv],
   totp: views.html.totp,
   home: views.html.home
 )(implicit ex: ExecutionContext) extends AbstractAuthController(scc) {
